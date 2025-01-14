@@ -1,12 +1,11 @@
 package com.bartovapps.gpstriprec;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 public class GpsRecLicense extends AppCompatActivity {
 
@@ -17,8 +16,8 @@ public class GpsRecLicense extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.googlemap_license);
-        tvLicense = (TextView) findViewById(R.id.gps_license_text);
-        toolbar = (Toolbar)findViewById(R.id.app_bar);
+        tvLicense = findViewById(R.id.gps_license_text);
+        toolbar = findViewById(R.id.app_bar);
         try {
             setSupportActionBar(toolbar);
         } catch (Throwable t) {

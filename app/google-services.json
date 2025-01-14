@@ -1,40 +1,26 @@
 {
   "project_info": {
-    "project_number": "741977047932",
-    "project_id": "bartovgpsrecorder"
+    "project_number": "1081731166036",
+    "project_id": "gps-trip-recorder",
+    "storage_bucket": "gps-trip-recorder.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:741977047932:android:b6d7c5acfb862150",
+        "mobilesdk_app_id": "1:1081731166036:android:ff1bea8817edb86aa6a2c1",
         "android_client_info": {
           "package_name": "com.bartovapps.gpstriprec"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "741977047932-jedk2tus9060up4c1cau866i8i0it5nh.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCLaNmh46uATmAnx_hlR6_cVAoWDGKnLGE"
+          "current_key": "AIzaSyB8fMeJII4dIvHgM-mebOs_e9JPJh2r-I0"
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 2,
-          "analytics_property": {
-            "tracking_id": "UA-61059507-1"
-          }
-        },
         "appinvite_service": {
-          "status": 1,
           "other_platform_oauth_client": []
-        },
-        "ads_service": {
-          "status": 1
         }
       }
     }

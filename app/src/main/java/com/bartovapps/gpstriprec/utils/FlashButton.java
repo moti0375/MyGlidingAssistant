@@ -1,11 +1,11 @@
 package com.bartovapps.gpstriprec.utils;
 
 import android.content.Context;
-import android.support.design.widget.FloatingActionButton;
 import android.util.AttributeSet;
 import android.view.View;
 
 import com.bartovapps.gpstriprec.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class FlashButton extends FloatingActionButton {
 

@@ -1,16 +1,16 @@
 package com.bartovapps.gpstriprec;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.bartovapps.gpstriprec.trip.TripManager;
 import com.bartovapps.gpstriprec.utils.Utils;

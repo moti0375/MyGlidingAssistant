@@ -4,10 +4,6 @@
     package="com.bartovapps.gpstriprec"
     android:installLocation="preferExternal">
 
-    <uses-sdk
-        android:minSdkVersion="14"
-        android:targetSdkVersion="21" />
-
     <permission
         android:name="com.bartovapps.gpstriprec.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
@@ -46,7 +42,7 @@
         <activity
             android:name=".SplashScreen"
             android:clearTaskOnLaunch="false"
-            android:label="@string/app_name"
+            android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -69,7 +65,8 @@
                 <data
                     android:mimeType="@string/kml_mime_type"
                     android:pathPattern=".*\\.kml"
-                    android:scheme="file" />
+                    android:scheme="file"
+                    android:host="file://"/>
 
                 <action android:name="android.intent.action.VIEW" />
 
@@ -109,8 +106,8 @@
         <activity
             android:name=".GpsRecMain"
             android:alwaysRetainTaskState="true"
+            android:exported="true"
             android:configChanges="orientation|screenSize"
-            android:label="@string/app_name"
             android:launchMode="singleTask"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -120,7 +117,8 @@
         <activity
             android:name=".GpsRecTripsList"
             android:label="@string/RecordedTrips"
-            android:screenOrientation="portrait"
+            android:screenOrientation="sensorPortrait"
+            android:exported="true"
             android:theme="@style/ListViewTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -132,7 +130,7 @@
         </activity>
         <activity
             android:name=".TripDetailsActivity"
-            android:label="@string/app_name"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
@@ -141,7 +139,7 @@
         </activity>
         <activity
             android:name=".GpsRecLicense"
-            android:label="@string/app_name"
+            android:exported="true"
             android:parentActivityName=".GpsRecMain"
             android:screenOrientation="landscape">
             <meta-data
@@ -165,6 +163,9 @@
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
 
+
+
+
         <activity
             android:name=".GpsTripRecGallery"
             android:label="@string/title_activity_gps_trip_rec_gallery"
@@ -184,11 +185,10 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="@string/google_maps_key" />
-
+            android:value="AIzaSyDuwHHcd5mrZcQzvXvWgU_L6jXFNye0yIU"/>
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
+            android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
             android:exported="false"
             android:grantUriPermissions="true">

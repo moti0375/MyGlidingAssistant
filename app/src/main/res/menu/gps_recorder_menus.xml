@@ -7,7 +7,7 @@
         android:orderInCategory="90"
         android:icon="@drawable/ic_action_volume_on"
         android:title="@string/StartMusicPlayer"
-        app:showAsAction="always"/>
+        app:showAsAction="ifRoom" />
     
     <item
         android:id="@+id/action_license"

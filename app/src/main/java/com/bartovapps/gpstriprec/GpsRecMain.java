@@ -29,10 +29,6 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -44,6 +40,10 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 
 import com.bartovapps.gpstriprec.db.TripsDataSource;
 import com.bartovapps.gpstriprec.displayers.DataDisplayer;
@@ -72,13 +72,14 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
-//import android.util.Log;
+import com.bartovapps.gpstriprec.R;
 
 public class GpsRecMain extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
@@ -162,7 +163,7 @@ public class GpsRecMain extends AppCompatActivity implements GoogleApiClient.Con
     boolean serviceBounded = false;
     Intent serviceIntent;
 
-    MapFragment mapFrag;
+    SupportMapFragment mapFrag;
 
     //File variable is static. This helps to prevent null pointer exceptions when return from camera intent.
     //This may occure if image was taken in landscape and phone was rotated back to portrait before returning to this Activity,
@@ -317,15 +318,15 @@ public class GpsRecMain extends AppCompatActivity implements GoogleApiClient.Con
         // Typeface typeFace = Typeface.createFromAsset(getAssets(),
         // "fonts/Digit01.ttf");
 
-        tvSpeed = (TextView) findViewById(R.id.tvSpeed);
-        tvDistance = (TextView) findViewById(R.id.tvDistance);
-        tvTimer = (TextView) findViewById(R.id.tvTimer);
-        tvAltitude = (TextView) findViewById(R.id.tvAltitude);
+        tvSpeed =  findViewById(R.id.tvSpeed);
+        tvDistance =  findViewById(R.id.tvDistance);
+        tvTimer =  findViewById(R.id.tvTimer);
+        tvAltitude =  findViewById(R.id.tvAltitude);
 
 
         //btStartStop = (ToggleButton) findViewById(R.id.btStartStop);
-        fabStartStop = (FloatingActionButton) findViewById(R.id.fabStartStop);
-        fabStartCamera = (FloatingActionButton) findViewById(R.id.fabCamera);
+        fabStartStop = findViewById(R.id.fabStartStop);
+        fabStartCamera =  findViewById(R.id.fabCamera);
 
 
         // tvSpeed.setTypeface(typeFace);
@@ -640,7 +641,6 @@ public class GpsRecMain extends AppCompatActivity implements GoogleApiClient.Con
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-
             case R.id.action_trips:
                 Intent tripListIntent = new Intent(this, GpsRecTripsList.class);
                 startActivityForResult(tripListIntent,
@@ -781,8 +781,7 @@ public class GpsRecMain extends AppCompatActivity implements GoogleApiClient.Con
         if (mMap == null && isServicesOk) {
             Log.i(TAG, "setUpMapIfNeeded: initializing map");
 
-            mapFrag = (MapFragment) getFragmentManager()
-                    .findFragmentById(R.id.map);
+            mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
             // Check if we were successful in obtaining the map.
             mapFrag.getMapAsync(this);
         }

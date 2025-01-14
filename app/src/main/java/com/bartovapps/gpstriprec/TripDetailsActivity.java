@@ -19,14 +19,15 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.bartovapps.gpstriprec.db.TripsDBOpenHelper;
 import com.bartovapps.gpstriprec.db.TripsDataSource;
@@ -213,13 +214,6 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.trip_details_menu, menu);
         return true;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == GALLERY_ACTIVITY_REQ) {
-//            Toast.makeText(TripDetailsActivity.this, "Returned from gallery", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void updatePreferences() {

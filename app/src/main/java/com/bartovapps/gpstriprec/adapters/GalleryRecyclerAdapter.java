@@ -2,13 +2,14 @@ package com.bartovapps.gpstriprec.adapters;
 
 import android.app.Activity;
 import android.net.Uri;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bartovapps.gpstriprec.R;
 import com.squareup.picasso.Picasso;

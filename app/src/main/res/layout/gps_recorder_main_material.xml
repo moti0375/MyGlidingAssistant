@@ -17,11 +17,11 @@
         android:layout_height="match_parent"
         android:background="@drawable/map_background">
 
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            class="com.google.android.gms.maps.MapFragment" />
+            android:name="com.google.android.gms.maps.SupportMapFragment" />
     </FrameLayout>
 
     <LinearLayout
@@ -96,7 +96,8 @@
 
     </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:contentDescription="Start Stop Trip"
         android:id="@+id/fabCamera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -108,7 +109,7 @@
         android:visibility="invisible"/>
 
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabStartStop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -116,7 +117,8 @@
         android:layout_above="@+id/tvAltitude"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_action_new" />
+        android:src="@drawable/ic_action_new"
+        android:contentDescription="Start Stop Trip"/>
 
     <TextView
         android:id="@+id/tvAltitude"

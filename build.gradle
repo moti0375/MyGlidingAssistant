@@ -8,8 +8,8 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
-        classpath 'com.google.gms:google-services:3.1.0'
+        classpath 'com.android.tools.build:gradle:8.5.1'
+        classpath 'com.google.gms:google-services:4.4.2'
     }
 }
 
@@ -23,14 +23,15 @@ allprojects {
 
     project.ext {
         // Sdk and tools
-        minSdkVersion = 16
-        targetSdkVersion = 26
-        compileSdkVersion = 26
+        minSdkVersion = 24
+        targetSdkVersion = 34
+        compileSdkVersion = 34
 
         // App dependencies
-        supportLibraryVersion = '26.1.0'
-        constraintLayout = '1.0.2'
-        googleApisVersion = '11.8.0'
+        supportLibraryVersion = '28.0.0'
+        constraintLayout = '2.2.0'
+        gmsLocationVersion = '21.3.0'
+        googleMapsVersion = "19.0.0"
         guavaVersion = '23.0-android'
         glideVersion = '3.6.1'
         picassoVersion = '2.5.2'
