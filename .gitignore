@@ -6,6 +6,7 @@
 /build
 /captures
 .externalNativeBuild
-.gitignore
 app/build/
 app/src/main/res/values-v17/
+app/google-services.json
+app_local.properties

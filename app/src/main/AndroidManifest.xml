@@ -16,6 +16,9 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
     <uses-permission
@@ -157,14 +160,13 @@
                 android:value=".GpsRecMain" />
         </activity>
 
-        <service android:name=".services.GpsTripRecService" />
+        <service android:name=".services.GpsTripRecService"
+            android:foregroundServiceType="location"
+            android:exported="false"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
-
-
 
         <activity
             android:name=".GpsTripRecGallery"
@@ -185,7 +187,7 @@
         -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyDuwHHcd5mrZcQzvXvWgU_L6jXFNye0yIU"/>
+            android:value="${googleMapsApiKey}"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

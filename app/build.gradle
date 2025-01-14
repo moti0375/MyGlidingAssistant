@@ -1,5 +1,12 @@
 apply plugin: 'com.android.application'
 
+def localPropertiesFile = file("app_local.properties")
+def appLocalProperties = new Properties()
+
+if (localPropertiesFile.exists()) {
+    appLocalProperties.load(new FileInputStream(localPropertiesFile))
+}
+
 android {
     compileSdk project.ext.compileSdkVersion
 
@@ -9,6 +16,7 @@ android {
         targetSdkVersion project.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+        manifestPlaceholders = [googleMapsApiKey: appLocalProperties.getProperty("GOOGLE_MAPS_API_KEY") ?: ""]
     }
 
     namespace "com.bartovapps.gpstriprec"
