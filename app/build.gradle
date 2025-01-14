@@ -1,10 +1,13 @@
 apply plugin: 'com.android.application'
 
-def localPropertiesFile = file("app_local.properties")
+def localPropertiesFile = file("../app_local.properties")
 def appLocalProperties = new Properties()
 
 if (localPropertiesFile.exists()) {
     appLocalProperties.load(new FileInputStream(localPropertiesFile))
+    print("appLocalProperties: $appLocalProperties" )
+} else {
+    print("localPropertiesFile not found" )
 }
 
 android {
