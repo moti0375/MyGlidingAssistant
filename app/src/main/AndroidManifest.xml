@@ -137,7 +137,7 @@
             android:name=".GpsRecLicense"
             android:exported="false"
             android:parentActivityName=".GpsRecMain"
-            android:screenOrientation="landscape">
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".GpsRecMain" />
