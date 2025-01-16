@@ -11,7 +11,6 @@ import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
-import com.bartovapps.gpstriprec.R;
 import com.bartovapps.gpstriprec.db.TripsDataSource;
 import com.bartovapps.gpstriprec.enums.MovementState;
 import com.bartovapps.gpstriprec.enums.SaveStatus;
@@ -46,7 +45,7 @@ public class TripManager {
     /**
      * The calculated distance
      */
-    Activity activity;
+    Context context;
     private float distance = 0;
     private float portionLength[] = new float[3];
     private float ACCURACY = 25;
@@ -78,18 +77,14 @@ public class TripManager {
     static List<Address> list;
     private Trip uploadedTrip;
     private List<ImageMarker> imageMarkers;
-
-    private static final String EXTERNAL_STORAGE_DIR = Environment.getExternalStorageDirectory().toString();
     public static final String TRIPS_DIR = "/GpsRecorder/trips";
     public static final String MAP_IMAGES_DIR = "/mapImages";
 
-    public static final String PROJ_ROOT_DIR = EXTERNAL_STORAGE_DIR + TRIPS_DIR;
-
-    public TripManager(Activity activity, float accuracy, double speedFilter,
+    public TripManager(Context context, float accuracy, double speedFilter,
                        MapHelper helper, TripsDataSource datasource, TimerManager timer) {
         this.ACCURACY = accuracy;
         SPEED_FILTER = speedFilter;
-        this.activity = activity;
+        this.context = context;
         this.mapHelper = helper;
         this.markplace = new StringBuilder();
         this.datasource = datasource;
@@ -288,13 +283,10 @@ public class TripManager {
 
         if (latLngList.size() > 1) {
             mapHelper.viewRoute(latLngList);
-            KmlCreator kmlHelper = new KmlCreator(activity);
+            KmlCreator kmlHelper = new KmlCreator(context);
             kmlHelper.openRawDocument();
             long timestamp = System.currentTimeMillis();
-            String root = Environment.getExternalStorageDirectory().toString();
-            String projectDir = activity.getResources().getString(R.string.projectRootDir);
-            String mapImageFile = PROJ_ROOT_DIR + MAP_IMAGES_DIR + "/" + "trip_" + timestamp + ".jpeg";
-
+            String mapImageFile = context.getExternalFilesDir(null) + MAP_IMAGES_DIR + "/" + "trip_" + timestamp + ".jpeg";
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy 'at' HH:mm");
 
             String date = sdf.format(new Date(System.currentTimeMillis()));
@@ -498,7 +490,7 @@ public class TripManager {
         mapHelper.clearEverything();
         mapHelper.overlayRoute(latLngList, 10, Color.CYAN);
         for (ImageMarker marker : imageMarkers) {
-            mapHelper.addImageMarker(marker, activity);
+            mapHelper.addImageMarker(marker, context);
         }
         mapHelper.viewRoute(latLngList);
         return kml_status;
@@ -507,14 +499,14 @@ public class TripManager {
     public void addImageMarker(Uri markerUri) throws Exception {
         ImageMarker imageMarker = new ImageMarker(markerUri, currentLocation.getLatitude(), currentLocation.getLongitude());
         imageMarkers.add(imageMarker);
-        mapHelper.addImageMarker(imageMarker, activity);
+        mapHelper.addImageMarker(imageMarker, context);
 //        Log.i(LOG_TAG, imageMarkers.size() + " ImageMarkers for this trip");
     }
 
     public void addImageMarker(Uri markerUri, Location location) {
         ImageMarker imageMarker = new ImageMarker(markerUri, location.getLatitude(), location.getLongitude());
         imageMarkers.add(imageMarker);
-        mapHelper.addImageMarker(imageMarker, activity);
+        mapHelper.addImageMarker(imageMarker, context);
 //        Log.i(LOG_TAG, imageMarkers.size() + " ImageMarkers for this trip");
     }
 

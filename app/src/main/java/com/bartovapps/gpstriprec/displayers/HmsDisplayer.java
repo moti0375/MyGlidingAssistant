@@ -2,7 +2,7 @@ package com.bartovapps.gpstriprec.displayers;
 
 import android.widget.TextView;
 
-public class HmsDisplayer implements TimeDisplayer{
+public class HmsDisplayer implements TimeDisplayer {
 
 	int seconds;
 	int minutes;

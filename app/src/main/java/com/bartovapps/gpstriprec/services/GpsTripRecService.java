@@ -14,7 +14,6 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
 import com.bartovapps.gpstriprec.GpsRecMain;
 import com.bartovapps.gpstriprec.R;

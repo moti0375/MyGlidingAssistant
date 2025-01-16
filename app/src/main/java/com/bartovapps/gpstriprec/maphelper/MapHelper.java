@@ -41,6 +41,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 //import android.util.Log;
@@ -376,7 +377,7 @@ public class MapHelper {
         setZoom(this.zoom + CAMERA_LONGSHOT_RAT);
     }
 
-    public void viewRoute(final ArrayList<LatLng> list) {
+    public void viewRoute(final List<LatLng> list) {
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
         for (LatLng location : list) {
@@ -386,13 +387,7 @@ public class MapHelper {
         final CameraUpdate update = CameraUpdateFactory.newLatLngBounds(
                 tmpBounds, 100);
 
-        activity.runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                mMap.moveCamera(update);
-            }
-        });
+        activity.runOnUiThread(() -> mMap.moveCamera(update));
 
         try {
             Thread.sleep(3000);
@@ -404,13 +399,14 @@ public class MapHelper {
 
     public void saveMapAsImage(final Activity activity, final long tripId) {
 
+        Log.i("MapHelper", "saveMapAsImage: ");
         long timestamp = System.currentTimeMillis();
 
         String root = Environment.getExternalStorageDirectory().toString();
         String projectDir = activity.getApplicationContext().getResources()
                 .getString(com.bartovapps.gpstriprec.R.string.projectRootDir);
 
-        if (Utils.checkExternalStorageState() == true) {
+        if (Utils.checkExternalStorageState()) {
             final File fileDir = new File(root + "/" + projectDir
                     + "/mapImages");
 
@@ -420,35 +416,29 @@ public class MapHelper {
 
             final String fileName = fileDir + "/trip_" + timestamp + ".jpeg";
 
-            SnapshotReadyCallback callback = new SnapshotReadyCallback() {
-
-                @Override
-                public void onSnapshotReady(Bitmap snapshot) {
-                    // TODO Auto-generated method stub
-                    try {
-                        FileOutputStream out = new FileOutputStream(fileName);
-                        snapshot = Bitmap.createScaledBitmap(snapshot, 500,
-                                500, false);
-                        snapshot.compress(Bitmap.CompressFormat.JPEG, 50, out);
-                        snapshot.recycle();
-                        snapshot = null;
-                        System.gc();
-                        TripsDataSource database = new TripsDataSource(activity);
-                        database.open();
-                        database.updateTripData(tripId,
-                                TripsDBOpenHelper.COLUMN_MAP_IMAGE, fileName);
-                        database.close();
-                        out.flush();
-                        out.close();
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+            SnapshotReadyCallback callback = snapshot -> {
+                try {
+                    FileOutputStream out = new FileOutputStream(fileName);
+                    snapshot = Bitmap.createScaledBitmap(snapshot, 500,
+                            500, false);
+                    snapshot.compress(Bitmap.CompressFormat.JPEG, 50, out);
+                    snapshot.recycle();
+                    TripsDataSource database = new TripsDataSource(activity);
+                    database.open();
+                    database.updateTripData(tripId,
+                            TripsDBOpenHelper.COLUMN_MAP_IMAGE, fileName);
+                    database.close();
+                    out.flush();
+                    out.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e("MapHelper", "There was an exception: " +e.getMessage());
                 }
-
             };
 
             mMap.snapshot(callback);
+        } else {
+            Log.i("MapHelper", "checkExternalStorageState false");
         }
     }
 
@@ -470,19 +460,26 @@ public class MapHelper {
 
                 @Override
                 public void onSnapshotReady(Bitmap snapshot) {
-                    // TODO Auto-generated method stub
+                    FileOutputStream out = null;
                     try {
-                        FileOutputStream out = new FileOutputStream(fileName);
+                         out = new FileOutputStream(fileName);
                         snapshot = Bitmap.createScaledBitmap(snapshot, 500,
                                 500, false);
                         snapshot.compress(Bitmap.CompressFormat.JPEG, 50, out);
                         snapshot.recycle();
                         snapshot = null;
                         System.gc();
-                        out.flush();
-                        out.close();
                     } catch (Exception e) {
                         e.printStackTrace();
+
+                        try {
+                            if(out != null){
+                                out.flush();
+                                out.close();
+                            }
+                        }catch (Exception finallyException){
+                            finallyException.printStackTrace();
+                        }
                     }
                 }
 

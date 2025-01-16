@@ -61,15 +61,11 @@ public class Utils {
 			Dialog dialog = GooglePlayServicesUtil.getErrorDialog(isAvailable,
 					activity, GPS_ERROR_DIALOG_REQUEST);
 			dialog.show();
-			dialog.setOnDismissListener(new OnDismissListener() {
-				
-				@Override
-				public void onDismiss(DialogInterface dialog) {
-					Toast.makeText(activity.getApplicationContext(), "Update Google Play Services and try again..",
-							Toast.LENGTH_SHORT).show();
-					activity.finish();
-				}
-			});
+			dialog.setOnDismissListener(dialog1 -> {
+                Toast.makeText(activity.getApplicationContext(), "Update Google Play Services and try again..",
+                        Toast.LENGTH_SHORT).show();
+                activity.finish();
+            });
 			
 		} else {
 			Toast.makeText(activity.getApplicationContext(), "Can't connect to Google Play Services",
@@ -81,12 +77,8 @@ public class Utils {
 	
 	public static boolean checkExternalStorageState(){
 		String state = Environment.getExternalStorageState();
-		
-		if (state.equals(Environment.MEDIA_MOUNTED)) {
-			return true;
-		} 
-		return false;
-	}
+        return state.equals(Environment.MEDIA_MOUNTED);
+    }
 	
 	public static boolean isPackageInstalled(String packageName, Context context) {
 		 PackageManager pm = context.getPackageManager();

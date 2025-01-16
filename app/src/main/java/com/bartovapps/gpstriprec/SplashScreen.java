@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bartovapps.gpstriprec.trip.TripManager;
 import com.bartovapps.gpstriprec.utils.Utils;
+import com.squareup.picasso.Picasso;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -42,25 +43,17 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
         i = new Intent(SplashScreen.this, GpsRecMain.class);
-        attachmentFile = TripManager.PROJ_ROOT_DIR + "/" + "attachment.kml";
-
-        File dirs = new File(TripManager.PROJ_ROOT_DIR);
-        if(!dirs.exists()){
-            dirs.mkdirs();
-        }
-
-
-        tvVersion = (TextView) findViewById(R.id.tvAppVertion);
+        attachmentFile = getExternalFilesDir(null) + "/" + "attachment.kml";
+        tvVersion = findViewById(R.id.tvAppVertion);
         version = Utils.getApplicationVersion(SplashScreen.this);
-        iv = (ImageView) findViewById(R.id.splashImage);
+        iv = findViewById(R.id.splashImage);
 
 
-        // Loads given image
-//        Picasso.with(iv.getContext())
-//                .load(R.drawable.splash_image)
-//                .fit()
-//                .centerInside()
-//                .into(iv);
+        Picasso.with(iv.getContext())
+                .load(R.drawable.splash_image)
+                .fit()
+                .centerInside()
+                .into(iv);
 
         new Handler().postDelayed(new Runnable() {
 

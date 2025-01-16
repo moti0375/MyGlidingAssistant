@@ -1,7 +1,12 @@
 package com.bartovapps.gpstriprec.kmlhleper;
 
+import static com.bartovapps.gpstriprec.trip.TripManager.TRIPS_DIR;
+
 import android.app.Activity;
+import android.content.Context;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.util.Log;
 
 import com.bartovapps.gpstriprec.R;
 import com.bartovapps.gpstriprec.trip.TripManager;
@@ -30,15 +35,15 @@ public class KmlCreator {
 	private static final String KML_NS = "http://www.opengis.net/kml/2.2";
 	// File xmlFile = new File("/sdcard/route.kml");
 
-	Activity activity;
+	Context context;
 	private InputStream stream;
 	private SAXBuilder builder;
 	private Document doc;
 	private Element rootNode;
 
-	public KmlCreator(Activity activity) {
-		this.activity = activity;
-		this.stream = activity.getResources().openRawResource(R.raw.trip_raw);
+	public KmlCreator(Context context) {
+		this.context = context;
+		this.stream = context.getResources().openRawResource(R.raw.trip_raw);
 		builder = new SAXBuilder();
 		// Log.i(LOG_TAG, "KML Helper created");
 	}
@@ -196,24 +201,21 @@ public class KmlCreator {
 
 		long timestamp = System.currentTimeMillis();
 
-		String root = Environment.getExternalStorageDirectory().toString();
-		if (Utils.checkExternalStorageState() == true) {
-			File fileDir = new File(TripManager.PROJ_ROOT_DIR);
+		if (Utils.checkExternalStorageState()) {
+			File fileDir = new File(context.getExternalFilesDir(null).getPath() + TRIPS_DIR );
 
 			if (!fileDir.exists()) {
-				fileDir.mkdirs();
+				boolean mkdirs = fileDir.mkdirs();
+				Log.i("KmlCreator", "fileDir make dir result: " + mkdirs);
 			}
 
 			String fileName = "/trip_" + timestamp + ".kml";
 
 			File kmlFile = new File(fileDir, fileName);
 
-//			Log.i(LOG_TAG, "File name: " + kmlFile.toString());
-
 			XMLOutputter xmlOutput = new XMLOutputter();
 			xmlOutput.setFormat(Format.getPrettyFormat());
 
-			
 			try {
 				FileWriter fr = new FileWriter(kmlFile);
 				xmlOutput.output(doc, fr);
