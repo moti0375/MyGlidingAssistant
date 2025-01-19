@@ -11,12 +11,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
-import android.content.IntentSender.SendIntentException;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.graphics.Color;
 
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -28,7 +28,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -37,7 +36,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,16 +58,13 @@ import com.bartovapps.gpstriprec.enums.AltUnits;
 import com.bartovapps.gpstriprec.enums.RecordingState;
 import com.bartovapps.gpstriprec.enums.SaveStatus;
 import com.bartovapps.gpstriprec.enums.Units;
+import com.bartovapps.gpstriprec.kmlhleper.KmlManager;
 import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
 import com.bartovapps.gpstriprec.maphelper.MapHelper;
 import com.bartovapps.gpstriprec.services.GpsTripRecService;
 import com.bartovapps.gpstriprec.timer.TimerManager;
-import com.bartovapps.gpstriprec.trip.Trip;
-import com.bartovapps.gpstriprec.trip.TripManager;
 import com.bartovapps.gpstriprec.utils.Utils;
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -80,15 +75,16 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import core.trip_manager.TripManagerImpl;
+import data.model.Trip;
+
 public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
     private static final String TAG = GpsRecMain.class.getSimpleName();
     private static final int TRIP_LIST_ACTIVITY = 100;
     private static final int CAMERA_INTENT_ACTIVITY = 200;
     private static final long TIME_INTERVAL = 2000;
 
-    private static final float SPEED_FILTER = 0.832f; // 0.833 < 3km/h
-    private static final float ACCURACY = 25.0f; // Accuracy of 25 meters
-    private static final int NEW_TRIP = 1;
+     private static final int NEW_TRIP = 1;
     private static final int CONTINUE_TRIP = 2;
     private static final int FOLLOW_TRIP = 3;
     private static final int LOADED_FROM_INTENT = 4;
@@ -118,7 +114,7 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
     private FloatingActionButton fabStartStop;
     private FloatingActionButton fabStartCamera;
 
-    private TripManager routeManager;
+    private core.trip_manager.TripManager routeManager;
     private TripsDataSource datasource;
     private DataDisplayer speedDisplayer;
     private DataDisplayer distanceDisplayer;
@@ -395,8 +391,6 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
 
         uploadedTrip = null;
         stopService();
-
-        //locationClient.disconnect();
     }
 
     @Override
@@ -527,23 +521,18 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
         return true;
     }
 
-    LocationListener trackLocationListener = new LocationListener() {
-
-        @Override
-        public void onLocationChanged(@NonNull Location location) {
-            routeManager.updateLocation(location);
-            updateDisplay();
-        }
+    LocationListener trackLocationListener = location -> {
+        routeManager.updateLocation(location);
     };
 
     protected void updateDisplay() {
-        speedDisplayer.displayData(tvSpeed, routeManager.getSpeed());
-        distanceDisplayer.displayData(tvDistance, routeManager.getDistance());
-        altitudeDisplayer.displayData(tvAltitude, routeManager.getAltitude());
-
-        if (recordingService != null && serviceBounded) {
-            recordingService.updateService(routeManager.getDistance());
-        }
+//        speedDisplayer.displayData(tvSpeed, routeManager.getSpeed());
+//        distanceDisplayer.displayData(tvDistance, routeManager.getDistance());
+//        altitudeDisplayer.displayData(tvAltitude, routeManager.getAltitude());
+//
+//        if (recordingService != null && serviceBounded) {
+//            recordingService.updateService(routeManager.getDistance());
+//        }
 
     }
 
@@ -651,9 +640,7 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
         mapHelper = new MapHelper(mMap, CAM_INIT_ZOOM, lineColor, mapType,
                 handler, this);
         mapHelper.setLineWidth(lineWidth);
-        routeManager = new TripManager(GpsRecMain.this, ACCURACY,
-                SPEED_FILTER, mapHelper, datasource, timerManager);
-
+        routeManager = new TripManagerImpl(this , mapHelper, datasource, timerManager, new KmlManager(this), new Geocoder(this));
         moveMapToInitialPosition();
     }
 
@@ -667,10 +654,11 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
         }
 
         if (path != null) { //this means that app started by tap on kml file!
-            uploadedTrip = new Trip(path, null, 0, 0);
-            UploadTripTask uploadTripTask = new UploadTripTask();
-            uploadTripTask.execute(uploadedTrip);
-            recordingMode = LOADED_FROM_INTENT;
+            //Todo refactor trip uploading
+//            uploadedTrip = new Trip(path, null, 0, 0);
+//            UploadTripTask uploadTripTask = new UploadTripTask();
+//            uploadTripTask.execute(uploadedTrip);
+//            recordingMode = LOADED_FROM_INTENT;
         } else {
             moveToLastKnownLocation();
         }
@@ -796,7 +784,7 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
         super.onActivityResult(requestCode, resultCode, data);
         // Check which request we're responding to
         if (requestCode == TRIP_LIST_ACTIVITY && resultCode == RESULT_OK && data.hasExtra("UploadedTrip")) {
-                uploadedTrip = (Trip) data.getSerializableExtra("UploadedTrip");
+               // uploadedTrip = (Trip) data.getSerializableExtra("UploadedTrip");
                 if (uploadedTrip != null) {
                     if (recordingState == RecordingState.Idle) {
                         new UploadTripTask().execute(uploadedTrip);
@@ -820,7 +808,6 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
     }
 
     private class UploadTripTask extends AsyncTask<Trip, Void, String> {
-
         @Override
         protected void onPreExecute() {
             loadingTripPd = new ProgressDialog(GpsRecMain.this);

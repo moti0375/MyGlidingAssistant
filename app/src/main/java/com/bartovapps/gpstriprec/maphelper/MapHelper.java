@@ -15,7 +15,9 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -39,7 +41,6 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,12 +69,13 @@ public class MapHelper {
     private LatLng latLng;
     private float bearing;
     private Handler handler;
-    private Activity activity;
+    private final Context context;
 
-    final private Map<String, ImageMarker> markersIdsMap;
+    private final Map<String, ImageMarker> markersIdsMap;
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     public MapHelper(GoogleMap map, float mapZoom, int color, int mapType,
-                     Handler handler, Activity activity) {
+                     Handler handler, Context context) {
         this.mMap = map;
 
         // this.zoom = mapZoom;
@@ -81,7 +83,7 @@ public class MapHelper {
         setLineColor(color);
         setMapType(mapType);
        // this.handler = handler;
-        this.activity = activity;
+        this.context = context;
         markersIdsMap = new LinkedHashMap<>();
         initMap();
 
@@ -91,7 +93,7 @@ public class MapHelper {
         clearEverything();
         CameraUpdate update = CameraUpdateFactory.zoomBy(this.zoom);
         mMap.moveCamera(update);
-        mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter());
+        //mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(null));
 
     }
 
@@ -149,18 +151,12 @@ public class MapHelper {
 
 
     public void addImageMarker(final ImageMarker imageMarker, final Context context) {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                LatLng ll = new LatLng(imageMarker.getLatitude(), imageMarker.getLongitude());
-                Marker marker = mMap.addMarker(new MarkerOptions().position(ll)
-                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).snippet("" + ll.latitude + "," + ll.longitude).title(context.getString(R.string.app_name)));
-                markersIdsMap.put(marker.getId(), imageMarker);
-
-            }
+        handler.post(() -> {
+            LatLng ll = new LatLng(imageMarker.getLatitude(), imageMarker.getLongitude());
+            Marker marker = mMap.addMarker(new MarkerOptions().position(ll)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).snippet("" + ll.latitude + "," + ll.longitude).title(context.getString(R.string.app_name)));
+            markersIdsMap.put(marker.getId(), imageMarker);
         });
-
     }
 
     public void clearMarkers() {
@@ -190,30 +186,27 @@ public class MapHelper {
     }
 
     public void clearEverything() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (marker != null) {
-                    marker.remove();
-                }
-                if (startMarker != null) {
-                    startMarker.remove();
-                    startMarker = null;
-                }
-                if (lastMarker != null) {
-                    lastMarker.remove();
-                    lastMarker = null;
-                }
-
-                if (line != null) {
-                    line.remove();
-                    line = null;
-                }
-                if (markersIdsMap != null) {
-                    markersIdsMap.clear();
-                }
-                mMap.clear();
+        handler.post(() -> {
+            if (marker != null) {
+                marker.remove();
             }
+            if (startMarker != null) {
+                startMarker.remove();
+                startMarker = null;
+            }
+            if (lastMarker != null) {
+                lastMarker.remove();
+                lastMarker = null;
+            }
+
+            if (line != null) {
+                line.remove();
+                line = null;
+            }
+            if (markersIdsMap != null) {
+                markersIdsMap.clear();
+            }
+            mMap.clear();
         });
 
     }
@@ -257,7 +250,7 @@ public class MapHelper {
 //    }
 
     //This method is used when uploading a trip in the details Activity
-    public void overlayRoute(final ArrayList<LatLng> list) {
+    public void overlayRoute(final List<LatLng> list) {
 
         final PolylineOptions options = new PolylineOptions()
                 .width(lineWidth).color(MapHelper.this.lineColor);
@@ -273,45 +266,36 @@ public class MapHelper {
                 tmpBounds, MAP_PADDING);
 
         Log.i(LOG_TAG, "About to overlay route..");
-        activity.runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                addMarker(list.get(0));
-                addMarker(list.get(list.size() - 1));
-                line = mMap.addPolyline(options);
-                mMap.moveCamera(update);
-            }
+        handler.post(() -> {
+            addMarker(list.get(0));
+            addMarker(list.get(list.size() - 1));
+            line = mMap.addPolyline(options);
+            mMap.moveCamera(update);
         });
     }
 
     //This method is called when upload a trip to main screen, color is given as
-    public void overlayRoute(final ArrayList<LatLng> list, final float zoom, final int color) {
+    public void overlayRoute(final List<LatLng> list, final float zoom, final int color) {
+        handler.post(() -> {
+            PolylineOptions options = new PolylineOptions()
+                    .width(lineWidth).color(color);
+            addMarker(list.get(0));
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-        activity.runOnUiThread(new Runnable() {
+            for (int i = 0; i < list.size() - 1; i++) {
+                options.add(list.get(i)).add(list.get(i + 1));
+                builder.include(list.get(i));
 
-            @Override
-            public void run() {
-                PolylineOptions options = new PolylineOptions()
-                        .width(lineWidth).color(color);
-                addMarker(list.get(0));
-                LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
-                for (int i = 0; i < list.size() - 1; i++) {
-                    options.add(list.get(i)).add(list.get(i + 1));
-                    builder.include(list.get(i));
-
-                    // Log.i(LOG_TAG, "Add polyline");
-                }
-                line = mMap.addPolyline(options);
-                addMarker(list.get(list.size() - 1));
-                LatLngBounds tmpBounds = builder.build();
-
-                CameraUpdate update = CameraUpdateFactory.newLatLngBounds(
-                        tmpBounds, 100);
-
-                mMap.moveCamera(update);
+                // Log.i(LOG_TAG, "Add polyline");
             }
+            line = mMap.addPolyline(options);
+            addMarker(list.get(list.size() - 1));
+            LatLngBounds tmpBounds = builder.build();
+
+            CameraUpdate update = CameraUpdateFactory.newLatLngBounds(
+                    tmpBounds, 100);
+
+            mMap.moveCamera(update);
         });
 
     }
@@ -387,7 +371,7 @@ public class MapHelper {
         final CameraUpdate update = CameraUpdateFactory.newLatLngBounds(
                 tmpBounds, 100);
 
-        activity.runOnUiThread(() -> mMap.moveCamera(update));
+       handler.post(() -> mMap.moveCamera(update));
 
         try {
             Thread.sleep(3000);
@@ -563,9 +547,8 @@ public class MapHelper {
         // "title" and "snippet".
         private final View mWindow;
 
-        CustomInfoWindowAdapter() {
-            mWindow = activity.getLayoutInflater().inflate(R.layout.custom_info_window, null);
-            //  mContents = getLayoutInflater().inflate(R.layout.custom_info_contents, null);
+        CustomInfoWindowAdapter(LayoutInflater inflater) {
+            mWindow = inflater.inflate(R.layout.custom_info_window, null);
         }
 
         @Override
@@ -585,7 +568,7 @@ public class MapHelper {
             ImageView imageView = (ImageView)view.findViewById(R.id.markerImage);
 
                 if (markersIdsMap.get(marker.getId()) == null) {  //This means it's the a marker with no image.. (like trip start and end locations)
-                    imageView.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_launcher));
+                    imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.ic_launcher));
                 } else {
 
                     Uri imageUri = markersIdsMap.get(marker.getId()).getImageUri();
@@ -593,7 +576,7 @@ public class MapHelper {
                     File imgFile = new File(imagePath);
 
                     if(!imgFile.exists()) {  //This can happen if user erased the image from gallery
-                        imageView.setImageDrawable(activity.getResources().getDrawable(R.drawable.image_broken));
+                        imageView.setImageDrawable(context.getResources().getDrawable(R.drawable.image_broken));
 //                        Picasso.with(activity).load(R.drawable.ic_launcher).into(imageView);
                     }else{
                         int rotation = getImageRotation(imagePath);
@@ -637,8 +620,8 @@ public class MapHelper {
 
     Bitmap getReducedImage(String imageFileLocation){
         Log.i(LOG_TAG, "image file path: " + imageFileLocation);
-        int targetImageWidth = (int)activity.getResources().getDimension(R.dimen.image_marker_width);
-        int targetImageHeight =(int)activity.getResources().getDimension(R.dimen.image_marker_height);
+        int targetImageWidth = (int) context.getResources().getDimension(R.dimen.image_marker_width);
+        int targetImageHeight =(int) context.getResources().getDimension(R.dimen.image_marker_height);
 
         Log.i(LOG_TAG, "image view sizes: " + targetImageWidth + ", " + targetImageHeight);
 

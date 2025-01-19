@@ -12,12 +12,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.bartovapps.gpstriprec.trip.TripManager;
 import com.bartovapps.gpstriprec.utils.Utils;
 import com.squareup.picasso.Picasso;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;

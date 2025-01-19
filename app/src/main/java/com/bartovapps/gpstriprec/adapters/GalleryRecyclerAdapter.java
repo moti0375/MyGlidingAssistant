@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by BartovMoti on 03/16/16.
@@ -25,12 +26,12 @@ public class GalleryRecyclerAdapter extends RecyclerView.Adapter<GalleryRecycler
     private static final String LOG_TAG = GalleryRecyclerAdapter.class.getSimpleName();
     LayoutInflater inflater;
     Activity activity;
-    ArrayList<Uri> markers;
+    List<Uri> markers;
     private SparseBooleanArray selectedItems;
 
 
 
-    public GalleryRecyclerAdapter(Activity context, ArrayList<Uri> data) {
+    public GalleryRecyclerAdapter(Activity context, List<Uri> data) {
         activity = context;
         this.markers = data;
         inflater = LayoutInflater.from(context);

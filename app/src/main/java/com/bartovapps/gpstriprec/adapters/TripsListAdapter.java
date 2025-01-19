@@ -22,13 +22,14 @@ import android.widget.TextView;
 import com.bartovapps.gpstriprec.R;
 import com.bartovapps.gpstriprec.displayers.HmsDisplayer;
 import com.bartovapps.gpstriprec.displayers.TimeDisplayer;
-import com.bartovapps.gpstriprec.trip.Trip;
 import com.bartovapps.gpstriprec.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
 import java.io.File;
 import java.util.List;
+
+import data.model.Trip;
 
 public class TripsListAdapter extends BaseAdapter {
 

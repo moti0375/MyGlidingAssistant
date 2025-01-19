@@ -18,12 +18,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bartovapps.gpstriprec.R;
 import com.bartovapps.gpstriprec.displayers.HmsDisplayer;
 import com.bartovapps.gpstriprec.displayers.TimeDisplayer;
-import com.bartovapps.gpstriprec.trip.Trip;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+
+import data.model.Trip;
 
 /**
  * Created by BartovMoti on 12/11/15.
@@ -32,14 +34,13 @@ public class TripsRecyclerAdapter extends RecyclerView.Adapter<TripsRecyclerAdap
 
     private static final String LOG_TAG = TripsRecyclerAdapter.class.getSimpleName();
     LayoutInflater inflater;
-    ArrayList<Trip> data = new ArrayList<>();
+    List<Trip> data = new ArrayList<>();
     Activity activity;
     private File imgFile;
     private SparseBooleanArray selectedItems;
     private TimeDisplayer timeDisplayer = new HmsDisplayer();
 
-
-    public TripsRecyclerAdapter(Activity context, ArrayList<Trip> data) {
+    public TripsRecyclerAdapter(Activity context, List<Trip> data) {
         inflater = LayoutInflater.from(context);
         this.activity = context;
         this.data = data;
@@ -57,13 +58,13 @@ public class TripsRecyclerAdapter extends RecyclerView.Adapter<TripsRecyclerAdap
     public void onBindViewHolder(TripsViewHolder holder, int position) {
         Log.i(LOG_TAG, "onBindViewHolder was called");
         Trip trip = new Trip();
-        trip.setTripName(data.get(position).getTripName());
-        trip.setDate(data.get(position).getDate());
-        trip.setDuration(data.get(position).getDuration());
-        trip.setImageFileName(data.get(position).getImageFileName());
+//        trip.setTripName(data.get(position).getTripName());
+//        trip.setDate(data.get(position).getDate());
+//        trip.setDuration(data.get(position).getDuration());
+//        trip.setImageFileName(data.get(position).getImageFileName());
 
         String tripTitle = trip.getTripName();
-        if (tripTitle == null || tripTitle.length() == 0) {
+        if (tripTitle == null || tripTitle.isEmpty()) {
             holder.tvTitle.setText("");
         } else {
             holder.tvTitle.setText(tripTitle);
@@ -120,8 +121,8 @@ public class TripsRecyclerAdapter extends RecyclerView.Adapter<TripsRecyclerAdap
         return selectedItems.size();
     }
 
-    public ArrayList<Trip> getSelectedItems() {
-        ArrayList<Trip> items = new ArrayList<>();
+    public List<Trip> getSelectedItems() {
+        List<Trip> items = new ArrayList<>();
         for (int i = 0; i < selectedItems.size(); i++) {
             items.add(data.get(selectedItems.keyAt(i)));
         }
@@ -137,10 +138,10 @@ public class TripsRecyclerAdapter extends RecyclerView.Adapter<TripsRecyclerAdap
 
         public TripsViewHolder(View itemView) {
             super(itemView);
-            tvTitle = (TextView) itemView.findViewById(R.id.tvListRowTripTitle);
-            tvDate = (TextView) itemView.findViewById(R.id.tvListRowDate);
-            tvDuration = (TextView) itemView.findViewById(R.id.tvListRowDuration);
-            ivMapImage = (ImageView) itemView.findViewById(R.id.ivListItemImage);
+            tvTitle = itemView.findViewById(R.id.tvListRowTripTitle);
+            tvDate = itemView.findViewById(R.id.tvListRowDate);
+            tvDuration = itemView.findViewById(R.id.tvListRowDuration);
+            ivMapImage = itemView.findViewById(R.id.ivListItemImage);
             //drawerRowIcon.setOnClickListener(this);
 
         }
@@ -148,7 +149,7 @@ public class TripsRecyclerAdapter extends RecyclerView.Adapter<TripsRecyclerAdap
     }
 
 
-    public void updateTrips(ArrayList<Trip> data) {
+    public void updateTrips(List<Trip> data) {
         if (this.data == null) {
             this.data = data;
         } else {

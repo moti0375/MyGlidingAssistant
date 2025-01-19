@@ -45,8 +45,6 @@ import com.bartovapps.gpstriprec.enums.Units;
 import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
 import com.bartovapps.gpstriprec.maphelper.ImageMarker;
 import com.bartovapps.gpstriprec.maphelper.MapHelper;
-import com.bartovapps.gpstriprec.trip.Trip;
-import com.bartovapps.gpstriprec.trip.TripManager;
 import com.bartovapps.gpstriprec.utils.Utils;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapLoadedCallback;
@@ -59,6 +57,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
+
+import core.trip_manager.TripManager;
+import data.model.Trip;
 
 public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener, OnMapReadyCallback,
         GoogleMap.OnMapLoadedCallback {
@@ -76,7 +78,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
     Context context = this;
     MapHelper mapHelper;
     KmlParser parser;
-    private ArrayList<LatLng> locations;
+    private List<LatLng> locations;
     private SharedPreferences settings;
     private int lineColor = Color.RED;
     private float lineWidth = 5;
@@ -150,7 +152,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
         setDisplayers();
 
         handler = new Handler();
-        trip = (Trip) getIntent().getSerializableExtra("trip");
+        //trip =  getIntent().getSerializableExtra("trip", Trip.serializer());
 
 
         if (trip != null) {
@@ -380,7 +382,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
             mapHelper.overlayRoute(locations);
             TripsDataSource database = new TripsDataSource(TripDetailsActivity.this);
             database.open();
-            ArrayList<ImageMarker> imageMarkers = database.findAllMarkersForTrip(trip.getId());
+            List<ImageMarker> imageMarkers = database.findAllMarkersForTrip(trip.getId());
             database.close();
 
 //            Log.i(TripDetailsActivity.LOG_TAG, "There are " + imageMarkers.size() + " imageMarkers for this trip");
@@ -473,8 +475,8 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
 
         date = trip.getDate();
         distance = trip.getDistance();
-        averageSpeed = trip.getSpeed();
-        averageMoveSpeed = trip.getMove_average_speed();
+        averageSpeed = trip.getAverageSpeed();
+        averageMoveSpeed = trip.getMoveAverageSpeed();
         duration = trip.getDuration();
         moveTime = trip.getMoveTime();
         stopTime = trip.getStopTime();
@@ -487,7 +489,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
 
         maxAltitude = trip.getMaxAlt();
         tripTitle = trip.getTripName();
-//        Log.i(LOG_TAG, "Trip Title: " + tripTitle);
+//        Log.i(LOG_TAG, "data.model.Trip Title: " + tripTitle);
 
         if (tripTitle == null || "".equals(tripTitle)) {
             tripTitle = getString(R.string.RecordedDetailedTitle);
@@ -533,7 +535,8 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
 
     private void displayAddresses() {
         if (startAddress == null || startAddress.contains("Unavailable") || startAddress.contains("none")) { // trying to get address if wasn't
-            startAddress = TripManager.getAddress(locations.get(0), context).trim(); //getting first location address
+            // Refactor after make TripManager singleton
+           // startAddress = TripManager.getAddress(locations.get(0)).trim(); //getting first location address
 //            Log.i(LOG_TAG, "Got start address: " + startAddress);
 
             if (startAddress.contains("Unavailable") || startAddress == null) { //if it still unavailable, might be location without address at all or no Internet at this time..
@@ -547,7 +550,8 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
 
 
         if (stopAddress == null || stopAddress.contains("Unavailable") || stopAddress.contains("none")) { // trying to get address if wasn't
-            stopAddress = TripManager.getAddress(locations.get(locations.size() - 1), context).trim(); //getting first location address
+            // Todo, refactor after making TripManager singleton
+           // stopAddress = TripManager.getAddress(locations.get(locations.size() - 1), context).trim(); //getting first location address
 //            Log.i(LOG_TAG, "Got stop address: " + stopAddress);
 
             if (stopAddress.contains("Unavailable") || stopAddress == null) { //if it still unavailable, might be location without address at all or no Internet at this time..
@@ -723,8 +727,8 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
             if (c != null && c.getCount() == 1) {
 //                Log.i(LOG_TAG, "item already exists! getting the already exists uri...");
                 c.moveToFirst();
-                long rowId = c.getLong(c.getColumnIndex(MediaStore.MediaColumns._ID));
-                String title = c.getString(c.getColumnIndex(MediaStore.MediaColumns.TITLE));
+                long rowId = c.getLong(c.getColumnIndexOrThrow(MediaStore.MediaColumns._ID));
+                String title = c.getString(c.getColumnIndexOrThrow(MediaStore.MediaColumns.TITLE));
 //                Log.i(LOG_TAG, "Title is: " + title);
                 c.close();
                 uri = MediaStore.Files.getContentUri("external", rowId);
@@ -775,18 +779,12 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
             //Updating the display name every share (maybe the user changed the name of the trip)
             ContentValues updateContentValues = new ContentValues();
             updateContentValues.put(MediaStore.Images.Media.DISPLAY_NAME, tripTitle.length() > 0 ? tripTitle + ".kml" : getString(R.string.app_name) + ".kml");
-            int updatedRows = context.getContentResolver().update(filesUri, updateContentValues, selection, args);
-//            Log.i(LOG_TAG, "Row updated now: " + updatedRows);
-
 
             Cursor c = context.getContentResolver().query(filesUri, projection, selection, args, null);
             if (c != null && c.getCount() == 1) {
 //                Log.i(LOG_TAG, "item already exists! getting the already exists uri...");
                 c.moveToFirst();
-                long rowId = c.getLong(c.getColumnIndex(MediaStore.MediaColumns._ID));
-                String title = c.getString(c.getColumnIndex(MediaStore.MediaColumns.TITLE));
-//                Log.i(LOG_TAG, "Title is: " + title);
-//                Log.i(LOG_TAG, "Display name: " + c.getString(c.getColumnIndex(MediaStore.MediaColumns.DISPLAY_NAME)));
+                long rowId = c.getLong(c.getColumnIndexOrThrow(MediaStore.MediaColumns._ID));
                 c.close();
                 uri = MediaStore.Files.getContentUri("external", rowId);
 //                Log.i(LOG_TAG, "refresh scan force uri=" + uri);

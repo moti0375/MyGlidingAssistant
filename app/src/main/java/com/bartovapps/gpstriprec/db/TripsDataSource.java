@@ -10,11 +10,12 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.bartovapps.gpstriprec.maphelper.ImageMarker;
-import com.bartovapps.gpstriprec.trip.Trip;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import data.model.Trip;
 
 
 public class TripsDataSource {
@@ -38,10 +39,10 @@ public class TripsDataSource {
             TripsDBOpenHelper.COLUMN_MAP_IMAGE,
             TripsDBOpenHelper.COLUMN_MOVE_SPEED,
             TripsDBOpenHelper.COLUMN_MOVE_TIME,
-            TripsDBOpenHelper.COLUMN_STOP_TIME };
+            TripsDBOpenHelper.COLUMN_STOP_TIME};
 
 
-    private static final String[] markersColumns ={
+    private static final String[] markersColumns = {
             TripsDBOpenHelper.COLUMN_MARKER_ID,
             TripsDBOpenHelper.COLUMN_MARKER_TRIP_ID,
             TripsDBOpenHelper.COLUMN_MARKER_LATITUDE,
@@ -65,12 +66,12 @@ public class TripsDataSource {
         dbhelper.close();
     }
 
-    public Trip create(Trip trip) {
+    public long create(Trip trip) {
         ContentValues values = new ContentValues();
         values.put(TripsDBOpenHelper.COLUMN_DATE, trip.getDate());
         values.put(TripsDBOpenHelper.COLUMN_DURATION, trip.getDuration());
         values.put(TripsDBOpenHelper.COLUMN_DIST, trip.getDistance());
-        values.put(TripsDBOpenHelper.COLUMN_SPEED, trip.getSpeed());
+        values.put(TripsDBOpenHelper.COLUMN_SPEED, trip.getAverageSpeed());
         values.put(TripsDBOpenHelper.COLUMN_FROM, trip.getStartAddress());
         values.put(TripsDBOpenHelper.COLUMN_TO, trip.getStopAddress());
         values.put(TripsDBOpenHelper.COLUMN_MAP, trip.getKml());
@@ -78,62 +79,46 @@ public class TripsDataSource {
         values.put(TripsDBOpenHelper.COLUMN_MAX_ALT, trip.getMaxAlt());
         values.put(TripsDBOpenHelper.COLUMN_NAME, trip.getTripName());
         values.put(TripsDBOpenHelper.COLUMN_MAP_IMAGE, trip.getImageFileName());
-        values.put(TripsDBOpenHelper.COLUMN_MOVE_SPEED, trip.getMove_average_speed());
+        values.put(TripsDBOpenHelper.COLUMN_MOVE_SPEED, trip.getMoveAverageSpeed());
         values.put(TripsDBOpenHelper.COLUMN_MOVE_TIME, trip.getMoveTime());
         values.put(TripsDBOpenHelper.COLUMN_STOP_TIME, trip.getStopTime());
         long insertId = database.insert(TripsDBOpenHelper.TABLE_TRIPS, null, values);
-        trip.setId(insertId);
-//		Log.i(LOG_TAG, "Trip created, map: " + trip.getKml());
 
-        return trip;
+        return insertId;
     }
 
-    public ArrayList<Trip> findAll() {
-        ArrayList<Trip> trips = new ArrayList<Trip>();
-        Cursor cursor = null;
-        try {
-            cursor = database.query(TripsDBOpenHelper.TABLE_TRIPS, allColumns,
-                    null, null, null, null, TripsDBOpenHelper.COLUMN_ID + " DESC");
+    public List<Trip> findAll() {
+        List<Trip> trips = new ArrayList<>();
+        try (Cursor cursor = database.query(TripsDBOpenHelper.TABLE_TRIPS, allColumns,
+                null, null, null, null, TripsDBOpenHelper.COLUMN_ID + " DESC");
+        ) {
+            if (cursor.getCount() > 0) {
+
+                while (cursor.moveToNext()) {
+                    Trip trip = new Trip(cursor.getLong(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_ID)),
+                            cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_DATE)),
+                            cursor.getFloat(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_DIST)),
+                            cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MAP)),
+                            cursor.getLong(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_DURATION)),
+                            cursor.getLong(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MOVE_TIME)),
+                            cursor.getLong(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_STOP_TIME)),
+                            cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_SPEED)),
+                            cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MOVE_SPEED)),
+                            cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_FROM)),
+                            cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_TO)),
+                            cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MAX_SPEED)),
+                            cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MAX_ALT)),
+                            cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_NAME)),
+                            cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MAP_IMAGE))
+                    );
+                    trips.add(trip);
+                }
+            }
         } catch (SQLiteException e) {
             e.printStackTrace();
-//            Log.i(LOG_TAG, "There was an SQLite exception: " + e.getMessage());
-
-            if (e.getMessage().contains("no such column")) {
-                // recoverDb();
-            }
             return trips;
         }
 
-//        Log.i(LOG_TAG, "Returned " + cursor.getCount() + " rows");
-//        Log.i(LOG_TAG, "Trip MOVE column " + cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_MOVE_SPEED));
-//        Log.i(LOG_TAG, "Trip ID column " + cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_ID));
-//        Log.i(LOG_TAG, "Trip DATE column " + cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_DATE));
-//        Log.i(LOG_TAG, "Trip MOVE_TIME column " + cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_MOVE_TIME));
-//        Log.i(LOG_TAG, "Trip STOP_TIME column " + cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_STOP_TIME));
-        if (cursor.getCount() > 0) {
-
-            while (cursor.moveToNext()) {
-                Trip trip = new Trip();
-                trip.setId(cursor.getLong(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_ID)));
-                trip.setDate(cursor.getString(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_DATE)));
-                trip.setDuration(cursor.getLong(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_DURATION)));
-                trip.setDistance(cursor.getFloat(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_DIST)));
-                trip.setSpeed(cursor.getDouble(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_SPEED)));
-                trip.setStartAddress(cursor.getString(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_FROM)));
-                trip.setStopAddress(cursor.getString(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_TO)));
-                trip.setKml(cursor.getString(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_MAP)));
-                trip.setMaxSpeed(cursor.getDouble(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_MAX_SPEED)));
-                trip.setMaxAlt(cursor.getDouble(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_MAX_ALT)));
-                trip.setTripName(cursor.getString(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_NAME)));
-                trip.setImageFileName(cursor.getString(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_MAP_IMAGE)));
-                trip.setMove_average_speed(cursor.getDouble(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_MOVE_SPEED)));
-                trip.setMoveTime(cursor.getLong(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_MOVE_TIME)));
-                trip.setStopTime(cursor.getLong(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_STOP_TIME)));
-                trips.add(trip);
-
-//				Log.i(LOG_TAG, "Trip add: " + trip.toString());
-            }
-        }
         return trips;
     }
 
@@ -148,14 +133,10 @@ public class TripsDataSource {
             }
         }
 
-
-//		Log.i(LOG_TAG, "Trip removed, map file deleted..");
-
         return (result == 1);
     }
 
     public boolean updateTripTitle(Trip trip, String title) {
-//        Log.i(LOG_TAG, "About to update trip " + trip.getId() + " title with " + title);
         ContentValues args = new ContentValues();
         String where = TripsDBOpenHelper.COLUMN_ID + "=" + trip.getId();
         args.put(TripsDBOpenHelper.COLUMN_NAME, title);
@@ -163,7 +144,6 @@ public class TripsDataSource {
     }
 
     public boolean updateTripData(long tripId, String column, String data) {
-//        Log.i(LOG_TAG, "About to update trip " + tripId + " " + column + " with " + data);
         ContentValues args = new ContentValues();
         String where = TripsDBOpenHelper.COLUMN_ID + "=" + tripId;
         args.put(column, data);
@@ -174,10 +154,10 @@ public class TripsDataSource {
         dbhelper.onCreate(database);
     }
 
-    public List<ImageMarker> insertImageMarkers(List<ImageMarker> markers, double tripId){
+    public List<ImageMarker> insertImageMarkers(List<ImageMarker> markers, double tripId) {
         ContentValues values = new ContentValues();
 
-        for(ImageMarker marker : markers){
+        for (ImageMarker marker : markers) {
             values.put(TripsDBOpenHelper.COLUMN_MARKER_TRIP_ID, tripId);
             values.put(TripsDBOpenHelper.COLUMN_MARKER_LATITUDE, marker.getLatitude());
             values.put(TripsDBOpenHelper.COLUMN_MARKER_LONGITUDE, marker.getLongitude());
@@ -187,76 +167,53 @@ public class TripsDataSource {
         }
         Log.i(LOG_TAG, markers.size() + " marker was inserted to database");
 
-        return  markers;
-    }
-
-
-    public ArrayList<ImageMarker> findAllMarkersForTrip(long tripId){
-        ArrayList<ImageMarker> markers = new ArrayList<>();
-
-        Cursor cursor = null;
-        try {
-            cursor = database.query(TripsDBOpenHelper.TABLE_MARKERS, markersColumns,
-                    TripsDBOpenHelper.COLUMN_MARKER_TRIP_ID + " = ?", new String[] {"" + tripId}, null, null, TripsDBOpenHelper.COLUMN_MARKER_ID );
-        } catch (SQLiteException e) {
-            e.printStackTrace();
-     //       Log.i(LOG_TAG, "There was an SQLite exception: " + e.getMessage());
-
-            if (e.getMessage().contains("no such column")) {
-                // recoverDb();
-            }
-            return markers;
-        }
-
-        if (cursor.getCount() > 0) {
-
-            while (cursor.moveToNext()) {
-                ImageMarker marker = new ImageMarker();
-                marker.setLatitude(cursor.getDouble(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_MARKER_LATITUDE)));
-                marker.setLongitude(cursor.getDouble(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_MARKER_LONGITUDE)));
-                marker.setImageUri(Uri.parse(cursor.getString(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_MARKER_URI))));
-                markers.add(marker);
-
-//				Log.i(LOG_TAG, "Trip add: " + trip.toString());
-            }
-        }
         return markers;
     }
 
-    public ArrayList<Uri> findAllMarkersUrisForTrip(long tripId){
-        ArrayList<Uri> uris = new ArrayList<>();
 
-        Cursor cursor = null;
-        try {
-            cursor = database.query(TripsDBOpenHelper.TABLE_MARKERS, markersColumns,
-                    TripsDBOpenHelper.COLUMN_MARKER_TRIP_ID + " = ?", new String[] {"" + tripId}, null, null, TripsDBOpenHelper.COLUMN_MARKER_ID);
-        } catch (SQLiteException e) {
-            e.printStackTrace();
-//            Log.i(LOG_TAG, "There was an SQLite exception: " + e.getMessage());
+    public List<ImageMarker> findAllMarkersForTrip(long tripId) {
+        List<ImageMarker> markers = new ArrayList<>();
 
-            if (e.getMessage().contains("no such column")) {
-                // recoverDb();
+        try (Cursor cursor = database.query(TripsDBOpenHelper.TABLE_MARKERS, markersColumns,
+                TripsDBOpenHelper.COLUMN_MARKER_TRIP_ID + " = ?", new String[]{"" + tripId}, null, null, TripsDBOpenHelper.COLUMN_MARKER_ID);
+        ) {
+            if (cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    ImageMarker marker = new ImageMarker();
+                    marker.setLatitude(cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_LATITUDE)));
+                    marker.setLongitude(cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_LONGITUDE)));
+                    marker.setImageUri(Uri.parse(cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_URI))));
+                    markers.add(marker);
+//				Log.i(LOG_TAG, "data.model.Trip add: " + trip.toString());
+                }
             }
-            return uris;
+        } catch (SQLiteException e) {
+            return markers;
         }
 
-        if (cursor.getCount() > 0) {
 
-            while (cursor.moveToNext()) {
-                Uri uri = Uri.parse(cursor.getString(cursor.getColumnIndex(TripsDBOpenHelper.COLUMN_MARKER_URI)));
-                uris.add(uri);
+        return markers;
+    }
 
-//				Log.i(LOG_TAG, "Trip add: " + trip.toString());
+    public List<Uri> findAllMarkersUrisForTrip(long tripId) {
+        List<Uri> uris = new ArrayList<>();
+
+        try (Cursor cursor = database.query(TripsDBOpenHelper.TABLE_MARKERS, markersColumns,
+                TripsDBOpenHelper.COLUMN_MARKER_TRIP_ID + " = ?", new String[]{"" + tripId}, null, null, TripsDBOpenHelper.COLUMN_MARKER_ID)) {
+            if (cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    Uri uri = Uri.parse(cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_URI)));
+                    uris.add(uri);
+                }
             }
+        } catch (SQLiteException e) {
+            return uris;
         }
         return uris;
     }
 
-    public int deleteMarkersForTrip(double tripId){
+    public int deleteMarkersForTrip(double tripId) {
         String where = TripsDBOpenHelper.COLUMN_MARKER_TRIP_ID + "=" + tripId;
-        int result = database.delete(TripsDBOpenHelper.TABLE_MARKERS, where, null);
-//        Log.i(LOG_TAG, result + " markers were removed from database");
-
-        return result;
+        return database.delete(TripsDBOpenHelper.TABLE_MARKERS, where, null);
     }
 }

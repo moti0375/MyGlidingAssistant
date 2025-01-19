@@ -1,15 +1,12 @@
 package com.bartovapps.gpstriprec.kmlhleper;
 
-import static com.bartovapps.gpstriprec.trip.TripManager.TRIPS_DIR;
 
-import android.app.Activity;
+import static core.trip_manager.TripManagerImpl.TRIPS_DIR;
+
 import android.content.Context;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import com.bartovapps.gpstriprec.R;
-import com.bartovapps.gpstriprec.trip.TripManager;
 import com.bartovapps.gpstriprec.utils.Utils;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -27,9 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-//import android.util.Log;
 
-public class KmlCreator {
+public class KmlManager {
 
 //	private static final String LOG_TAG = "GPS RECORDER";
 	private static final String KML_NS = "http://www.opengis.net/kml/2.2";
@@ -41,7 +37,7 @@ public class KmlCreator {
 	private Document doc;
 	private Element rootNode;
 
-	public KmlCreator(Context context) {
+	public KmlManager(Context context) {
 		this.context = context;
 		this.stream = context.getResources().openRawResource(R.raw.trip_raw);
 		builder = new SAXBuilder();
@@ -176,7 +172,7 @@ public class KmlCreator {
 		return mapFile;
 	}
 	
-	public String updateTripLatLng(ArrayList<LatLng> latlngs) {
+	public String updateTripLatLng(List<LatLng> latlngs) {
 		StringBuilder route = new StringBuilder();
 		String mapFile = null;
 		
@@ -206,7 +202,7 @@ public class KmlCreator {
 
 			if (!fileDir.exists()) {
 				boolean mkdirs = fileDir.mkdirs();
-				Log.i("KmlCreator", "fileDir make dir result: " + mkdirs);
+				Log.i("KmlManager", "fileDir make dir result: " + mkdirs);
 			}
 
 			String fileName = "/trip_" + timestamp + ".kml";

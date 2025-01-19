@@ -1,4 +1,9 @@
-apply plugin: 'com.android.application'
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android' // Add this line
+    id 'kotlinx-serialization'
+    id 'kotlin-kapt'
+}
 
 def localPropertiesFile = file("../app_local.properties")
 def appLocalProperties = new Properties()
@@ -29,6 +34,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
+    sourceSets {
+        main {
+            java.srcDirs += 'src/main/kotlin'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
 }
 
 dependencies {
@@ -39,6 +55,8 @@ dependencies {
     implementation "com.google.android.material:material:1.12.0"
     implementation "androidx.constraintlayout:constraintlayout:$rootProject.ext.constraintLayout"
     implementation "androidx.viewpager2:viewpager2:1.1.0"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.9.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2"
 
     //GoogleGms
     implementation "com.google.android.gms:play-services-location:$rootProject.ext.gmsLocationVersion"

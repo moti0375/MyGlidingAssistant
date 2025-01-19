@@ -3,8 +3,6 @@ package com.bartovapps.gpstriprec.utils;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.DialogInterface.OnDismissListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -25,9 +23,8 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.bartovapps.gpstriprec.db.TripsDataSource;
-import com.bartovapps.gpstriprec.kmlhleper.KmlCreator;
+import com.bartovapps.gpstriprec.kmlhleper.KmlManager;
 import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
-import com.bartovapps.gpstriprec.trip.Trip;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.model.LatLng;
@@ -41,6 +38,8 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import data.model.Trip;
 
 public class Utils {
 	
@@ -142,10 +141,10 @@ public class Utils {
 	   
 	   public static int mergeTrips(Trip tripA, Trip tripB, Activity activity, TripsDataSource datasource){
 		   int status = 1;
-		   ArrayList<LatLng> latLngList = new ArrayList<LatLng>();
+		   ArrayList<LatLng> latLngList = new ArrayList<>();
 		   
-		   KmlCreator kmlCreator = new KmlCreator(activity);
-		   kmlCreator.openRawDocument();
+		   KmlManager kmlManager = new KmlManager(activity);
+		   kmlManager.openRawDocument();
 		   KmlParser tripAParser = new KmlParser(tripA.getKml());
 		   KmlParser tripBParser = new KmlParser(tripB.getKml());
 		   tripAParser.openTripKml();
@@ -156,7 +155,7 @@ public class Utils {
 		   tripAParser.closeKml();
 		   tripBParser.closeKml();
 		   
-		   String mapFile = kmlCreator.updateTripLatLng(latLngList);
+		   String mapFile = kmlManager.updateTripLatLng(latLngList);
 		   
 		   tripAParser.getLastLocation();
 		   long tripsDuration = tripA.getDuration() + tripB.getDuration();
@@ -166,14 +165,14 @@ public class Utils {
 		   String date = sdf.format(new Date(System.currentTimeMillis()));
 		   
 		   double maxSpeed = Math.max(tripA.getMaxSpeed(), tripB.getMaxSpeed());
-		   
-			Trip trip = new Trip(mapFile, date, tripsDistance, averageSpeed);
-			trip.setDuration(tripsDuration);
-			trip.setMaxSpeed(maxSpeed);
 
-			datasource.open();
-			datasource.create(trip);
-			datasource.close();
+		   //Todo uncomment this part when ready
+//			Trip trip = new Trip(mapFile, date, tripsDistance, averageSpeed);
+//			trip.setDuration(tripsDuration);
+//			trip.setMaxSpeed(maxSpeed);
+//			datasource.open();
+//			datasource.create(trip);
+//			datasource.close();
 		   		   
 		   
 		   return status;

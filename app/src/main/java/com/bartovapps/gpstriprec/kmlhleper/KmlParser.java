@@ -16,7 +16,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-//import android.util.Log;
 
 public class KmlParser {
 
@@ -32,7 +31,7 @@ public class KmlParser {
     private SAXBuilder builder;
     private Document doc;
     private Element rootNode;
-    private ArrayList<LatLng> locations;
+    private List<LatLng> locations;
 
     public KmlParser(String fileName) {
         this.xmlFile = new File(fileName);
@@ -43,7 +42,7 @@ public class KmlParser {
         int status = KML_OPENED;
         try {
             fis = new FileInputStream(xmlFile);
-            doc = (Document) builder.build(fis);
+            doc = builder.build(fis);
             rootNode = doc.getRootElement();
 //			Log.i(LOG_TAG, "Document Opened: root element: " + rootNode.getName());
         } catch (JDOMException e) {
@@ -60,7 +59,7 @@ public class KmlParser {
         return status;
     }
 
-    public ArrayList<LatLng> getTripLocations() {
+    public List<LatLng> getTripLocations() {
         Element LineString = null;
         Element docElement = null;
         try{
@@ -100,12 +99,12 @@ public class KmlParser {
     }
 
 
-    public static ArrayList<LatLng> getLocationsFromKml(String kmlFileName) {
+    public static List<LatLng> getLocationsFromKml(String kmlFileName) {
         Element LineString = null;
         SAXBuilder builder;
         Document doc;
         Element rootNode;
-        ArrayList<LatLng> locations = null;
+        List<LatLng> locations = null;
 
 
         builder = new SAXBuilder();
@@ -115,7 +114,7 @@ public class KmlParser {
 
         try {
             fis = new FileInputStream(kmlFileName);
-            doc = (Document) builder.build(fis);
+            doc = builder.build(fis);
             rootNode = doc.getRootElement();
             Element docElement = rootNode.getChild("Document",
                     Namespace.getNamespace(KML_NS));
@@ -159,8 +158,8 @@ public class KmlParser {
        return locations;
     }
 
-    public static ArrayList<LatLng> coorStrToLocaitons(String coordinatesStr) {
-        ArrayList<LatLng> list = new ArrayList<LatLng>();
+    public static List<LatLng> coorStrToLocaitons(String coordinatesStr) {
+        List<LatLng> list = new ArrayList<LatLng>();
 
         double lat;
         double lng;

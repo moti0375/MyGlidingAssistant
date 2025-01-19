@@ -20,6 +20,7 @@ import com.bartovapps.gpstriprec.db.TripsDataSource;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GpsTripRecGallery extends AppCompatActivity implements View.OnClickListener , View.OnTouchListener{
 
@@ -29,7 +30,7 @@ public class GpsTripRecGallery extends AppCompatActivity implements View.OnClick
     long tripId;
     RecyclerView galleryRecyclerView;
     GalleryRecyclerAdapter galleryRecyclerAdapter;
-    ArrayList<Uri> markers;
+    List<Uri> markers;
     boolean recyclerViewVisible = true;
     int position = 0;
     float x1 = 0;
@@ -173,8 +174,8 @@ public class GpsTripRecGallery extends AppCompatActivity implements View.OnClick
         return false;
     }
 
-    private ArrayList<Uri> getImageMarkers() {
-        ArrayList<Uri> markers;
+    private List<Uri> getImageMarkers() {
+        List<Uri> markers;
         TripsDataSource database = new TripsDataSource(this);
         database.open();
         markers = database.findAllMarkersUrisForTrip(tripId);

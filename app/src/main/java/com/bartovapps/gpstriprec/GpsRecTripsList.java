@@ -1,5 +1,6 @@
 package com.bartovapps.gpstriprec;
 
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -43,13 +44,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bartovapps.gpstriprec.adapters.TripsListAdapter;
 import com.bartovapps.gpstriprec.adapters.TripsRecyclerAdapter;
 import com.bartovapps.gpstriprec.db.TripsDataSource;
-import com.bartovapps.gpstriprec.trip.Trip;
-import com.bartovapps.gpstriprec.trip.TripManager;
 import com.bartovapps.gpstriprec.utils.Utils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+
+import data.model.Trip;
 
 public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceModeListener {
     public static final String USERNAME = "pref_username";
@@ -71,9 +73,9 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
 
 
     TripsDataSource datasource;
-    ArrayList<Trip> trips;
+    List<Trip> trips;
     TextView tvTripsSummary;
-    ArrayList<Trip> selectedTrips;
+    List<Trip> selectedTrips;
     RecyclerView tripsRecyclerView;
     TripsRecyclerAdapter tripsRecyclerAdapter;
 
@@ -202,7 +204,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
 
     public void startTabsActivity(Trip selectedTrip) {
         Intent myIntent = new Intent(this, TripDetailsActivity.class);
-        myIntent.putExtra("trip", selectedTrip);
+        //myIntent.putExtra("trip", selectedTrip);
         startActivity(myIntent);
     }
 
@@ -483,7 +485,9 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
 
                                 setPosition(-1); //this will prevent list scroll after trip merge
                                 mergePd.setCancelable(false);
-                                new MergeTripsLongOperation().execute("");
+
+                                //Todo - Refactor merge trip
+//                                new MergeTripsLongOperation().execute("");
                                 dialog.dismiss();
                                 //mode.finish();
                             }
@@ -506,42 +510,42 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
 
     }
 
-    private class MergeTripsLongOperation extends AsyncTask<String, Void, String> {
-
-        @Override
-        protected String doInBackground(String... params) {
-
-            int MergeStatus = TripManager.mergeTrips(selectedTrips.get(1), selectedTrips.get(0), GpsRecTripsList.this, datasource);
-            String result = new String();
-            switch (MergeStatus) {
-                case TripManager.MERGE_SUCCESS:
-                    result = getResources().getString(R.string.Completed);
-                    break;
-                case TripManager.UNABLE_TO_MERGE:
-                    result = getResources().getString(R.string.ContinuousMergerTrips);
-                    break;
-                case TripManager.KML_NOT_FOUND:
-                    result = "Trips details cannot be found!, Merge Failed!";
-            }
-            return result;
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            Toast.makeText(GpsRecTripsList.this, result, Toast.LENGTH_SHORT).show();
-            mergePd.dismiss();
-            actionMode.finish();
-            refreshDisplay();
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-        }
-    }
+//    private class MergeTripsLongOperation extends AsyncTask<String, Void, String> {
+//
+//        @Override
+//        protected String doInBackground(String... params) {
+//
+//            int MergeStatus = TripManager.mergeTrips(selectedTrips.get(1), selectedTrips.get(0), GpsRecTripsList.this, datasource);
+//            String result = new String();
+//            switch (MergeStatus) {
+//                case MERGE_SUCCESS:
+//                    result = getResources().getString(R.string.Completed);
+//                    break;
+//                case UNABLE_TO_MERGE:
+//                    result = getResources().getString(R.string.ContinuousMergerTrips);
+//                    break;
+//                case KML_NOT_FOUND:
+//                    result = "Trips details cannot be found!, Merge Failed!";
+//            }
+//            return result;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(String result) {
+//            Toast.makeText(GpsRecTripsList.this, result, Toast.LENGTH_SHORT).show();
+//            mergePd.dismiss();
+//            actionMode.finish();
+//            refreshDisplay();
+//        }
+//
+//        @Override
+//        protected void onPreExecute() {
+//        }
+//
+//        @Override
+//        protected void onProgressUpdate(Void... values) {
+//        }
+//    }
 
 
     void UploadTripDialog() {
@@ -556,22 +560,18 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
         alertDialogBuilder
                 .setMessage(getResources().getString(R.string.UploadTrip))
                 .setCancelable(true).setPositiveButton(getResources().getString(R.string.YES),
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-//								Toast.makeText(GpsRecTripsList.this, "Uploading this trip...", Toast.LENGTH_LONG).show();
-                        Intent intent = GpsRecTripsList.this.getIntent();
-                        intent.putExtra("UploadedTrip", selectedTrips.get(0));
-                        GpsRecTripsList.this.setResult(RESULT_OK, intent);
-                        finish();
-                    }
-                })
+                        (dialog, id) -> {
+                            dialog.dismiss();
+    //								Toast.makeText(GpsRecTripsList.this, "Uploading this trip...", Toast.LENGTH_LONG).show();
+                            Intent intent = GpsRecTripsList.this.getIntent();
+                            //intent.putExtra("UploadedTrip", selectedTrips.get(0));
+                            GpsRecTripsList.this.setResult(RESULT_OK, intent);
+                            finish();
+                        })
                 .setNegativeButton(getResources().getString(R.string.NO),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                                actionMode.finish();
-                            }
+                        (dialog, id) -> {
+                            dialog.dismiss();
+                            actionMode.finish();
                         });
 
         // create alert dialog
