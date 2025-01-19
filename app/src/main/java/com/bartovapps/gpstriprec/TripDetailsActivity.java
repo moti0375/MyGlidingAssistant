@@ -1,5 +1,8 @@
 package com.bartovapps.gpstriprec;
 
+import static com.bartovapps.gpstriprec.core.db.TripsDBOpenHelper.COLUMN_FROM;
+import static com.bartovapps.gpstriprec.core.db.TripsDBOpenHelper.COLUMN_TO;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -29,8 +32,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import com.bartovapps.gpstriprec.db.TripsDBOpenHelper;
-import com.bartovapps.gpstriprec.db.TripsDataSource;
+import com.bartovapps.gpstriprec.core.db.TripsDataSource;
+import com.bartovapps.gpstriprec.core.di.QMainThread;
+import com.bartovapps.gpstriprec.core.map_helper.ImageMarker;
+import com.bartovapps.gpstriprec.core.map_helper.MapHelper;
 import com.bartovapps.gpstriprec.displayers.DataDisplayer;
 import com.bartovapps.gpstriprec.displayers.FeetAltDisplayer;
 import com.bartovapps.gpstriprec.displayers.HmsDisplayer;
@@ -43,8 +48,6 @@ import com.bartovapps.gpstriprec.displayers.TimeDisplayer;
 import com.bartovapps.gpstriprec.enums.AltUnits;
 import com.bartovapps.gpstriprec.enums.Units;
 import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
-import com.bartovapps.gpstriprec.maphelper.ImageMarker;
-import com.bartovapps.gpstriprec.maphelper.MapHelper;
 import com.bartovapps.gpstriprec.utils.Utils;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapLoadedCallback;
@@ -59,9 +62,12 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import core.trip_manager.TripManager;
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import data.model.Trip;
 
+@AndroidEntryPoint
 public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener, OnMapReadyCallback,
         GoogleMap.OnMapLoadedCallback {
     private static final String TAG = "TAG_TripDetailsActivity";
@@ -76,7 +82,10 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
     private static final float CAM_ZOOM = 15f;
     private GoogleMap mMap;
     Context context = this;
+    @Inject
     MapHelper mapHelper;
+
+    @Inject
     KmlParser parser;
     private List<LatLng> locations;
     private SharedPreferences settings;
@@ -125,9 +134,12 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
     Units units = Units.Metric;
     AltUnits altUnits = AltUnits.Feet;
 
-
+    @Inject
+    @QMainThread
     Handler handler;
 
+    @Inject
+    TripsDataSource tripsDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -199,7 +211,6 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
         Log.i(TAG, "onResume:");
 
         if (Utils.isFileExists(mapKmlFileName)) {
-            parser = new KmlParser(mapKmlFileName);
             setUpMapIfNeeded();
         } else {
 //            Log.i(LOG_TAG, "Cannot find map file: " + mapKmlFileName);
@@ -321,9 +332,6 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
         mMap.setOnMapLoadedCallback(mapLoaded);
         mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
-
-        mapHelper = new MapHelper(mMap, GpsRecMain.CAM_INIT_ZOOM, lineColor, mapType,
-                handler, this);
         mapHelper.setLineWidth(lineWidth);
         MapOverlayTask task = new MapOverlayTask();
         task.execute(mapKmlFileName);
@@ -377,13 +385,12 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
         @Override
         protected String doInBackground(String... params) {
             // locations = parser.getTripLocations();
-            locations = KmlParser.getLocationsFromKml(params[0]);
+            locations = parser.parsKmlString(params[0]);
 //            mapHelper.overlayRoute(locations, CAM_ZOOM);
             mapHelper.overlayRoute(locations);
-            TripsDataSource database = new TripsDataSource(TripDetailsActivity.this);
-            database.open();
-            List<ImageMarker> imageMarkers = database.findAllMarkersForTrip(trip.getId());
-            database.close();
+            tripsDataSource.open();
+            List<ImageMarker> imageMarkers = tripsDataSource.findAllMarkersForTrip(trip.getId());
+            tripsDataSource.close();
 
 //            Log.i(TripDetailsActivity.LOG_TAG, "There are " + imageMarkers.size() + " imageMarkers for this trip");
 
@@ -542,7 +549,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
             if (startAddress.contains("Unavailable") || startAddress == null) { //if it still unavailable, might be location without address at all or no Internet at this time..
                 startAddress = getString(R.string.UnavailableData);
             } else {
-                updateDb(TripsDBOpenHelper.COLUMN_FROM, startAddress); //updating the database as address has been acquired!
+                updateDb(COLUMN_FROM, startAddress); //updating the database as address has been acquired!
             }
         } else {
 //            Log.i(LOG_TAG, "Start Address from DataBase: " + startAddress);
@@ -550,14 +557,14 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
 
 
         if (stopAddress == null || stopAddress.contains("Unavailable") || stopAddress.contains("none")) { // trying to get address if wasn't
-            // Todo, refactor after making TripManager singleton
+            // Todo, refactor after making Trip
            // stopAddress = TripManager.getAddress(locations.get(locations.size() - 1), context).trim(); //getting first location address
 //            Log.i(LOG_TAG, "Got stop address: " + stopAddress);
 
             if (stopAddress.contains("Unavailable") || stopAddress == null) { //if it still unavailable, might be location without address at all or no Internet at this time..
                 stopAddress = getString(R.string.UnavailableData);
             } else {
-                updateDb(TripsDBOpenHelper.COLUMN_TO, stopAddress); //updating the database as address has been acquired!
+                updateDb(COLUMN_TO, stopAddress); //updating the database as address has been acquired!
             }
         } else {
 //            Log.i(LOG_TAG, "Stop Address from DataBase: " + stopAddress);
@@ -569,10 +576,9 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
     }
 
     private void updateDb(String column, String data) { //if addresses succeed to acquire, db will be update accordingly
-        TripsDataSource database = new TripsDataSource(this);
-        database.open();
-        database.updateTripData(trip.getId(), column, data);
-        database.close();
+        tripsDataSource.open();
+        tripsDataSource.updateTripData(trip.getId(), column, data);
+        tripsDataSource.close();
     }
 
 

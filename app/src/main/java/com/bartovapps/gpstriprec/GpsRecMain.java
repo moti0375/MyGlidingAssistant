@@ -1,5 +1,7 @@
 package com.bartovapps.gpstriprec;
 
+import static com.bartovapps.gpstriprec.kmlhleper.KmlParserImpl.KML_OPENED;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -46,7 +48,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.core.content.res.ResourcesCompat;
 
-import com.bartovapps.gpstriprec.db.TripsDataSource;
+import com.bartovapps.gpstriprec.core.db.TripsDataSource;
+import com.bartovapps.gpstriprec.core.map_helper.MapHelper;
+import com.bartovapps.gpstriprec.core.timer.TripTimer;
 import com.bartovapps.gpstriprec.displayers.DataDisplayer;
 import com.bartovapps.gpstriprec.displayers.FeetAltDisplayer;
 import com.bartovapps.gpstriprec.displayers.KmhDisplayer;
@@ -58,11 +62,8 @@ import com.bartovapps.gpstriprec.enums.AltUnits;
 import com.bartovapps.gpstriprec.enums.RecordingState;
 import com.bartovapps.gpstriprec.enums.SaveStatus;
 import com.bartovapps.gpstriprec.enums.Units;
-import com.bartovapps.gpstriprec.kmlhleper.KmlManager;
 import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
-import com.bartovapps.gpstriprec.maphelper.MapHelper;
 import com.bartovapps.gpstriprec.services.GpsTripRecService;
-import com.bartovapps.gpstriprec.timer.TimerManager;
 import com.bartovapps.gpstriprec.utils.Utils;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
@@ -75,9 +76,14 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import javax.inject.Inject;
+
+import core.trip_manager.TripManager;
 import core.trip_manager.TripManagerImpl;
+import dagger.hilt.android.AndroidEntryPoint;
 import data.model.Trip;
 
+@AndroidEntryPoint
 public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
     private static final String TAG = GpsRecMain.class.getSimpleName();
     private static final int TRIP_LIST_ACTIVITY = 100;
@@ -105,17 +111,22 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
     public static final String FAILED = "FAILED";
 
     private TextView tvSpeed;
-    // private TextView tvLatitude;
-    // private TextView tvLongitude;
-    private TextView tvDistance;
+     private TextView tvDistance;
     private TextView tvTimer;
     private TextView tvAltitude;
     //    private ToggleButton btStartStop;
     private FloatingActionButton fabStartStop;
     private FloatingActionButton fabStartCamera;
 
-    private core.trip_manager.TripManager routeManager;
-    private TripsDataSource datasource;
+    @Inject
+    public TripManager tripManager;
+    @Inject
+    public TripsDataSource datasource;
+    @Inject
+    TripTimer timerManager;
+    @Inject
+    MapHelper mapHelper;
+
     private DataDisplayer speedDisplayer;
     private DataDisplayer distanceDisplayer;
     private DataDisplayer altitudeDisplayer;
@@ -129,10 +140,9 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
     private int mapType = GoogleMap.MAP_TYPE_NORMAL;
     private int recordingMode = NEW_TRIP;
 
-    TimerManager timerManager;
-    GoogleMap mMap;
 
-    MapHelper mapHelper;
+
+    GoogleMap mMap;
     ProgressDialog gpsPd;
     ProgressDialog savingTripPd;
     ProgressDialog loadingTripPd;
@@ -177,7 +187,6 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
         updatePreferences();
         handler = new Handler(Looper.getMainLooper());
         lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        datasource = new TripsDataSource(GpsRecMain.this);
         gpsPd = new ProgressDialog(GpsRecMain.this);
         savingTripPd = new ProgressDialog(GpsRecMain.this);
         serviceIntent = new Intent(GpsRecMain.this, GpsTripRecService.class);
@@ -185,10 +194,13 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
 
         setUpMapIfNeeded();
         setUiComponents();
-        timerManager = new TimerManager(getApplicationContext(), tvTimer);
+        subscribeTimerChanges();
 
     }
 
+    private void subscribeTimerChanges() {
+        timerManager.subscribeTimerChanges(); //todo implement timer observer
+    }
 
     // Invoke displayInterstitial() when you are ready to display an
     // interstitial.
@@ -353,10 +365,10 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
             case CONTINUE_TRIP:
                 break;
             case FOLLOW_TRIP:
-                routeManager.resetRoute(false);
+                tripManager.resetRoute(false);
                 break;
             default:
-                routeManager.resetRoute(true);
+                tripManager.resetRoute(true);
                 break;
         }
 
@@ -413,7 +425,7 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
     protected void onDestroy() {
         if (recordingState == RecordingState.Recording) {
             stopRecording();
-            routeManager.saveTrip();
+            tripManager.saveTrip();
         }
 
         disableGpsLocationListener(trackLocationListener);
@@ -521,9 +533,7 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
         return true;
     }
 
-    LocationListener trackLocationListener = location -> {
-        routeManager.updateLocation(location);
-    };
+    LocationListener trackLocationListener = location -> tripManager.updateLocation(location);
 
     protected void updateDisplay() {
 //        speedDisplayer.displayData(tvSpeed, routeManager.getSpeed());
@@ -622,9 +632,9 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
         stopRecording();
     };
 
-    OnCancelListener saveDialogCancelListener = dialog -> {
+    OnCancelListener saveDialogCancelListener = dialog ->
         fabStartStop.setBackgroundDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_action_new, getTheme()));
-    };
+
 
     /* Called from ErrorDialogFragment when the dialog is dismissed. */
 
@@ -637,10 +647,7 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
     public void onMapReady(GoogleMap googleMap) {
         Log.i(TAG, "onMapReady: ");
         mMap = googleMap;
-        mapHelper = new MapHelper(mMap, CAM_INIT_ZOOM, lineColor, mapType,
-                handler, this);
         mapHelper.setLineWidth(lineWidth);
-        routeManager = new TripManagerImpl(this , mapHelper, datasource, timerManager, new KmlManager(this), new Geocoder(this));
         moveMapToInitialPosition();
     }
 
@@ -702,7 +709,7 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
             startService();
 
             enableGPSLocationListener(trackLocationListener);
-            routeManager.setCurrentLocation(location);
+            tripManager.setCurrentLocation(location);
             mapHelper.setLocation(location);
 
             if (recordingState == RecordingState.Recording) {
@@ -725,7 +732,7 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
         @Override
         protected String doInBackground(String... params) {
             String result = new String();
-            SaveStatus status = routeManager.saveTrip();
+            SaveStatus status = tripManager.saveTrip();
             switch (status) {
                 case PASSED:
                     result = getResources().getString(R.string.TripSaved);
@@ -799,7 +806,7 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
                       Uri capturedImageUri = Uri.fromFile(mImageMarkerFileLocation);
 
             try {
-                routeManager.addImageMarker(capturedImageUri);
+                tripManager.addImageMarker(capturedImageUri);
             } catch (Exception e) {
                 e.printStackTrace();
                 Toast.makeText(GpsRecMain.this, "There was an error, please try again...", Toast.LENGTH_SHORT).show();
@@ -823,8 +830,8 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
             Trip trip = params[0];
             if (Utils.isFileExists(trip.getKml())) {
 
-                int status = routeManager.uploadTrip(trip);
-                if (status != KmlParser.KML_OPENED) {
+                int status = tripManager.uploadTrip(trip);
+                if (status != KML_OPENED) {
                     return FAILED;
                 }
             } else {

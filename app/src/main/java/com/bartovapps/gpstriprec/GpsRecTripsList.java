@@ -4,7 +4,6 @@ package com.bartovapps.gpstriprec;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -43,7 +42,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bartovapps.gpstriprec.adapters.TripsListAdapter;
 import com.bartovapps.gpstriprec.adapters.TripsRecyclerAdapter;
-import com.bartovapps.gpstriprec.db.TripsDataSource;
+import com.bartovapps.gpstriprec.core.db.TripsDataSource;
 import com.bartovapps.gpstriprec.utils.Utils;
 
 import java.io.File;
@@ -51,8 +50,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 import data.model.Trip;
 
+@AndroidEntryPoint
 public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceModeListener {
     public static final String USERNAME = "pref_username";
     public static final String VIEWIMAGE = "pref_viewimages";
@@ -63,7 +66,6 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
     public static final String DB_ROOT = "/data/com.bartovapps.gpstriprec/databases/";
     public static final int TRIP_NAME_MAX_LENGTH = 25;
 
-    Context context = this;
     private SharedPreferences settings;
     private OnSharedPreferenceChangeListener listener;
     public int position = -1;
@@ -72,6 +74,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
     int itemsCount = 0;
 
 
+    @Inject
     TripsDataSource datasource;
     List<Trip> trips;
     TextView tvTripsSummary;
@@ -147,7 +150,6 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
         };
         settings.registerOnSharedPreferenceChangeListener(listener);
 
-        datasource = new TripsDataSource(GpsRecTripsList.this);
         tripsRecyclerAdapter = new TripsRecyclerAdapter(this, trips);
         tripsRecyclerView.setAdapter(tripsRecyclerAdapter);
         refreshDisplay();
@@ -169,12 +171,12 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
             NavUtils.navigateUpFromSameTask(this);
         }
         if (item.getItemId() == R.id.action_backup_trips) {
-            Toast.makeText(context, "Export Trips selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Export Trips selected", Toast.LENGTH_SHORT).show();
             exportTrips();
         }
 
         if (item.getItemId() == R.id.action_import_trips) {
-            Toast.makeText(context, "Import Trips selected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Import Trips selected", Toast.LENGTH_SHORT).show();
             importTrips();
         }
 
@@ -254,8 +256,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
 
 
     public void deleteTripAlertDialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                context);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         // set title
         alertDialogBuilder.setTitle(getResources().getString(
@@ -433,7 +434,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
                 break;
             case R.id.action_upload_trip:
                 setPosition(-1);
-                UploadTripDialog();
+                uploadTripDialog();
                 break;
         }
 
@@ -463,8 +464,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
 //    };
 
     void MergeTripsDialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                context);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         // set title
         alertDialogBuilder.setTitle(getResources().getString(
@@ -475,29 +475,23 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
                 .setMessage(getResources().getString(R.string.MergeTrips))
                 .setCancelable(true)
                 .setPositiveButton(getResources().getString(R.string.YES),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                mergePd = ProgressDialog.show(
-                                        GpsRecTripsList.this,
-                                        getResources().getString(
-                                                R.string.app_name),
-                                        getResources().getString(R.string.MergeingTrips));
+                        (dialog, id) -> {
+                            mergePd = ProgressDialog.show(
+                                    GpsRecTripsList.this,
+                                    getResources().getString(
+                                            R.string.app_name),
+                                    getResources().getString(R.string.MergeingTrips));
 
-                                setPosition(-1); //this will prevent list scroll after trip merge
-                                mergePd.setCancelable(false);
+                            setPosition(-1); //this will prevent list scroll after trip merge
+                            mergePd.setCancelable(false);
 
-                                //Todo - Refactor merge trip
+                            //Todo - Refactor merge trip
 //                                new MergeTripsLongOperation().execute("");
-                                dialog.dismiss();
-                                //mode.finish();
-                            }
+                            dialog.dismiss();
+                            //mode.finish();
                         })
                 .setNegativeButton(getResources().getString(R.string.NO),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                            }
-                        });
+                        (dialog, id) -> dialog.dismiss());
 
         // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -548,9 +542,8 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
 //    }
 
 
-    void UploadTripDialog() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                context);
+    void uploadTripDialog() {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         // set title
         alertDialogBuilder.setTitle(getResources().getString(
@@ -586,8 +579,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
 
     private void exportTrips() {
 
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                context);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         // set title
         alertDialogBuilder.setTitle(getResources().getString(
@@ -598,19 +590,13 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
                 .setMessage(getString(R.string.ExportTripsDialogMessage))
                 .setCancelable(true)
                 .setPositiveButton(getResources().getString(R.string.YES),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Toast.makeText(context, "Exporting trips!", Toast.LENGTH_SHORT).show();
-                                ExportTripsTask importTask = new ExportTripsTask();
-                                importTask.execute();
-                            }
+                        (dialog, id) -> {
+                            Toast.makeText(GpsRecTripsList.this, "Exporting trips!", Toast.LENGTH_SHORT).show();
+                            ExportTripsTask importTask = new ExportTripsTask();
+                            importTask.execute();
                         })
                 .setNegativeButton(getResources().getString(R.string.NO),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                            }
-                        });
+                        (dialog, id) -> dialog.dismiss());
 
         // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();
@@ -624,8 +610,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
     }
 
     private void importTrips() {
-        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-                context);
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
 
         // set title
         alertDialogBuilder.setTitle(getResources().getString(
@@ -636,19 +621,13 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
                 .setMessage(getString(R.string.ImportTripsDialogMessage))
                 .setCancelable(true)
                 .setPositiveButton(getResources().getString(R.string.YES),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                Toast.makeText(context, "Importing Trips", Toast.LENGTH_SHORT).show();
-                                ImportDatabaseTask importDatabaseTask = new ImportDatabaseTask();
-                                importDatabaseTask.execute();
-                            }
+                        (dialog, id) -> {
+                            Toast.makeText(GpsRecTripsList.this, "Importing Trips", Toast.LENGTH_SHORT).show();
+                            ImportDatabaseTask importDatabaseTask = new ImportDatabaseTask();
+                            importDatabaseTask.execute();
                         })
                 .setNegativeButton(getResources().getString(R.string.NO),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                            }
-                        });
+                        (dialog, id) -> dialog.dismiss());
 
         // create alert dialog
         AlertDialog alertDialog = alertDialogBuilder.create();

@@ -16,12 +16,16 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bartovapps.gpstriprec.adapters.GalleryRecyclerAdapter;
-import com.bartovapps.gpstriprec.db.TripsDataSource;
+import com.bartovapps.gpstriprec.core.db.TripsDataSource;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class GpsTripRecGallery extends AppCompatActivity implements View.OnClickListener , View.OnTouchListener{
 
     private static final String LOG_TAG = GpsTripRecGallery.class.getSimpleName();
@@ -38,6 +42,9 @@ public class GpsTripRecGallery extends AppCompatActivity implements View.OnClick
     Toolbar toolbar;
     RecyclerView.LayoutManager layoutManager;
     private final static float MIN_DISTANCE = 150;
+
+    @Inject
+    TripsDataSource tripsDataSource;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,10 +183,9 @@ public class GpsTripRecGallery extends AppCompatActivity implements View.OnClick
 
     private List<Uri> getImageMarkers() {
         List<Uri> markers;
-        TripsDataSource database = new TripsDataSource(this);
-        database.open();
-        markers = database.findAllMarkersUrisForTrip(tripId);
-        database.close();
+        tripsDataSource.open();
+        markers = tripsDataSource.findAllMarkersUrisForTrip(tripId);
+        tripsDataSource.close();
 //        Log.i(LOG_TAG, "got " + markers.size() + " markers from databae");
         return markers;
     }

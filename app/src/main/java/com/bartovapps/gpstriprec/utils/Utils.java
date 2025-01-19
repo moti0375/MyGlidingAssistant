@@ -16,14 +16,13 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.location.Address;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.bartovapps.gpstriprec.db.TripsDataSource;
-import com.bartovapps.gpstriprec.kmlhleper.KmlManager;
+import androidx.annotation.Nullable;
+
+import com.bartovapps.gpstriprec.core.db.TripsDataSource;
 import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -78,26 +77,19 @@ public class Utils {
 		String state = Environment.getExternalStorageState();
         return state.equals(Environment.MEDIA_MOUNTED);
     }
-	
+
 	public static boolean isPackageInstalled(String packageName, Context context) {
-		 PackageManager pm = context.getPackageManager();
-	    try {
-            Log.i(LOG_TAG, "About to get info for package: " + packageName);
-            pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
-	        return true;
-	    } catch (NameNotFoundException e) {
-            e.printStackTrace();
-	        return false;
-	    }
+		PackageManager pm = context.getPackageManager();
+		try {
+			Log.i(LOG_TAG, "About to get info for package: " + packageName);
+			pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
+			return true;
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		}
 	}
-	
-	public static boolean isNetworkAvailable(Context context) {
-	    ConnectivityManager connectivityManager 
-	          = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-	}
-	
+
 	public static void deleteCache(Activity activity) {
 	      try {
 	         File dir = activity.getApplicationContext().getCacheDir();
@@ -139,52 +131,50 @@ public class Utils {
 		   return Version;
 	   }
 	   
-	   public static int mergeTrips(Trip tripA, Trip tripB, Activity activity, TripsDataSource datasource){
-		   int status = 1;
-		   ArrayList<LatLng> latLngList = new ArrayList<>();
-		   
-		   KmlManager kmlManager = new KmlManager(activity);
-		   kmlManager.openRawDocument();
-		   KmlParser tripAParser = new KmlParser(tripA.getKml());
-		   KmlParser tripBParser = new KmlParser(tripB.getKml());
-		   tripAParser.openTripKml();
-		   tripBParser.openTripKml();
-		   
-		   latLngList.addAll(tripAParser.getTripLocations());
-		   latLngList.addAll(tripBParser.getTripLocations());
-		   tripAParser.closeKml();
-		   tripBParser.closeKml();
-		   
-		   String mapFile = kmlManager.updateTripLatLng(latLngList);
-		   
-		   tripAParser.getLastLocation();
-		   long tripsDuration = tripA.getDuration() + tripB.getDuration();
-		   float tripsDistance = tripA.getDistance() + tripB.getDistance();
-		   double averageSpeed = tripsDistance  / (int) (tripsDuration / 1000); // m/sec
-		   SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy 'at' HH:mm");
-		   String date = sdf.format(new Date(System.currentTimeMillis()));
-		   
-		   double maxSpeed = Math.max(tripA.getMaxSpeed(), tripB.getMaxSpeed());
+//	   public static int mergeTrips(Trip tripA, Trip tripB, Activity activity, TripsDataSource datasource){
+//		   int status = 1;
+//		   ArrayList<LatLng> latLngList = new ArrayList<>();
+//
+//		   KmlManager kmlManager = new KmlManager(activity);
+//		   kmlManager.openRawDocument();
+//		   KmlParser tripAParser = new KmlParser(tripA.getKml());
+//		   KmlParser tripBParser = new KmlParser(tripB.getKml());
+//		   tripAParser.openTripKml();
+//		   tripBParser.openTripKml();
+//
+//		   latLngList.addAll(tripAParser.getTripLocations());
+//		   latLngList.addAll(tripBParser.getTripLocations());
+//		   tripAParser.closeKml();
+//		   tripBParser.closeKml();
+//
+//		   String mapFile = kmlManager.updateTripLatLng(latLngList);
+//
+//		   tripAParser.getLastLocation();
+//		   long tripsDuration = tripA.getDuration() + tripB.getDuration();
+//		   float tripsDistance = tripA.getDistance() + tripB.getDistance();
+//		   double averageSpeed = tripsDistance  / (int) (tripsDuration / 1000); // m/sec
+//		   SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy 'at' HH:mm");
+//		   String date = sdf.format(new Date(System.currentTimeMillis()));
+//
+//		   double maxSpeed = Math.max(tripA.getMaxSpeed(), tripB.getMaxSpeed());
+//
+//		   //Todo uncomment this part when ready
+////			Trip trip = new Trip(mapFile, date, tripsDistance, averageSpeed);
+////			trip.setDuration(tripsDuration);
+////			trip.setMaxSpeed(maxSpeed);
+////			datasource.open();
+////			datasource.create(trip);
+////			datasource.close();
+//
+//
+//		   return status;
+//
+//	   }
 
-		   //Todo uncomment this part when ready
-//			Trip trip = new Trip(mapFile, date, tripsDistance, averageSpeed);
-//			trip.setDuration(tripsDuration);
-//			trip.setMaxSpeed(maxSpeed);
-//			datasource.open();
-//			datasource.create(trip);
-//			datasource.close();
-		   		   
-		   
-		   return status;
-		   
-	   }
 
-
-    public static boolean isFileExists(String fileName){
+    public static boolean isFileExists(@Nullable  String fileName){
         if(fileName == null) return false;
-            if (new File(fileName).exists()){
-                return true;
-            }else return false;
+        return new File(fileName).exists();
     }
 
     public static void copyFile(File src, File dst) throws IOException {

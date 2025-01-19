@@ -8,19 +8,23 @@ import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.util.Log
-import com.bartovapps.gpstriprec.db.TripsDataSource
+import com.bartovapps.gpstriprec.core.db.TripsDataSource
+import com.bartovapps.gpstriprec.core.kml.KmlManager
+import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
+import com.bartovapps.gpstriprec.core.map_helper.MapHelper
+import com.bartovapps.gpstriprec.core.timer.TripTimer
 import com.bartovapps.gpstriprec.enums.MovementState
 import com.bartovapps.gpstriprec.enums.SaveStatus
-import com.bartovapps.gpstriprec.kmlhleper.KmlManager
 import com.bartovapps.gpstriprec.kmlhleper.KmlParser
-import com.bartovapps.gpstriprec.maphelper.ImageMarker
-import com.bartovapps.gpstriprec.maphelper.MapHelper
-import com.bartovapps.gpstriprec.timer.TimerManager
+import com.bartovapps.gpstriprec.kmlhleper.KmlParserImpl.Companion.FAIL_TO_OPEN_KML
+import com.bartovapps.gpstriprec.kmlhleper.KmlParserImpl.Companion.KML_OPENED
 import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.maps.model.LatLng
+import dagger.hilt.android.qualifiers.ApplicationContext
 import data.model.Trip
 import java.sql.Date
 import java.text.SimpleDateFormat
+import javax.inject.Inject
 import kotlin.math.max
 
 interface TripManager {
@@ -37,12 +41,14 @@ interface TripManager {
     fun addImageMarker(capturedImageUri: Uri)
 }
 
-class TripManagerImpl(
-    private val context: Context,
+
+class TripManagerImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val mapHelper: MapHelper,
     private val datasource: TripsDataSource,
-    private val timer: TimerManager,
+    private val timer: TripTimer,
     private val kmlManager: KmlManager,
+    private val kmlParser : KmlParser,
     private val geocoder: Geocoder
 ) : TripManager {
     private var startLocation: Location? = null
@@ -190,7 +196,9 @@ class TripManagerImpl(
                 moveState = MovementState.Stopped
                 stopTime = System.currentTimeMillis()
                 mapHelper.mapCameraLongshot()
-                mapHelper.goToLocation(currentLocation)
+                currentLocation?.let {
+                    mapHelper.goToLocation(it)
+                }
                 speed = location.speed.toDouble() // m/sec
             }
         } else {
@@ -225,9 +233,7 @@ class TripManagerImpl(
             val mapImageFile = context.getExternalFilesDir(null)
                 .toString() + MAP_IMAGES_DIR + "/" + "trip_" + timestamp + ".jpeg"
             val sdf = SimpleDateFormat("dd-MM-yyyy 'at' HH:mm")
-
             val date = sdf.format(Date(System.currentTimeMillis()))
-
             val mapFile = kmlManager.updateTripLatLng(latLngList) // creating and
 
             // saving the
@@ -241,7 +247,6 @@ class TripManagerImpl(
 //			Log.i(LOG_TAG, "End address: " + stopAddress);
             duration = timer.timeMillis //mSec
             averageSpeed = (distance / (duration / 1000).toInt()).toDouble() // m/sec
-
             movementTime = duration - overallStopTime //mSec
             averageMoveSpeed = (distance / (movementTime / 1000).toInt()).toDouble() //m/sec
 
@@ -277,7 +282,7 @@ class TripManagerImpl(
     }
 
     override fun uploadTrip(trip: Trip): Int {
-        var kml_status = KmlParser.KML_OPENED
+        var kmlStatus = KML_OPENED
         this.uploadedTrip = trip.also {
             this.distance = it.distance
             this.maxSpeed = it.maxSpeed
@@ -294,23 +299,27 @@ class TripManagerImpl(
 //            return kml_status;
 //        }
         latLngList.clear()
-        this.latLngList = KmlParser.getLocationsFromKml(trip.kml)
+        trip.kml?.let {
+            this.latLngList.addAll(kmlParser.parsKmlString(trip.kml))
+        }
 
         if (this.latLngList.isEmpty()) {
-            kml_status = KmlParser.FAIL_TO_OPEN_KML
-            return kml_status
+            kmlStatus = FAIL_TO_OPEN_KML
+            return kmlStatus
         }
 
         datasource.open()
-        imageMarkers = datasource.findAllMarkersForTrip(trip.id)
+        imageMarkers.clear()
+        imageMarkers.addAll(datasource.findAllMarkersForTrip(trip.id))
         datasource.close()
+
         mapHelper.clearEverything()
         mapHelper.overlayRoute(latLngList, 10f, Color.CYAN)
         for (marker in imageMarkers) {
             mapHelper.addImageMarker(marker, context)
         }
         mapHelper.viewRoute(latLngList)
-        return kml_status
+        return kmlStatus
     }
 
     @Throws(Exception::class)
@@ -347,28 +356,29 @@ class TripManagerImpl(
         tripB: Trip,
     ): Int {
         val status = 1
-        val latLngList = ArrayList<LatLng>()
+        val latLngList = mutableListOf<LatLng>()
 
         val tripALastLoc: LatLng
         val TripBFirstLoc: LatLng
         val gap = FloatArray(3)
 
+        if(tripA.kml == null || tripB.kml == null){
+            return KML_NOT_FOUND
+        }
+
         if (!Utils.isFileExists(tripA.kml) || !Utils.isFileExists(tripB.kml)) {
             return KML_NOT_FOUND
         }
 
-        val tripAParser = KmlParser(tripA.kml)
-        val tripBParser = KmlParser(tripB.kml)
-        tripAParser.openTripKml()
-        tripBParser.openTripKml()
 
-        latLngList.addAll(tripAParser.tripLocations)
-        latLngList.addAll(tripBParser.tripLocations)
+        val tripALocations = kmlParser.parsKmlString(tripA.kml)
+        val tripBLocations = kmlParser.parsKmlString(tripB.kml)
 
-        tripALastLoc = tripAParser.lastLocation
-        TripBFirstLoc = tripBParser.getfirstLocation()
-        tripAParser.closeKml()
-        tripBParser.closeKml()
+        latLngList.addAll(tripALocations)
+        latLngList.addAll(tripBLocations)
+
+        tripALastLoc = tripALocations.last()
+        TripBFirstLoc = tripBLocations.first()
 
         Location.distanceBetween(
             tripALastLoc.latitude,
@@ -383,7 +393,6 @@ class TripManagerImpl(
         kmlManager.openRawDocument()
         val mapFile = kmlManager.updateTripLatLng(latLngList)
 
-        tripAParser.lastLocation
         val tripsDuration = tripA.duration + tripB.duration
         val tripsDistance = tripA.distance + tripB.distance
         val averageSpeed = (tripsDistance / (tripsDuration / 1000).toInt()).toDouble() // m/sec

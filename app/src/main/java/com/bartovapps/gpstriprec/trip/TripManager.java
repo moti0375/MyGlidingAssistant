@@ -14,11 +14,11 @@
 //import com.bartovapps.gpstriprec.db.TripsDataSource;
 //import com.bartovapps.gpstriprec.enums.MovementState;
 //import com.bartovapps.gpstriprec.enums.SaveStatus;
-//import com.bartovapps.gpstriprec.kmlhleper.KmlManager;
+//import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.kml.KmlManager;
 //import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
 //import com.bartovapps.gpstriprec.maphelper.ImageMarker;
-//import com.bartovapps.gpstriprec.maphelper.MapHelper;
-//import com.bartovapps.gpstriprec.timer.TimerManager;
+//import com.bartovapps.gpstriprec.maphelper.com.bartovapps.gpstriprec.core.map_helper.MapHelper;
+//import com.bartovapps.gpstriprec.timer.com.bartovapps.gpstriprec.core.timer.TimerManager;
 //import com.bartovapps.gpstriprec.utils.Utils;
 //import com.google.android.gms.maps.model.LatLng;
 //
@@ -56,7 +56,7 @@
 //    private double speed = 0.0;
 //    private float accuracy = 0;
 //    private static double SPEED_FILTER = 1.5;
-//    private MapHelper mapHelper;
+//    private com.bartovapps.gpstriprec.core.map_helper.MapHelper mapHelper;
 //    private ArrayList<String> locations = new ArrayList<String>();
 //    private ArrayList<LatLng> latLngList = new ArrayList<>();
 //    private StringBuilder markplace;
@@ -66,7 +66,7 @@
 //    private double maxSpeed = 0;
 //    private double altitude = 0;
 //    private double maxAltitude = 0;
-//    private TimerManager timer;
+//    private com.bartovapps.gpstriprec.core.timer.TimerManager timer;
 //    private long stopTime = 0;
 //    private long overallStopTime = 0;
 //    private long movementTime = 0;
@@ -81,7 +81,7 @@
 //    public static final String MAP_IMAGES_DIR = "/mapImages";
 //
 //    public TripManager(Context context, float accuracy, double speedFilter,
-//                       MapHelper helper, TripsDataSource datasource, TimerManager timer) {
+//                       com.bartovapps.gpstriprec.core.map_helper.MapHelper helper, TripsDataSource datasource, com.bartovapps.gpstriprec.core.timer.TimerManager timer) {
 //        this.ACCURACY = accuracy;
 //        SPEED_FILTER = speedFilter;
 //        this.context = context;
@@ -283,7 +283,7 @@
 //
 //        if (latLngList.size() > 1) {
 //            mapHelper.viewRoute(latLngList);
-//            KmlManager kmlHelper = new KmlManager(context);
+//            com.bartovapps.gpstriprec.core.kml.KmlManager kmlHelper = new com.bartovapps.gpstriprec.core.kml.KmlManager(context);
 //            kmlHelper.openRawDocument();
 //            long timestamp = System.currentTimeMillis();
 //            String mapImageFile = context.getExternalFilesDir(null) + MAP_IMAGES_DIR + "/" + "trip_" + timestamp + ".jpeg";
@@ -418,7 +418,7 @@
 //        }
 //
 //
-//        KmlManager kmlCreator = new KmlManager(activity);
+//        com.bartovapps.gpstriprec.core.kml.KmlManager kmlCreator = new com.bartovapps.gpstriprec.core.kml.KmlManager(activity);
 //        kmlCreator.openRawDocument();
 //
 //        String mapFile = kmlCreator.updateTripLatLng(latLngList);
