@@ -16,8 +16,8 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bartovapps.gpstriprec.R;
-import com.bartovapps.gpstriprec.displayers.HmsDisplayer;
-import com.bartovapps.gpstriprec.displayers.TimeDisplayer;
+import com.bartovapps.gpstriprec.presentation.displayers.HmsDisplayer;
+import com.bartovapps.gpstriprec.presentation.displayers.TimeDisplayer;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
@@ -38,7 +38,7 @@ public class TripsRecyclerAdapter extends RecyclerView.Adapter<TripsRecyclerAdap
     Activity activity;
     private File imgFile;
     private SparseBooleanArray selectedItems;
-    private TimeDisplayer timeDisplayer = new HmsDisplayer();
+    private final TimeDisplayer timeDisplayer = new HmsDisplayer();
 
     public TripsRecyclerAdapter(Activity context, List<Trip> data) {
         inflater = LayoutInflater.from(context);

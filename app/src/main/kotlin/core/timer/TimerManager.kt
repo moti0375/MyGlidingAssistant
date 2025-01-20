@@ -2,7 +2,7 @@ package com.bartovapps.gpstriprec.core.timer
 
 import android.os.Handler
 import com.bartovapps.gpstriprec.core.di.QTimerThread
-import com.bartovapps.gpstriprec.displayers.HmsDisplayer
+import com.bartovapps.gpstriprec.presentation.displayers.TimeDisplayer
 import javax.inject.Inject
 
 interface TripTimer {
@@ -17,7 +17,8 @@ interface TripTimer {
 }
 
 class TimerManager @Inject constructor(
-    @QTimerThread private val timerHandler: Handler
+    @QTimerThread private val timerHandler: Handler,
+    private val timeDisplayer: TimeDisplayer,
 ) : TripTimer {
     private var startTime: Long = 0
 
@@ -27,8 +28,6 @@ class TimerManager @Inject constructor(
     private var pausedMsec: Long = 0
 
     override var timeMillis: Long = 0
-
-    var timeDisplayer = HmsDisplayer()
 
     private val timerRunnable = Runnable {
         timeMillis = System.currentTimeMillis() - startTime

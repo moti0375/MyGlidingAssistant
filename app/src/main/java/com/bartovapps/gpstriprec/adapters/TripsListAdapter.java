@@ -20,8 +20,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bartovapps.gpstriprec.R;
-import com.bartovapps.gpstriprec.displayers.HmsDisplayer;
-import com.bartovapps.gpstriprec.displayers.TimeDisplayer;
+import com.bartovapps.gpstriprec.presentation.displayers.HmsDisplayer;
+import com.bartovapps.gpstriprec.presentation.displayers.TimeDisplayer;
 import com.bartovapps.gpstriprec.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
@@ -33,7 +33,6 @@ import data.model.Trip;
 
 public class TripsListAdapter extends BaseAdapter {
 
-    private Activity activity;
     private List<Trip> trips;
     private static LayoutInflater inflater = null;
     private Trip trip;
@@ -41,20 +40,12 @@ public class TripsListAdapter extends BaseAdapter {
     private File imgFile;
     private Bitmap myBitmap;
     private SparseBooleanArray mSelectedItemsIds;
-    private LruCache<Long, Bitmap> imageCache;
     private int viewItemHeight = 0;
 
     @SuppressLint("NewApi")
-    public TripsListAdapter(Activity a, List<Trip> d) {
-        activity = a;
+    public TripsListAdapter(List<Trip> d) {
         trips = d;
-        inflater = (LayoutInflater) a.getBaseContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mSelectedItemsIds = new SparseBooleanArray();
-
-        final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
-        final int cacheSize = maxMemory / 8;
-
-        imageCache = new LruCache<Long, Bitmap>(cacheSize);
     }
 
     public int getCount() {
@@ -90,20 +81,20 @@ public class TripsListAdapter extends BaseAdapter {
 
 
         if (trip.getImageFileName() == null) {
-            Picasso.with(activity).load(R.drawable.ic_google_map_hdpi_active).transform(new CircleTransform()).
+            Picasso.with(convertView.getContext()).load(R.drawable.ic_google_map_hdpi_active).transform(new CircleTransform()).
                     into(viewHolder.ivMapImage);
         } else if (trip.getImageFileName().length() == 0) {
-            Picasso.with(activity).load(R.drawable.ic_google_map_hdpi_active).transform(new CircleTransform()).
+            Picasso.with(convertView.getContext()).load(R.drawable.ic_google_map_hdpi_active).transform(new CircleTransform()).
                     into(viewHolder.ivMapImage);
         } else {
             imgFile = new File(trip.getImageFileName());
             if (!imgFile.exists()) {
-                Picasso.with(activity).load(R.drawable.ic_google_map_hdpi_active).transform(new CircleTransform()).
+                Picasso.with(convertView.getContext()).load(R.drawable.ic_google_map_hdpi_active).transform(new CircleTransform()).
                         into(viewHolder.ivMapImage);
 //                viewHolder.ivMapImage.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_google_map_hdpi_active));
             } else {
                 Bitmap bitmap = Utils.getRoundedShape(BitmapFactory.decodeFile(imgFile.toString()), 200);
-                Picasso.with(activity)
+                Picasso.with(convertView.getContext())
                         .load(imgFile).transform(new CircleTransform())
                         .into(viewHolder.ivMapImage);
 

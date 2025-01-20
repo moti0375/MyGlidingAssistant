@@ -5,7 +5,7 @@
 //import android.widget.TextView;
 //
 //import com.bartovapps.gpstriprec.displayers.HmsDisplayer;
-//import com.bartovapps.gpstriprec.displayers.TimeDisplayer;
+//import com.bartovapps.gpstriprec.displayers.com.bartovapps.gpstriprec.presentation.displayers.TimeDisplayer;
 //
 //public class com.bartovapps.gpstriprec.core.timer.TimerManager {
 //
@@ -18,7 +18,7 @@
 //	private int seconds = 0;
 //
 //	private long pausedMsec = 0;
-//	TimeDisplayer timeDisplayer;
+//	com.bartovapps.gpstriprec.presentation.displayers.TimeDisplayer timeDisplayer;
 //
 //	Handler timerHandler = new Handler();
 //	Runnable timerRunnable = new Runnable() {

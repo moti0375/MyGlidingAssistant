@@ -447,7 +447,6 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
     @Override
     public void onDestroyActionMode(ActionMode mode) {
         actionMode = null;
-        TripsListAdapter checkedListAdapter = new TripsListAdapter(GpsRecTripsList.this, trips);
         //tripListView.removeAllViews();
         //   tripListView.setAdapter(checkedListAdapter);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
