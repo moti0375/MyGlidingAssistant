@@ -13,8 +13,8 @@ import com.bartovapps.gpstriprec.core.kml.KmlManager
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.core.map_helper.MapHelper
 import com.bartovapps.gpstriprec.core.timer.TripTimer
-import com.bartovapps.gpstriprec.enums.MovementState
-import com.bartovapps.gpstriprec.enums.SaveStatus
+import com.bartovapps.gpstriprec.data.enums.MovementState
+import com.bartovapps.gpstriprec.data.enums.SaveStatus
 import com.bartovapps.gpstriprec.kmlhleper.KmlParser
 import com.bartovapps.gpstriprec.kmlhleper.KmlParserImpl.Companion.FAIL_TO_OPEN_KML
 import com.bartovapps.gpstriprec.kmlhleper.KmlParserImpl.Companion.KML_OPENED

@@ -12,8 +12,8 @@
 //import android.util.Log;
 //
 //import com.bartovapps.gpstriprec.db.TripsDataSource;
-//import com.bartovapps.gpstriprec.enums.MovementState;
-//import com.bartovapps.gpstriprec.enums.SaveStatus;
+//import com.bartovapps.gpstriprec.enums.com.bartovapps.gpstriprec.data.enums.MovementState;
+//import com.bartovapps.gpstriprec.enums.com.bartovapps.gpstriprec.data.enums.SaveStatus;
 //import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.kml.KmlManager;
 //import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
 //import com.bartovapps.gpstriprec.maphelper.ImageMarker;
@@ -73,7 +73,7 @@
 //    private long duration = 0;
 //    private String startAddress = "none";
 //    private String stopAddress = "none";
-//    private MovementState moveState = null;
+//    private com.bartovapps.gpstriprec.data.enums.MovementState moveState = null;
 //    static List<Address> list;
 //    private Trip uploadedTrip;
 //    private List<ImageMarker> imageMarkers;
@@ -155,11 +155,11 @@
 //                }
 //
 //                if (moveState == null) {
-//                    moveState = MovementState.Moving;
+//                    moveState = com.bartovapps.gpstriprec.data.enums.MovementState.Moving;
 ////					Toast.makeText(context, "Moving...", Toast.LENGTH_LONG)
 ////							.show();
-//                } else if (moveState == MovementState.Stopped) {
-//                    moveState = MovementState.Moving;
+//                } else if (moveState == com.bartovapps.gpstriprec.data.enums.MovementState.Stopped) {
+//                    moveState = com.bartovapps.gpstriprec.data.enums.MovementState.Moving;
 //                    stopTime = System.currentTimeMillis() - stopTime;
 //                    overallStopTime += stopTime;
 ////                    Toast.makeText(activity, "Stopped for " + (int) (stopTime / 1000) + " Seconds", Toast.LENGTH_SHORT)
@@ -211,8 +211,8 @@
 //
 //        if ((!location.hasSpeed() || location.getSpeed() == 0) && !location.hasBearing()) { //this means that we stopped!!
 //            this.speed = 0;
-//            if (moveState == MovementState.Moving) {
-//                moveState = MovementState.Stopped;
+//            if (moveState == com.bartovapps.gpstriprec.data.enums.MovementState.Moving) {
+//                moveState = com.bartovapps.gpstriprec.data.enums.MovementState.Stopped;
 //                stopTime = System.currentTimeMillis();
 ////				Toast.makeText(context, "Stopped...", Toast.LENGTH_LONG).show();
 //                mapHelper.mapCameraLongshot();
@@ -279,7 +279,7 @@
 //    }
 //
 //    @SuppressLint("SimpleDateFormat")
-//    public SaveStatus saveTrip() {
+//    public com.bartovapps.gpstriprec.data.enums.SaveStatus saveTrip() {
 //
 //        if (latLngList.size() > 1) {
 //            mapHelper.viewRoute(latLngList);
@@ -336,9 +336,9 @@
 ////            Log.i(LOG_TAG, "Trip file " + mapFile + " saved..");
 //            mapHelper.saveMapAsImage(mapImageFile);
 //
-//            return SaveStatus.PASSED;
+//            return com.bartovapps.gpstriprec.data.enums.SaveStatus.PASSED;
 //        } else {
-//            return SaveStatus.NOT_ENOUGH_DATA;
+//            return com.bartovapps.gpstriprec.data.enums.SaveStatus.NOT_ENOUGH_DATA;
 //        }
 //    }
 //

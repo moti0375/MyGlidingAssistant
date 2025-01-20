@@ -51,15 +51,14 @@ import androidx.core.content.res.ResourcesCompat;
 import com.bartovapps.gpstriprec.core.db.TripsDataSource;
 import com.bartovapps.gpstriprec.core.map_helper.MapHelper;
 import com.bartovapps.gpstriprec.core.timer.TripTimer;
+import com.bartovapps.gpstriprec.data.enums.AltitudeUnits;
+import com.bartovapps.gpstriprec.data.enums.RecordingState;
+import com.bartovapps.gpstriprec.data.enums.SaveStatus;
+import com.bartovapps.gpstriprec.data.enums.Units;
 import com.bartovapps.gpstriprec.displayers.FeetAltDisplayer;
 import com.bartovapps.gpstriprec.displayers.MetricDisplayer;
 import com.bartovapps.gpstriprec.displayers.MileageDisplayer;
 import com.bartovapps.gpstriprec.displayers.MphDisplayer;
-import com.bartovapps.gpstriprec.enums.AltUnits;
-import com.bartovapps.gpstriprec.enums.RecordingState;
-import com.bartovapps.gpstriprec.enums.SaveStatus;
-import com.bartovapps.gpstriprec.enums.Units;
-import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
 import com.bartovapps.gpstriprec.presentation.displayers.DataDisplayer;
 import com.bartovapps.gpstriprec.presentation.displayers.KmhDisplayer;
 import com.bartovapps.gpstriprec.presentation.displayers.MetricAltDisplayer;
@@ -135,7 +134,7 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
     private SharedPreferences settings;
     private Units units = Units.Metric;
     private int autoSave = AUTO_SAVE;
-    private AltUnits altUnits = AltUnits.Feet;
+    private AltitudeUnits altUnits = AltitudeUnits.Feet;
     private int lineColor = Color.RED;
     private int mapType = GoogleMap.MAP_TYPE_NORMAL;
     private int recordingMode = NEW_TRIP;
@@ -221,15 +220,15 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
                 .getString(R.string.altitudeUnitsKey), "1"));
 
         if (units == 2) {
-            this.units = Units.Mileage;
+            this.units = Units.Millage;
         } else {
             this.units = Units.Metric;
         }
 
         if (altitudeUnits == 1) {
-            this.altUnits = AltUnits.Feet;
+            this.altUnits = AltitudeUnits.Feet;
         } else {
-            this.altUnits = AltUnits.Metric;
+            this.altUnits = AltitudeUnits.Metric;
         }
 
         setDisplayers();
@@ -260,7 +259,7 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
     }
 
     private void setDisplayers() {
-        if (units == Units.Mileage) {
+        if (units == Units.Millage) {
             speedDisplayer = new MphDisplayer();
             distanceDisplayer = new MileageDisplayer();
         } else {
@@ -268,7 +267,7 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
             distanceDisplayer = new MetricDisplayer();
         }
 
-        if (altUnits == AltUnits.Feet) {
+        if (altUnits == AltitudeUnits.Feet) {
             altitudeDisplayer = new FeetAltDisplayer();
         } else {
             altitudeDisplayer = new MetricAltDisplayer();

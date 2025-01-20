@@ -17,8 +17,8 @@ import androidx.core.app.NotificationCompat;
 
 import com.bartovapps.gpstriprec.GpsRecMain;
 import com.bartovapps.gpstriprec.R;
-import com.bartovapps.gpstriprec.enums.AltUnits;
-import com.bartovapps.gpstriprec.enums.Units;
+import com.bartovapps.gpstriprec.data.enums.AltitudeUnits;
+import com.bartovapps.gpstriprec.data.enums.Units;
 
 /**
  * Created by BartovMoti on 03/11/15.
@@ -29,7 +29,7 @@ public class GpsTripRecService extends Service {
     NotificationCompat.Builder mBuilder;
     private SharedPreferences settings;
     private Units units = Units.Metric;
-    private AltUnits altUnits = AltUnits.Feet;
+    private AltitudeUnits altUnits = AltitudeUnits.Feet;
 
 
     @Override
@@ -89,7 +89,7 @@ public class GpsTripRecService extends Service {
     }
 
     private void updateNotification(float distance) {
-        if (units == Units.Mileage) {
+        if (units == Units.Millage) {
             mBuilder.setContentText(getString(R.string.Distance)+ ": " + String.format("%.1f Km", distance / 1609.34));
         } else {
             mBuilder.setContentText(getString(R.string.Distance)+ ": " + (distance < 1000 ? String.format("%.1f M", distance) : String.format("%.1f Km", distance / 1000)));
@@ -113,16 +113,16 @@ public class GpsTripRecService extends Service {
                 this.units = Units.Metric;
                 break;
             case 2:
-                this.units = Units.Mileage;
+                this.units = Units.Millage;
                 break;
         }
 
         switch (altitudeUnits) {
             case 1:
-                this.altUnits = AltUnits.Feet;
+                this.altUnits = AltitudeUnits.Feet;
                 break;
             case 2:
-                this.altUnits = AltUnits.Metric;
+                this.altUnits = AltitudeUnits.Metric;
                 break;
         }
 

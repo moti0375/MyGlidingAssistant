@@ -36,12 +36,12 @@ import com.bartovapps.gpstriprec.core.db.TripsDataSource;
 import com.bartovapps.gpstriprec.core.di.QMainThread;
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker;
 import com.bartovapps.gpstriprec.core.map_helper.MapHelper;
+import com.bartovapps.gpstriprec.data.enums.AltitudeUnits;
+import com.bartovapps.gpstriprec.data.enums.Units;
 import com.bartovapps.gpstriprec.displayers.FeetAltDisplayer;
 import com.bartovapps.gpstriprec.displayers.MetricDisplayer;
 import com.bartovapps.gpstriprec.displayers.MileageDisplayer;
 import com.bartovapps.gpstriprec.displayers.MphDisplayer;
-import com.bartovapps.gpstriprec.enums.AltUnits;
-import com.bartovapps.gpstriprec.enums.Units;
 import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
 import com.bartovapps.gpstriprec.presentation.displayers.DataDisplayer;
 import com.bartovapps.gpstriprec.presentation.displayers.HmsDisplayer;
@@ -132,7 +132,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
     TimeDisplayer timeDisplayer;
 
     Units units = Units.Metric;
-    AltUnits altUnits = AltUnits.Feet;
+    AltitudeUnits altUnits = AltitudeUnits.Feet;
 
     @Inject
     @QMainThread
@@ -242,16 +242,16 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
                 this.units = Units.Metric;
                 break;
             case 2:
-                this.units = Units.Mileage;
+                this.units = Units.Millage;
                 break;
         }
 
         switch (altUnits) {
             case 1:
-                this.altUnits = AltUnits.Feet;
+                this.altUnits = AltitudeUnits.Feet;
                 break;
             case 2:
-                this.altUnits = AltUnits.Metric;
+                this.altUnits = AltitudeUnits.Metric;
                 break;
         }
 
@@ -505,7 +505,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
     }
 
     private void setDisplayers() {
-        if (this.units == Units.Mileage) {
+        if (this.units == Units.Millage) {
             speedDisplayer = new MphDisplayer();
             moveSpeedDisplayer = new MphDisplayer();
             distanceDisplayer = new MileageDisplayer();
@@ -515,7 +515,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
             distanceDisplayer = new MetricDisplayer();
         }
 
-        if (this.altUnits == AltUnits.Feet) {
+        if (this.altUnits == AltitudeUnits.Feet) {
             altitudeDisplayer = new FeetAltDisplayer();
         } else {
             altitudeDisplayer = new MetricAltDisplayer();
