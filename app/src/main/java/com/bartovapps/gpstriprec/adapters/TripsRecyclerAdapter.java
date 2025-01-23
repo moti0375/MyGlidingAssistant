@@ -34,12 +34,11 @@ import data.model.Trip;
 public class TripsRecyclerAdapter extends RecyclerView.Adapter<TripsRecyclerAdapter.TripsViewHolder> {
 
     private static final String LOG_TAG = TripsRecyclerAdapter.class.getSimpleName();
-    List<Trip> data = new ArrayList<>();
+    private final List<Trip> data = new ArrayList<>();
     private final SparseBooleanArray selectedItems;
     private final TimeDisplayer timeDisplayer = new HmsDisplayer();
 
-    public TripsRecyclerAdapter(Activity context, List<Trip> data) {
-        this.data = data;
+    public TripsRecyclerAdapter() {
         selectedItems = new SparseBooleanArray();
     }
 
@@ -109,9 +108,7 @@ public class TripsRecyclerAdapter extends RecyclerView.Adapter<TripsRecyclerAdap
 
 
     public void updateTrips(List<Trip> data) {
-        if(this.data.isEmpty()){
-            this.data.clear();
-        }
+        this.data.clear();
         this.data.addAll(data);
         notifyDataSetChanged();
     }

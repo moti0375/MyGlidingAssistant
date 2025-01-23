@@ -102,12 +102,10 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
         getSupportActionBar().setDisplayUseLogoEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_action_back);
-        //getSupportActionBar().setHomeButtonEnabled(true);
+        tripsRecyclerAdapter = new TripsRecyclerAdapter();
 
-
-        //getActionBar().hide();
-        tvTripsSummary = (TextView) findViewById(R.id.tvTripsListSummary);
-        tripsRecyclerView = (RecyclerView) findViewById(R.id.tripsRecyclerView);
+        tvTripsSummary = findViewById(R.id.tvTripsListSummary);
+        tripsRecyclerView = findViewById(R.id.tripsRecyclerView);
         tripsRecyclerView.addOnItemTouchListener(new RecyclerTouchListener(GpsRecTripsList.this, tripsRecyclerView, GpsRecTripsList.this, new ClickListener() {
             @Override
             public void onClick(View v, int position) {
@@ -137,23 +135,13 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
 //        tripListView.setOnItemClickListener(itemListener);
 
         selectedTrips = new ArrayList<>();
+        tripsRecyclerView.setAdapter(tripsRecyclerAdapter);
 
-        settings = PreferenceManager.getDefaultSharedPreferences(this);
-
-        listener = new OnSharedPreferenceChangeListener() {
-
-            @Override
-            public void onSharedPreferenceChanged(
-                    SharedPreferences sharedPreferences, String key) {
-                GpsRecTripsList.this.refreshDisplay();
-            }
-        };
+        settings = getSharedPreferences("GPS_TRIP_RECORDER", MODE_PRIVATE);
+        listener = (sharedPreferences, key) -> GpsRecTripsList.this.refreshDisplay();
         settings.registerOnSharedPreferenceChangeListener(listener);
 
-        tripsRecyclerAdapter = new TripsRecyclerAdapter(this, trips);
-        tripsRecyclerView.setAdapter(tripsRecyclerAdapter);
         refreshDisplay();
-        // AdBuddiz.showAd(this);
 
     }
 
