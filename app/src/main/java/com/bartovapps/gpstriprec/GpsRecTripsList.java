@@ -136,7 +136,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
 //        tripListView.setMultiChoiceModeListener(multiChoiceModeListener);
 //        tripListView.setOnItemClickListener(itemListener);
 
-        selectedTrips = new ArrayList<Trip>();
+        selectedTrips = new ArrayList<>();
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -206,7 +206,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
 
     public void startTabsActivity(Trip selectedTrip) {
         Intent myIntent = new Intent(this, TripDetailsActivity.class);
-        //myIntent.putExtra("trip", selectedTrip);
+        myIntent.putExtra("trip_id", selectedTrip.getId());
         startActivity(myIntent);
     }
 
@@ -224,6 +224,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
         datasource.open();
         trips = datasource.findAll();
         datasource.close();
+        Log.i(LOG_TAG, "refreshDisplay: " + trips);
 
         int size = trips.size();
 //        Log.i(LOG_TAG, "Got " + size + " trips for database");

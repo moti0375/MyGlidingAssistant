@@ -102,7 +102,6 @@ public class GpsTripRecService extends Service {
     private void updatePreferences() {
         int units = Integer.parseInt(settings.getString(getResources()
                 .getString(R.string.units), "1"));
-
         int altitudeUnits = Integer.parseInt(settings.getString(getResources()
                 .getString(R.string.altitudeUnitsKey), "1"));
 

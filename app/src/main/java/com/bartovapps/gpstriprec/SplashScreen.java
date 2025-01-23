@@ -25,10 +25,7 @@ public class SplashScreen extends AppCompatActivity {
 
     private static final String LOG_TAG = SplashScreen.class.getSimpleName();
     private static final long SPLASH_TIMEOUT = 3500;
-    private static final int MAX_WIDTH = 1024;
-    private static final int MAX_HEIGHT = 768;
 
-    private TextView tvVersion;
     private String version;
     private ImageView iv;
     String root = Environment.getExternalStorageDirectory().toString();
@@ -42,35 +39,20 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.splash_screen);
         i = new Intent(SplashScreen.this, GpsRecMain.class);
         attachmentFile = getExternalFilesDir(null) + "/" + "attachment.kml";
-        tvVersion = findViewById(R.id.tvAppVertion);
         version = Utils.getApplicationVersion(SplashScreen.this);
         iv = findViewById(R.id.splashImage);
 
 
         Picasso.with(iv.getContext())
-                .load(R.drawable.splash_image)
+                .load(R.drawable.splash)
                 .fit()
                 .centerInside()
                 .into(iv);
 
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                startMainActivity();
-            }
-        }, SPLASH_TIMEOUT);
-
-
+        new Handler().postDelayed(() -> startMainActivity(), SPLASH_TIMEOUT);
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (version != null && version.length() > 0) {
-            tvVersion.setText("Ver: " + version);
-        }
-    }
+
 
     private void startMainActivity() {
         Intent launcherIntent = getIntent();

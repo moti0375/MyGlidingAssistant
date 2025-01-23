@@ -16,3 +16,16 @@ annotation class QTimerThread
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class QExternalDirectory
+
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class QDefaultFilesDir
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class QTripsKmlDir
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class QTripsImagesDir

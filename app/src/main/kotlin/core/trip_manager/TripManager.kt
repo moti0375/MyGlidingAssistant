@@ -9,6 +9,8 @@ import android.location.Location
 import android.net.Uri
 import android.util.Log
 import com.bartovapps.gpstriprec.core.db.TripsDataSource
+import com.bartovapps.gpstriprec.core.di.QTripsImagesDir
+import com.bartovapps.gpstriprec.core.di.QTripsKmlDir
 import com.bartovapps.gpstriprec.core.kml.KmlManager
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.core.map_helper.MapHelper
@@ -31,24 +33,26 @@ interface TripManager {
     fun updateLocation(location: Location)
     fun resetRoute(resetMap: Boolean)
     fun updateRouteStatus(location: Location)
-    fun saveTrip() : SaveStatus
+    fun saveTrip(): SaveStatus
     fun setCurrentLocation(location: Location)
     fun updateAccuracy(accuracy: Float)
-    fun setSpeedFilter(speedFilter : Double)
-    fun mergeTrips(tripA: Trip, tripB: Trip) : Int
-    fun getAddress(location: LatLng) : String?
-    fun uploadTrip(trip: Trip) : Int
+    fun setSpeedFilter(speedFilter: Double)
+    fun mergeTrips(tripA: Trip, tripB: Trip): Int
+    fun getAddress(location: LatLng): String?
+    fun uploadTrip(trip: Trip): Int
     fun addImageMarker(capturedImageUri: Uri)
 }
 
 
 class TripManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
+    @QTripsKmlDir private val tripsKmlDir: String,
+    @QTripsImagesDir private val tripsImagesDir: String,
     private val mapHelper: MapHelper,
     private val datasource: TripsDataSource,
     private val timer: TripTimer,
     private val kmlManager: KmlManager,
-    private val kmlParser : KmlParser,
+    private val kmlParser: KmlParser,
     private val geocoder: Geocoder
 ) : TripManager {
     private var startLocation: Location? = null
@@ -226,12 +230,12 @@ class TripManagerImpl @Inject constructor(
 
     @SuppressLint("SimpleDateFormat")
     override fun saveTrip(): SaveStatus {
+        Log.i("TripManager", "About to save trip")
         return if (latLngList.size > 1) {
             mapHelper.viewRoute(latLngList)
             kmlManager.openRawDocument()
             val timestamp = System.currentTimeMillis()
-            val mapImageFile = context.getExternalFilesDir(null)
-                .toString() + MAP_IMAGES_DIR + "/" + "trip_" + timestamp + ".jpeg"
+            val mapImageFile = "$tripsImagesDir/trip_$timestamp.jpeg"
             val sdf = SimpleDateFormat("dd-MM-yyyy 'at' HH:mm")
             val date = sdf.format(Date(System.currentTimeMillis()))
             val mapFile = kmlManager.updateTripLatLng(latLngList) // creating and
@@ -268,16 +272,17 @@ class TripManagerImpl @Inject constructor(
 
             datasource.open()
             val tripId = datasource.create(trip)
+
             if (imageMarkers.isNotEmpty()) {
                 datasource.insertImageMarkers(imageMarkers, tripId.toDouble())
             }
             datasource.close()
 
-            //            Log.i(LOG_TAG, "data.model.Trip file " + mapFile + " saved..");
+            Log.i(TAG, "data.model.Trip file $mapFile saved");
             mapHelper.saveMapAsImage(mapImageFile)
-             SaveStatus.PASSED
+            SaveStatus.PASSED
         } else {
-             SaveStatus.NOT_ENOUGH_DATA
+            SaveStatus.NOT_ENOUGH_DATA
         }
     }
 
@@ -362,7 +367,7 @@ class TripManagerImpl @Inject constructor(
         val TripBFirstLoc: LatLng
         val gap = FloatArray(3)
 
-        if(tripA.kml == null || tripB.kml == null){
+        if (tripA.kml == null || tripB.kml == null) {
             return KML_NOT_FOUND
         }
 
@@ -468,7 +473,7 @@ class TripManagerImpl @Inject constructor(
 
 
     companion object {
-        private const val TAG = "TAG_TripManager"
+        private const val TAG = "TripManager"
 
         const val MERGE_SUCCESS: Int = 1
         const val KML_NOT_FOUND: Int = 2
@@ -481,8 +486,6 @@ class TripManagerImpl @Inject constructor(
 
 
         var list = mutableListOf<Address>()
-        const val TRIPS_DIR: String = "/trips"
-        const val MAP_IMAGES_DIR: String = "/mapImages"
 
     }
 }

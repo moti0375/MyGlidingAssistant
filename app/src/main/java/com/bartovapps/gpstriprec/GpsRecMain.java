@@ -183,7 +183,6 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
 
         settings = this.getSharedPreferences("GPS_TRIP_RECORDER", MODE_PRIVATE);
         settings.registerOnSharedPreferenceChangeListener(prefListener);
-        updatePreferences();
         handler = new Handler(Looper.getMainLooper());
         lm = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         gpsPd = new ProgressDialog(GpsRecMain.this);
@@ -573,9 +572,8 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the
         // map.
-        if (mMap == null) {
+        if (mapFrag == null) {
             Log.i(TAG, "setUpMapIfNeeded: initializing map");
-
             mapFrag = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
             // Check if we were successful in obtaining the map.
             if (mapFrag != null) {
@@ -646,7 +644,9 @@ public class GpsRecMain extends AppCompatActivity implements OnMapReadyCallback,
     public void onMapReady(GoogleMap googleMap) {
         Log.i(TAG, "onMapReady: ");
         mMap = googleMap;
+        mapHelper.initMap(mMap);
         mapHelper.setLineWidth(lineWidth);
+        updatePreferences();
         moveMapToInitialPosition();
     }
 

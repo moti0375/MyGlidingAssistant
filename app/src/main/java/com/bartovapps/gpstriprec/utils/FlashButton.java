@@ -24,13 +24,10 @@ public class FlashButton extends FloatingActionButton {
 
     public FlashButton(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int next = ((mState.ordinal() + 1) % FlashEnum.values().length);
-                setState(FlashEnum.values()[next]);
-                performFlashClick();
-            }
+        this.setOnClickListener(view -> {
+            int next = ((mState.ordinal() + 1) % FlashEnum.values().length);
+            setState(FlashEnum.values()[next]);
+            performFlashClick();
         });
         //Sets initial state
         setState(FlashEnum.AUTOMATIC);

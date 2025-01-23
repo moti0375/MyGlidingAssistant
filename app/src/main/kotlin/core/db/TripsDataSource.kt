@@ -43,6 +43,41 @@ class TripsDataSource @Inject constructor(private val dbhelper: TripsDBOpenHelpe
         return insertId
     }
 
+    fun findTripById(tripId: Long): Trip? {
+        return database.query(
+            TripsDBOpenHelper.TABLE_TRIPS,
+            allColumns,
+            TripsDBOpenHelper.COLUMN_ID + " = ? ",
+            arrayOf("$tripId"),
+            null,
+            null,
+            TripsDBOpenHelper.COLUMN_ID + " DESC",
+            "1"
+        )?.use { cursor ->
+            if (cursor.moveToFirst()) {
+                Trip(
+                    cursor.getLong(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_DATE)),
+                    cursor.getFloat(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_DIST)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MAP)),
+                    cursor.getLong(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_DURATION)),
+                    cursor.getLong(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MOVE_TIME)),
+                    cursor.getLong(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_STOP_TIME)),
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_SPEED)),
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MOVE_SPEED)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_FROM)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_TO)),
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MAX_SPEED)),
+                    cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MAX_ALT)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_NAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MAP_IMAGE))
+                )
+            } else {
+                null
+            }
+        }
+    }
+
     fun findAll(): List<Trip> {
         val trips: MutableList<Trip> = ArrayList()
         try {

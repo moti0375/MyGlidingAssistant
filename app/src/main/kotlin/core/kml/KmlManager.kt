@@ -1,11 +1,10 @@
 package com.bartovapps.gpstriprec.core.kml
 
 import android.content.res.Resources
-import android.util.Log
 import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.core.di.QExternalDirectory
+import com.bartovapps.gpstriprec.core.di.QTripsKmlDir
 import com.google.android.gms.maps.model.LatLng
-import core.trip_manager.TripManagerImpl
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.JDOMException
@@ -22,21 +21,22 @@ import javax.inject.Singleton
 @Singleton
 class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.kml");
     private val resources: Resources,
+    @QTripsKmlDir private val tripsKmlDir: String,
     @QExternalDirectory private val externalDirectory: File?,
     private val saxBuilder: SAXBuilder
 ) {
-    private val stream = resources.openRawResource(R.raw.trip_raw)
     private var doc: Document? = null
     private var rootNode: Element? = null
-
     init {
         // Log.i(LOG_TAG, "KML Helper created");
     }
 
     fun openRawDocument() {
         try {
-            doc = saxBuilder.build(stream) as Document
-            rootNode = doc?.rootElement
+            resources.openRawResource(R.raw.trip_raw).use {
+                doc = saxBuilder.build(it) as Document
+                rootNode = doc?.rootElement
+            }
         } catch (e: JDOMException) {
             e.printStackTrace()
         } catch (e: IOException) {
@@ -46,7 +46,7 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
 
     fun updateStartPoint(point: String?) {
         var startPoint: Element? = null
-        val docElement = rootNode!!.getChild(
+        val docElement = rootNode?.getChild(
             "Document",
             Namespace.getNamespace(KML_NS)
         )
@@ -152,7 +152,7 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
         // Log.i(LOG_TAG, "end point coordinates: " + coordinated.getValue());
     }
 
-    fun updateTrip(locations: ArrayList<String>): String? {
+    fun updateTrip(locations: List<String>): String? {
         val route = StringBuilder()
 
         var mapFile: String? = null
@@ -167,7 +167,6 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
             mapFile = writeFile()
         }
 
-        closeKml()
         return mapFile
     }
 
@@ -194,18 +193,17 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
 
     private fun writeFile(): String {
         val timestamp = System.currentTimeMillis()
-        val fileDir = File(externalDirectory?.path + TripManagerImpl.TRIPS_DIR)
+        val fileDir = File(tripsKmlDir)
 
-        if (!fileDir.exists()) {
-            val mkdirs = fileDir.mkdirs()
-            Log.i(
-                "KmlManager",
-                "fileDir make dir result: $mkdirs"
-            )
-        }
+//        if (!fileDir.exists()) {
+//            val mkdirs = fileDir.mkdirs()
+//            Log.i(
+//                "KmlManager",
+//                "fileDir make dir result: $mkdirs"
+//            )
+//        }
 
         val fileName = "/trip_$timestamp.kml"
-
         val kmlFile = File(fileDir, fileName)
 
         val xmlOutput = XMLOutputter()
@@ -221,14 +219,6 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
             fr.close()
         }
         return kmlFile.toString()
-    }
-
-    fun closeKml() {
-        try {
-            stream.close()
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
     }
 
     companion object {

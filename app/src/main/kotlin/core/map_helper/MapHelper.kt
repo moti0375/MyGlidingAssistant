@@ -1,5 +1,5 @@
 package com.bartovapps.gpstriprec.core.map_helper
-import android.app.Activity
+
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -11,7 +11,6 @@ import android.graphics.Rect
 import android.graphics.Typeface
 import android.location.Location
 import android.media.ExifInterface
-import android.os.Environment
 import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,7 +20,6 @@ import androidx.core.content.res.ResourcesCompat
 import com.bartovapps.gpstriprec.core.db.TripsDBOpenHelper
 import com.bartovapps.gpstriprec.core.db.TripsDataSource
 import com.bartovapps.gpstriprec.core.di.QMainThread
-import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter
@@ -44,10 +42,14 @@ import kotlin.math.min
 
 
 import com.bartovapps.gpstriprec.R
+import com.bartovapps.gpstriprec.core.di.QTripsImagesDir
+import javax.inject.Singleton
 
+@Singleton
 class MapHelper @Inject constructor(
     @QMainThread private val handler: Handler,
     @ApplicationContext private val context: Context,
+    @QTripsImagesDir private val tripImagesDir: String,
     private val tripsDataSource: TripsDataSource,
 ) {
     // private static final String LOG_TAG = "MAP_HELPER";
@@ -64,22 +66,14 @@ class MapHelper @Inject constructor(
     private var latLng: LatLng? = null
     private var bearing = 0f
 
-    //this.mMap = map;
-
-    // this.zoom = mapZoom;
-    //setZoom(mapZoom);
-    //setLineColor(color);
-    //setMapType(mapType);
-    // this.handler = handler;
     private val markersIdsMap: MutableMap<String, ImageMarker?> = LinkedHashMap()
 
-    private fun initMap(googleMap: GoogleMap) {
+    fun initMap(googleMap: GoogleMap) {
         this.mMap = googleMap
         clearEverything()
         val update = CameraUpdateFactory.zoomBy(this.zoom)
         mMap.moveCamera(update)
-
-        //mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(null));
+        mMap.setInfoWindowAdapter(CustomInfoWindowAdapter(LayoutInflater.from(context)))
     }
 
     fun setLocation(location: Location) {
@@ -107,7 +101,7 @@ class MapHelper @Inject constructor(
         }
     }
 
-    fun addMarker(ll: LatLng) {
+    private fun addMarker(ll: LatLng) {
         marker?.let {
             lastMarker = it
             it.remove()
@@ -129,7 +123,7 @@ class MapHelper @Inject constructor(
             .title("End Point")
             .snippet(ll.latitude.toString() + "," + ll.longitude)
             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-        marker = mMap?.addMarker(options)
+        marker = mMap.addMarker(options)
         System.gc()
     }
 
@@ -137,13 +131,15 @@ class MapHelper @Inject constructor(
     fun addImageMarker(imageMarker: ImageMarker, context: Context) {
         handler.post {
             val ll = LatLng(imageMarker.latitude, imageMarker.longitude)
-            val marker = mMap!!.addMarker(
+            mMap.addMarker(
                 MarkerOptions().position(ll)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
                     .snippet("" + ll.latitude + "," + ll.longitude)
                     .title(context.getString(R.string.app_name))
-            )
-            markersIdsMap[marker!!.id] = imageMarker
+            )?.apply {
+                markersIdsMap[id] = imageMarker
+            }
+
         }
     }
 
@@ -165,34 +161,28 @@ class MapHelper @Inject constructor(
 
         // CameraUpdate update = CameraUpdateFactory.newCameraPosition(new
         // CameraPosition(ll, this.zoom, 0, bearing));
-        mMap!!.animateCamera(
+        mMap.animateCamera(
             CameraUpdateFactory
                 .newCameraPosition(cameraPosition)
         )
     }
 
     fun clearEverything() {
-        handler.post {
-            marker?.remove()
-            if (marker != null) {
-            }
-            if (startMarker != null) {
-                startMarker!!.remove()
+        if (this::mMap.isInitialized) {
+            handler.post {
+                marker?.remove()
+                startMarker?.remove()
                 startMarker = null
-            }
-            if (lastMarker != null) {
-                lastMarker!!.remove()
-                lastMarker = null
-            }
 
-            if (line != null) {
-                line!!.remove()
+                lastMarker?.remove()
+                lastMarker = null
+
+                line?.remove()
                 line = null
-            }
-            if (markersIdsMap != null) {
+
                 markersIdsMap.clear()
+                mMap.clear()
             }
-            mMap.clear()
         }
     }
 
@@ -304,32 +294,19 @@ class MapHelper @Inject constructor(
         }
     }
 
-    fun saveMapAsImage(activity: Activity, tripId: Long) {
-        Log.i("com.bartovapps.gpstriprec.core.map_helper.MapHelper", "saveMapAsImage: ")
+    fun saveMapAsImage( tripId: Long) {
+        Log.i("MapHelper", "saveMapAsImage: ")
         val timestamp = System.currentTimeMillis()
 
-        val root = Environment.getExternalStorageDirectory().toString()
-        val projectDir = activity.applicationContext.resources
-            .getString(R.string.projectRootDir)
+        val fileName = "$tripImagesDir/trip_$timestamp.jpeg"
 
-        if (Utils.checkExternalStorageState()) {
-            val fileDir = File(
-                (root + "/" + projectDir
-                        + "/mapImages")
-            )
-
-            if (!fileDir.exists()) {
-                fileDir.mkdirs()
-            }
-
-            val fileName = "$fileDir/trip_$timestamp.jpeg"
-
-            val callback = SnapshotReadyCallback { snapshot: Bitmap? ->
-                var snapshot = snapshot
+        val callback = SnapshotReadyCallback { s: Bitmap? ->
+            s?.let {
+                var snapshot = it
                 try {
                     val out = FileOutputStream(fileName)
                     snapshot = Bitmap.createScaledBitmap(
-                        snapshot!!, 500,
+                        snapshot, 500,
                         500, false
                     )
                     snapshot.compress(Bitmap.CompressFormat.JPEG, 50, out)
@@ -345,58 +322,58 @@ class MapHelper @Inject constructor(
                     out.close()
                 } catch (e: Exception) {
                     e.printStackTrace()
-                    Log.e("com.bartovapps.gpstriprec.core.map_helper.MapHelper", "There was an exception: " + e.message)
+                    Log.e(
+                        "com.bartovapps.gpstriprec.core.map_helper.MapHelper",
+                        "There was an exception: " + e.message
+                    )
                 }
             }
-
-            mMap.snapshot(callback)
-        } else {
-            Log.i("com.bartovapps.gpstriprec.core.map_helper.MapHelper", "checkExternalStorageState false")
         }
+
+        mMap.snapshot(callback)
     }
 
     fun saveMapAsImage(mapFileName: String) {
-        if (Utils.checkExternalStorageState() == true) {
-            // final File fileDir = new File(root +
-            // context.getResources().getString(com.bartovapps.gpstriprec.R.string.projectRootDir)
-            // + "/mapsImages");
-            val fileName = File(mapFileName)
-            val fileDir = File(fileName.parentFile.toString())
-            if (!fileDir.exists()) {
-                fileDir.mkdirs()
+        // final File fileDir = new File(root +
+        // context.getResources().getString(com.bartovapps.gpstriprec.R.string.projectRootDir)
+        // + "/mapsImages");
+        Log.i(LOG_TAG, "About to save map image");
+        val fileName = File(mapFileName).apply {
+            parentFile?.let { dir ->
+                if (!dir.exists()) {
+                    dir.mkdirs()
+                }
             }
+        }
 
-            // final String fileName = fileDir + "/" + mapFileName;
-            val callback =
-                SnapshotReadyCallback { snapshot ->
-                    var snapshot = snapshot
-                    var out: FileOutputStream? = null
+        // final String fileName = fileDir + "/" + mapFileName;
+        val callback =
+            SnapshotReadyCallback { s ->
+                var snapshot = s
+                var out: FileOutputStream? = null
+                try {
+                    out = FileOutputStream(fileName)
+                    snapshot = Bitmap.createScaledBitmap(
+                        snapshot!!, 500,
+                        500, false
+                    )
+                    snapshot.compress(Bitmap.CompressFormat.JPEG, 50, out)
+                    snapshot.recycle()
+                    Log.i(LOG_TAG, "trip image saved to $mapFileName")
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                } finally {
                     try {
-                        out = FileOutputStream(fileName)
-                        snapshot = Bitmap.createScaledBitmap(
-                            snapshot!!, 500,
-                            500, false
-                        )
-                        snapshot.compress(Bitmap.CompressFormat.JPEG, 50, out)
-                        snapshot.recycle()
-                        snapshot = null
-                        System.gc()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-
-                        try {
-                            if (out != null) {
-                                out.flush()
-                                out.close()
-                            }
-                        } catch (finallyException: Exception) {
-                            finallyException.printStackTrace()
+                        out?.apply {
+                            close()
+                            flush()
                         }
+                    } catch (finallyException: Exception) {
+                        finallyException.printStackTrace()
                     }
                 }
-
-            mMap.snapshot(callback)
-        }
+            }
+        mMap.snapshot(callback)
     }
 
     // private class LongOperation extends AsyncTask<String, Void, String> {
@@ -481,18 +458,29 @@ class MapHelper @Inject constructor(
             val imageView = view.findViewById<View>(R.id.markerImage) as ImageView
 
             if (markersIdsMap[marker.id] == null) {  //This means it's the a marker with no image.. (like trip start and end locations)
-                imageView.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.ic_launcher, context.theme))
+                imageView.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        context.resources,
+                        R.drawable.ic_launcher,
+                        context.theme
+                    )
+                )
             } else {
                 val imageUri = markersIdsMap[marker.id]!!.imageUri
                 val imagePath = imageUri?.path
                 val imgFile = File(imagePath)
 
                 if (!imgFile.exists()) {  //This can happen if user erased the image from gallery
-                    imageView.setImageDrawable(ResourcesCompat.getDrawable(context.resources, R.drawable.image_broken, context.theme))
+                    imageView.setImageDrawable(
+                        ResourcesCompat.getDrawable(
+                            context.resources,
+                            R.drawable.image_broken,
+                            context.theme
+                        )
+                    )
                     //                        Picasso.with(activity).load(R.drawable.ic_launcher).into(imageView);
                 } else {
                     val rotation = getImageRotation(imagePath!!)
-                    //                        Picasso.with(activity).load(imageUri).rotate(rotation).into(imageView);
                     val reducedSizeImage = getReducedImage(imageUri.path)
                     imageView.setImageBitmap(rotateImage(reducedSizeImage, imageUri.path!!))
                     //                        Picasso.with(activity).load(imageUri.getPath()).fit().centerInside().into(imageView);
@@ -605,7 +593,7 @@ class MapHelper @Inject constructor(
         private const val EARTHRADIUS = 6366198.0
         private const val CAMERA_LONGSHOT_RAT = 2f
         private const val CAMERA_LONGSHOT_TILT = 65f
-        private const val LOG_TAG = "com.bartovapps.gpstriprec.core.map_helper.MapHelper"
+        private const val LOG_TAG = "MapHelper"
         private const val MAP_PADDING = 30
 
         private const val NORTH = 360f

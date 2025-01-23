@@ -164,12 +164,13 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
         setDisplayers();
 
         handler = new Handler();
-        //trip =  getIntent().getSerializableExtra("trip", Trip.serializer());
-
+        long tripId =  getIntent().getLongExtra("trip_id", 0);
+        tripsDataSource.open();
+        trip = tripsDataSource.findTripById(tripId);
+        tripsDataSource.close();
 
         if (trip != null) {
             mapKmlFileName = trip.getKml();
-//            Log.i(LOG_TAG, "MAP FileName: " + mapKmlFileName);
             initDisplayComponents();
             getTripDetails();
         } else {
@@ -196,9 +197,6 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
             String filePath = new File(trip.getKml()).getParent() + "/sharing";
             File parent = new File(filePath);
             final String sharedImage = parent.toString() + "/sharedMap.png";
-            if (!parent.exists()) {
-                parent.mkdirs();
-            }
             shareMapDialog(sharedImage);
         }
         return super.onOptionsItemSelected(item);
@@ -335,7 +333,6 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
         mapHelper.setLineWidth(lineWidth);
         MapOverlayTask task = new MapOverlayTask();
         task.execute(mapKmlFileName);
-
     }
 
 
@@ -350,7 +347,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
                 e.printStackTrace();
             }
 
-            mapHelper.saveMapAsImage(TripDetailsActivity.this, trip.getId());
+            mapHelper.saveMapAsImage( trip.getId());
             return "Executed";
         }
 
@@ -384,23 +381,18 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
 
         @Override
         protected String doInBackground(String... params) {
-            // locations = parser.getTripLocations();
             locations = parser.parsKmlString(params[0]);
-//            mapHelper.overlayRoute(locations, CAM_ZOOM);
             mapHelper.overlayRoute(locations);
             tripsDataSource.open();
             List<ImageMarker> imageMarkers = tripsDataSource.findAllMarkersForTrip(trip.getId());
             tripsDataSource.close();
 
 //            Log.i(TripDetailsActivity.LOG_TAG, "There are " + imageMarkers.size() + " imageMarkers for this trip");
-
             if (imageMarkers != null) {
                 for (ImageMarker imageMarker : imageMarkers) {
                     mapHelper.addImageMarker(imageMarker, context);
-
                 }
             }
-
             return null;
         }
 

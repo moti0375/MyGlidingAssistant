@@ -19,13 +19,4 @@ data class Trip @JvmOverloads constructor(
     val maxSpeed: Double = 0.0,
     val maxAlt: Double = 0.0,
     val tripName: String? = null,
-    val imageFileName: String? = null){
-
-
-    override fun toString(): String {
-        return """
-            Date: ${date}
-            Duration: ${(if (duration > 60) (duration.toInt() / 60).toString() + ":" + duration.toInt() % 60 else duration.toInt()).toString() + (if (duration > 60) " min" else " sec")}
-            """.trimIndent()
-    }
-}
+    val imageFileName: String? = null)
