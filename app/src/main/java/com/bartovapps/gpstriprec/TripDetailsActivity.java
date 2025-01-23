@@ -163,7 +163,6 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
         updatePreferences();
         setDisplayers();
 
-        handler = new Handler();
         long tripId =  getIntent().getLongExtra("trip_id", 0);
         tripsDataSource.open();
         trip = tripsDataSource.findTripById(tripId);
@@ -174,12 +173,8 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
             initDisplayComponents();
             getTripDetails();
         } else {
-//            Log.i(LOG_TAG, "Cannot find map file: " + mapKmlFileName);
             Toast.makeText(context, getResources().getString(R.string.MapUnavailable), Toast.LENGTH_LONG).show();
         }
-
-//	    AdBuddiz.showAd(this);
-
     }
 
     @Override
@@ -331,6 +326,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
         mMap.setOnMarkerClickListener(this);
         mMap.setOnInfoWindowClickListener(this);
         mapHelper.setLineWidth(lineWidth);
+        mapHelper.initMap(mMap);
         MapOverlayTask task = new MapOverlayTask();
         task.execute(mapKmlFileName);
     }
@@ -382,6 +378,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
         @Override
         protected String doInBackground(String... params) {
             locations = parser.parsKmlString(params[0]);
+            Log.i(TAG, "MapOverlayTask: locations: " + locations);
             mapHelper.overlayRoute(locations);
             tripsDataSource.open();
             List<ImageMarker> imageMarkers = tripsDataSource.findAllMarkersForTrip(trip.getId());
@@ -612,26 +609,20 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
                 .setIcon(getResources().getDrawable(R.drawable.ic_launcher))
                 .setCancelable(false)
                 .setPositiveButton(getResources().getString(R.string.YES),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                                //Toast.makeText(context, "Google Earth is not installed on this device\nGoogle Erath is required for this action", Toast.LENGTH_LONG).show();
-                                Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_EARTH_STORE_URI));
-                                marketIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-                                try {
-                                    startActivity(marketIntent);
-                                } catch (ActivityNotFoundException e) {
-                                    e.printStackTrace();
-                                    Toast.makeText(TripDetailsActivity.this, getString(R.string.GooglePlayError), Toast.LENGTH_LONG).show();
-                                }
+                        (dialog, id) -> {
+                            dialog.cancel();
+                            //Toast.makeText(context, "Google Earth is not installed on this device\nGoogle Erath is required for this action", Toast.LENGTH_LONG).show();
+                            Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(GOOGLE_EARTH_STORE_URI));
+                            marketIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY | Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+                            try {
+                                startActivity(marketIntent);
+                            } catch (ActivityNotFoundException e) {
+                                e.printStackTrace();
+                                Toast.makeText(TripDetailsActivity.this, getString(R.string.GooglePlayError), Toast.LENGTH_LONG).show();
                             }
                         })
                 .setNegativeButton(getResources().getString(R.string.NO),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
+                        (dialog, id) -> dialog.cancel());
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
@@ -668,11 +659,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
                             }
                         })
                 .setNegativeButton(getResources().getString(R.string.NO),
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
+                        (dialog, id) -> dialog.cancel());
 
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
@@ -684,14 +671,10 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
     private void takeMapHqSnapshot(final String imageFileName) {
 
 
-        GoogleMap.SnapshotReadyCallback callback = new GoogleMap.SnapshotReadyCallback() {
+        GoogleMap.SnapshotReadyCallback callback = snapshot -> {
+            // TODO Auto-generated method stub
+            shareImage(snapshot);
 
-            @Override
-            public void onSnapshotReady(Bitmap snapshot) {
-                // TODO Auto-generated method stub
-                shareImage(snapshot);
-
-            }
         };
         mMap.snapshot(callback);
 

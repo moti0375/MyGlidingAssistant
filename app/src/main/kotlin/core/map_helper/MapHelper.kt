@@ -45,7 +45,6 @@ import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.core.di.QTripsImagesDir
 import javax.inject.Singleton
 
-@Singleton
 class MapHelper @Inject constructor(
     @QMainThread private val handler: Handler,
     @ApplicationContext private val context: Context,
@@ -69,6 +68,7 @@ class MapHelper @Inject constructor(
     private val markersIdsMap: MutableMap<String, ImageMarker?> = LinkedHashMap()
 
     fun initMap(googleMap: GoogleMap) {
+        Log.i(LOG_TAG, "initMap: $this")
         this.mMap = googleMap
         clearEverything()
         val update = CameraUpdateFactory.zoomBy(this.zoom)
@@ -192,7 +192,7 @@ class MapHelper @Inject constructor(
             .width(lineWidth).color(this@MapHelper.lineColor)
         val builder = LatLngBounds.Builder()
         for (i in 0 until list.size - 1) {
-//                    Log.i(LOG_TAG, "Add polyline");
+            Log.i(LOG_TAG, "Add polyline");
             options.add(list[i]).add(list[i + 1])
             builder.include(list[i])
         }
@@ -202,7 +202,7 @@ class MapHelper @Inject constructor(
             tmpBounds, MAP_PADDING
         )
 
-        Log.i(LOG_TAG, "About to overlay route..")
+        Log.i(LOG_TAG, "About to overlay route.. list: $list")
         handler.post {
             addMarker(list[0])
             addMarker(list[list.size - 1])
