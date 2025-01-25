@@ -3,17 +3,15 @@ import android.graphics.Color
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
-import android.widget.TextView
-import com.bartovapps.gpstriprec.presentation.displayers.DataDisplayer
-import java.text.DecimalFormat
+import java.util.Locale
 
-class MetricAltDisplayer : DataDisplayer {
+class MillageFormatter : UnitsFormatter {
     private val distanceBuilder: StringBuilder = StringBuilder()
-    private val unitBuilder: StringBuilder = StringBuilder("M")
-    private val numFormat: DecimalFormat = DecimalFormat("#,###.##")
+    private val unitBuilder: StringBuilder = StringBuilder("Mi")
 
-    override fun displayData(view: TextView, altitude: Double) {
-        distanceBuilder.replace(0, distanceBuilder.length, numFormat.format(altitude))
+    override fun formatUnits(data: Double) : SpannableString{
+        val miles = data / 1609.34
+        distanceBuilder.replace(0, distanceBuilder.length, String.format(Locale.getDefault(), "%.1f", miles))
         val ss1 = SpannableString(distanceBuilder.toString() + unitBuilder.toString())
         ss1.setSpan(RelativeSizeSpan(0.5f), distanceBuilder.length, ss1.length, 0) // set size
         ss1.setSpan(
@@ -21,7 +19,8 @@ class MetricAltDisplayer : DataDisplayer {
             distanceBuilder.length,
             ss1.length,
             0
-        ) // set color
-        view.text = ss1
+        )
+
+        return ss1
     }
 }

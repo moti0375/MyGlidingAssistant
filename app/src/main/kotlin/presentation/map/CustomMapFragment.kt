@@ -89,17 +89,10 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback {
         val update = CameraUpdateFactory.newLatLngBounds(
             tmpBounds, 100
         )
-
-        this.activity?.runOnUiThread { this.map.moveCamera(update) }
-
-        try {
-            Thread.sleep(3000)
-        } catch (e: InterruptedException) {
-            Thread.interrupted()
-        }
+        this.map.moveCamera(update)
     }
 
-    fun createMapSnapshot(callback: GoogleMap.SnapshotReadyCallback) {
+    fun takeMapSnapshot(callback: GoogleMap.SnapshotReadyCallback) {
         this.map.snapshot(callback)
     }
 

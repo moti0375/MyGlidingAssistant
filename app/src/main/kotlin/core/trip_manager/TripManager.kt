@@ -2,12 +2,14 @@ package core.trip_manager
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.location.Address
 import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.util.Log
+import com.bartovapps.gpstriprec.core.db.TripsDBOpenHelper
 import com.bartovapps.gpstriprec.core.db.TripsDataSource
 import com.bartovapps.gpstriprec.core.di.QTripsImagesDir
 import com.bartovapps.gpstriprec.core.kml.KmlManager
@@ -29,6 +31,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.FileOutputStream
 import java.sql.Date
 import java.text.SimpleDateFormat
 import javax.inject.Inject
@@ -38,7 +41,7 @@ interface TripManager {
     fun updateLocation(location: Location)
     fun resetRoute(resetMap: Boolean)
     fun updateRouteStatus(location: Location)
-    fun saveTrip(): SaveStatus
+    fun saveTrip(tripImage: Bitmap?): SaveStatus
     fun setCurrentLocation(location: Location)
     fun updateAccuracy(accuracy: Float)
     fun setSpeedFilter(speedFilter: Double)
@@ -124,7 +127,7 @@ class TripManagerImpl @Inject constructor(
                 this.currentLocation = newLocation
                 locations.add(markplace.toString())
                 latLngList.add(LatLng(this.latitude, this.longitude))
-                publishTripState(TripState.NewLocation(newLocation))
+                publishTripState(TripState.TripUpdated(newLocation, distance))
             }
         } else { // all other locations
             // only locations that has speed, bearing, and bigger than the
@@ -145,7 +148,7 @@ class TripManagerImpl @Inject constructor(
                 this.distance += portionLength[0]
                 this.currentLocation = newLocation
                 this.speed = newLocation.speed.toDouble()
-                publishTripState(TripState.NewLocation(newLocation))
+                publishTripState(TripState.TripUpdated(newLocation, distance))
                 if (speed > maxSpeed) {
                     maxSpeed = speed
                 }
@@ -207,7 +210,7 @@ class TripManagerImpl @Inject constructor(
                 stopTime = System.currentTimeMillis()
                 publishTripState(TripState.Stopped)
                 currentLocation?.let {
-                    publishTripState(TripState.NewLocation(it))
+                    publishTripState(TripState.TripUpdated(it, distance))
                 }
                 speed = location.speed.toDouble() // m/sec
             }
@@ -235,7 +238,7 @@ class TripManagerImpl @Inject constructor(
 
 
     @SuppressLint("SimpleDateFormat")
-    override fun saveTrip(): SaveStatus {
+    override fun saveTrip(tripImage: Bitmap?): SaveStatus {
         Log.i("TripManager", "About to save trip")
         return if (latLngList.size > 1) {
             kmlManager.openRawDocument()
@@ -254,7 +257,7 @@ class TripManagerImpl @Inject constructor(
 //			stopAddress = getAddress(new LatLng(currentLocation.getLatitude(),
 //					currentLocation.getLongitude()), context);
 //			Log.i(LOG_TAG, "End address: " + stopAddress);
-            duration = timer.timeMillis //mSec
+            duration = timer.getDuration() //mSec
             averageSpeed = (distance / (duration / 1000).toInt()).toDouble() // m/sec
             movementTime = duration - overallStopTime //mSec
             averageMoveSpeed = (distance / (movementTime / 1000).toInt()).toDouble() //m/sec
@@ -281,8 +284,11 @@ class TripManagerImpl @Inject constructor(
             }
             datasource.close()
 
-            Log.i(TAG, "data.model.Trip file $mapFile saved");
-            publishTripState(TripState.TripSaved(latLngList, mapImageFile))
+            Log.i(TAG, "data.model.Trip file $mapFile saved")
+            if(tripImage != null){
+                saveTripImage(tripImage, tripId, mapImageFile)
+            }
+            publishTripState(TripState.TripSaved(latLngList))
             SaveStatus.PASSED
         } else {
             SaveStatus.NOT_ENOUGH_DATA
@@ -332,6 +338,31 @@ class TripManagerImpl @Inject constructor(
             ImageMarker(markerUri, currentLocation!!.latitude, currentLocation!!.longitude)
         imageMarkers.add(imageMarker)
         publishTripState(TripState.NewImageMarker(imageMarker))
+    }
+
+    private fun saveTripImage(image: Bitmap, tripId: Long, mapImageFile: String) {
+            try {
+                val out = FileOutputStream(mapImageFile)
+                val bm: Bitmap = Bitmap.createScaledBitmap(
+                    image, 500,
+                    500, false
+                )
+                bm.compress(Bitmap.CompressFormat.JPEG, 50, out)
+                bm.recycle()
+
+                datasource.open()
+                datasource.updateTripData(tripId, TripsDBOpenHelper.COLUMN_MAP_IMAGE, mapImageFile)
+                datasource.close()
+                out.flush()
+                out.close()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e(
+                    "com.bartovapps.gpstriprec.core.map_helper.MapHelper",
+                    "There was an exception: " + e.message
+                )
+            }
+
     }
 
     override fun setCurrentLocation(location: Location) {

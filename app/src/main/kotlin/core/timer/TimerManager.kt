@@ -2,7 +2,9 @@ package com.bartovapps.gpstriprec.core.timer
 
 import android.os.Handler
 import com.bartovapps.gpstriprec.core.di.QTimerThread
-import com.bartovapps.gpstriprec.presentation.displayers.TimeDisplayer
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 interface TripTimer {
@@ -12,13 +14,12 @@ interface TripTimer {
     fun resetTimer()
     fun resumeTimer()
     fun setStartTime(timer: Long)
-    fun subscribeTimerChanges()
-    val timeMillis : Long
+    val timeMillisFlow: StateFlow<Long>
+    fun getDuration(): Long
 }
 
 class TimerManager @Inject constructor(
     @QTimerThread private val timerHandler: Handler,
-    private val timeDisplayer: TimeDisplayer,
 ) : TripTimer {
     private var startTime: Long = 0
 
@@ -27,11 +28,12 @@ class TimerManager @Inject constructor(
 
     private var pausedMsec: Long = 0
 
-    override var timeMillis: Long = 0
+    private val timerMutableStateFlow = MutableStateFlow<Long>(0)
+    override val timeMillisFlow = timerMutableStateFlow.asStateFlow()
+
 
     private val timerRunnable = Runnable {
-        timeMillis = System.currentTimeMillis() - startTime
-        //todo post timer value
+        timerMutableStateFlow.value = System.currentTimeMillis() - startTime
         postTimerEvent(1000)
     }
 
@@ -46,7 +48,7 @@ class TimerManager @Inject constructor(
 
     override fun pauseTimer() {
         timerHandler.removeCallbacks(timerRunnable)
-        pausedMsec = timeMillis
+        pausedMsec = timerMutableStateFlow.value
     }
 
     override fun resetTimer() {
@@ -67,13 +69,13 @@ class TimerManager @Inject constructor(
         get() = (minutes * 60 + seconds).toDouble()
 
     override fun setStartTime(startTime: Long) {
-        this.timeMillis = startTime
+        this.timerMutableStateFlow.value = startTime
         this.pausedMsec = startTime
         resumeTimer()
         pauseTimer()
     }
 
-    override fun subscribeTimerChanges() {
-        //todo implement timer subscription
+    override fun getDuration(): Long {
+        return this.timerMutableStateFlow.value
     }
 }

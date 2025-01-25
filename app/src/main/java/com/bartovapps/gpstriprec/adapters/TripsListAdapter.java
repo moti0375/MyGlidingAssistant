@@ -2,15 +2,12 @@ package com.bartovapps.gpstriprec.adapters;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Build;
-import android.util.LruCache;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +17,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bartovapps.gpstriprec.R;
-import com.bartovapps.gpstriprec.presentation.displayers.HmsDisplayer;
-import com.bartovapps.gpstriprec.presentation.displayers.TimeDisplayer;
+import com.bartovapps.gpstriprec.presentation.displayers.HmsFormatter;
+import com.bartovapps.gpstriprec.presentation.displayers.TimeFormatter;
 import com.bartovapps.gpstriprec.utils.Utils;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
@@ -36,7 +33,7 @@ public class TripsListAdapter extends BaseAdapter {
     private List<Trip> trips;
     private static LayoutInflater inflater = null;
     private Trip trip;
-    private TimeDisplayer timeDisplayer = new HmsDisplayer();
+    private TimeFormatter timeDisplayer = new HmsFormatter();
     private File imgFile;
     private Bitmap myBitmap;
     private SparseBooleanArray mSelectedItemsIds;
@@ -103,7 +100,7 @@ public class TripsListAdapter extends BaseAdapter {
 
         // Setting all values in listview
         viewHolder.tvDate.setText(trip.getDate());
-        timeDisplayer.displayTime(viewHolder.tvDuration, trip.getDuration());
+        viewHolder.tvDuration.setText(timeDisplayer.displayTime(trip.getDuration()));
         String tripTitle = trip.getTripName();
         if (tripTitle == null || tripTitle.length() == 0) {
             viewHolder.tvTitle.setText("");

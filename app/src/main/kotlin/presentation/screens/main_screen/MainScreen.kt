@@ -1,5 +1,8 @@
 package com.bartovapps.gpstriprec.presentation.screens.main_screen
 
+import com.bartovapps.gpstriprec.presentation.displayers.MetricFormatter
+import com.bartovapps.gpstriprec.presentation.displayers.MillageFormatter
+import com.bartovapps.gpstriprec.presentation.displayers.MphFormatter
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
@@ -48,14 +51,12 @@ import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
 import com.bartovapps.gpstriprec.data.enums.RecordingState
 import com.bartovapps.gpstriprec.data.enums.SaveStatus
 import com.bartovapps.gpstriprec.data.enums.Units
-import com.bartovapps.gpstriprec.displayers.FeetAltDisplayer
-import com.bartovapps.gpstriprec.displayers.MetricDisplayer
-import com.bartovapps.gpstriprec.displayers.MileageDisplayer
-import com.bartovapps.gpstriprec.displayers.MphDisplayer
 import com.bartovapps.gpstriprec.kmlhleper.KmlParserImpl
-import com.bartovapps.gpstriprec.presentation.displayers.DataDisplayer
-import com.bartovapps.gpstriprec.presentation.displayers.KmhDisplayer
-import com.bartovapps.gpstriprec.presentation.displayers.MetricAltDisplayer
+import com.bartovapps.gpstriprec.presentation.displayers.FeetFormatter
+import com.bartovapps.gpstriprec.presentation.displayers.UnitsFormatter
+import com.bartovapps.gpstriprec.presentation.displayers.HmsFormatter
+import com.bartovapps.gpstriprec.presentation.displayers.KmhFormatter
+import com.bartovapps.gpstriprec.presentation.displayers.MetricAltFormatter
 import com.bartovapps.gpstriprec.presentation.map.CustomSupportMapFragment
 import com.bartovapps.gpstriprec.presentation.map.MapReadyCallback
 import com.bartovapps.gpstriprec.services.GpsTripRecService
@@ -94,9 +95,10 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
     @Inject
     lateinit var timerManager: TripTimer
 
-    private lateinit var speedDisplayer: DataDisplayer
-    private lateinit var distanceDisplayer: DataDisplayer
-    private lateinit var altitudeDisplayer: DataDisplayer
+    private lateinit var speedFormatter: UnitsFormatter
+    private lateinit var distanceFormatter: UnitsFormatter
+    private lateinit var altitudeFormatter: UnitsFormatter
+    private val timeFormatter = HmsFormatter()
 
     private lateinit var lm: LocationManager
     private lateinit var settings: SharedPreferences
@@ -118,11 +120,11 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
 
     // Bool to track whether the app is already resolving an error
     private var uploadedTrip: Trip? = null
-    var recordingService: GpsTripRecService? = null
-    var serviceBounded: Boolean = false
-    var serviceIntent: Intent? = null
+    private var recordingService: GpsTripRecService? = null
+    private var serviceBounded: Boolean = false
+    private var serviceIntent: Intent? = null
 
-    lateinit var mapFrag: CustomSupportMapFragment
+    private lateinit var mapFrag: CustomSupportMapFragment
 
     private var toolbar: Toolbar? = null
 
@@ -166,19 +168,33 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
 
     private fun processTripState(state: TripState) {
         when (state) {
-            TripState.Initiated -> mapFrag.clearEverything()
+            is TripState.Initiated -> mapFrag.clearEverything()
             is TripState.NewImageMarker -> mapFrag.addImageMarker(state.imageMarker)
-            is TripState.NewLocation -> mapFrag.moveToLocationAndDrawLine(state.location)
-            TripState.OnGoing -> mapFrag.mapCameraCloseup()
-            is TripState.OverlayRoute -> TODO()
-            TripState.Stopped -> mapFrag.mapCameraLongShot()
-            is TripState.TripSaved -> mapFrag.fitCameraToRoute(state.locations)
+            is TripState.TripUpdated -> processTripUpdate(state)
+            is TripState.OnGoing -> mapFrag.mapCameraCloseup()
+            is TripState.OverlayRoute -> {
+                //todo implement when ready
+            }
+            is TripState.Stopped -> mapFrag.mapCameraLongShot()
+            is TripState.TripSaved -> {
+                mapFrag.fitCameraToRoute(state.locations)
+                savingTripPd?.dismiss()
+            }
             is TripState.StartLocation -> mapFrag.goToLocation(state.location)
         }
     }
 
+    private fun processTripUpdate(state: TripState.TripUpdated) {
+        mapFrag.moveToLocationAndDrawLine(state.location)
+        updateDisplay(state)
+    }
+
     private fun subscribeTimerChanges() {
-        timerManager.subscribeTimerChanges() //todo implement timer observer
+        lifecycleScope.launch {
+            timerManager.timeMillisFlow.collect{
+                tvTimer.text = timeFormatter.displayTime(it)
+            }
+        }
     }
 
 
@@ -221,7 +237,7 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
             this.altUnits = AltitudeUnits.Metric
         }
 
-        setDisplayers()
+        setFormatters()
 
         when (color) {
             2 -> this.lineColor = Color.GREEN
@@ -240,19 +256,19 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
         }
     }
 
-    private fun setDisplayers() {
+    private fun setFormatters() {
         if (units == Units.Millage) {
-            speedDisplayer = MphDisplayer()
-            distanceDisplayer = MileageDisplayer()
+            speedFormatter = MphFormatter()
+            distanceFormatter = MillageFormatter()
         } else {
-            speedDisplayer = KmhDisplayer()
-            distanceDisplayer = MetricDisplayer()
+            speedFormatter = KmhFormatter()
+            distanceFormatter = MetricFormatter()
         }
 
-        altitudeDisplayer = if (altUnits == AltitudeUnits.Feet) {
-            FeetAltDisplayer()
+        altitudeFormatter = if (altUnits == AltitudeUnits.Feet) {
+            FeetFormatter()
         } else {
-            MetricAltDisplayer()
+            MetricAltFormatter()
         }
     }
 
@@ -336,7 +352,6 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
         enableLocationListener(fixListener)
         mapFrag.zoom = cameraZoom
         mapFrag.tilt = 0f
-        updateDisplay()
         gpsPd?.apply {
             setCancelable(true)
             setOnCancelListener(pdOnCancelListener)
@@ -368,7 +383,6 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
             fabStartStop.setImageDrawable(resources.getDrawable(R.drawable.ic_action_new))
         }
         fabStartCamera.visibility = View.INVISIBLE
-
         uploadedTrip = null
         stopService()
     }
@@ -419,7 +433,9 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
     override fun onDestroy() {
         if (recordingState == RecordingState.Recording) {
             stopRecording()
-            tripManager.saveTrip()
+            mapFrag.takeMapSnapshot{
+                tripManager.saveTrip(it)
+            }
         }
 
         disableGpsLocationListener(trackLocationListener)
@@ -541,14 +557,14 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
             )
         }
 
-    private fun updateDisplay() {
-//        speedDisplayer.displayData(tvSpeed, routeManager.getSpeed());
-//        distanceDisplayer.displayData(tvDistance, routeManager.getDistance());
-//        altitudeDisplayer.displayData(tvAltitude, routeManager.getAltitude());
-//
-//        if (recordingService != null && serviceBounded) {
-//            recordingService.updateService(routeManager.getDistance());
-//        }
+    private fun updateDisplay(tripUpdate: TripState.TripUpdated) {
+        tvSpeed.text = speedFormatter.formatUnits(tripUpdate.location.speed.toDouble())
+        tvDistance.text = distanceFormatter.formatUnits(tripUpdate.distance.toDouble())
+        tvAltitude.text = altitudeFormatter.formatUnits(tripUpdate.location.altitude)
+
+        if (recordingService != null && serviceBounded) {
+            recordingService?.updateService(tripUpdate.distance)
+        }
     }
 
 
@@ -586,29 +602,17 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
 
     private fun setUpMapIfNeeded() {
         Log.i(TAG, "setUpMapIfNeeded: initializing map")
-        if (!this::mapFrag.isInitialized) {
-            mapFrag = supportFragmentManager.findFragmentById(R.id.map) as CustomSupportMapFragment
-            mapFrag.lineWidth = lineWidth
-            mapFrag.setMapReadyCallback(this)
-        }
+        mapFrag = supportFragmentManager.findFragmentById(R.id.map) as CustomSupportMapFragment
+        mapFrag.lineWidth = lineWidth
+        mapFrag.setMapReadyCallback(this)
     }
 
     private fun saveTripAlertDialog() {
-        val alertDialogBuilder = AlertDialog.Builder(
-            this
-        )
-
-        // set title
-        alertDialogBuilder.setTitle(
-            resources
-                .getString(R.string.SAVE_TRIP)
-        )
-
-        // set dialog message
-        alertDialogBuilder
+        val alertDialogBuilder = AlertDialog.Builder(this).apply {
+            setTitle(resources.getString(R.string.SAVE_TRIP))
             .setMessage(resources.getString(R.string.SaveDialog))
             .setCancelable(true)
-            .setIcon(ResourcesCompat.getDrawable(resources, R.drawable.ic_launcher, this.theme))
+            .setIcon(ResourcesCompat.getDrawable(resources, R.drawable.ic_launcher, this@MainScreen.theme))
             .setPositiveButton(
                 resources.getString(R.string.YES)
             ) { dialog: DialogInterface, id: Int ->
@@ -621,7 +625,8 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
                 stopRecording()
                 dialog.dismiss()
             }
-
+        }
+        // set title
         // create alert dialog
         val alertDialog = alertDialogBuilder.create()
 
@@ -728,17 +733,18 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
     private inner class SaveTripTask : AsyncTask<String?, Void?, String>() {
         override fun doInBackground(vararg params: String?): String {
             var result = ""
-            val status = tripManager.saveTrip()
-            when (status) {
-                SaveStatus.PASSED -> result = resources.getString(R.string.TripSaved)
-                SaveStatus.NOT_ENOUGH_DATA -> result = resources.getString(R.string.NotEnoughData)
-                else -> {}
+            mapFrag.takeMapSnapshot{
+                val status = tripManager.saveTrip(it)
+                when (status) {
+                    SaveStatus.PASSED -> result = resources.getString(R.string.TripSaved)
+                    SaveStatus.NOT_ENOUGH_DATA -> result = resources.getString(R.string.NotEnoughData)
+                    else -> {}
+                }
             }
             return result
         }
 
         override fun onPostExecute(result: String) {
-            savingTripPd?.dismiss()
             Toast.makeText(this@MainScreen, result, Toast.LENGTH_LONG).show()
         }
     }
@@ -844,7 +850,6 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
                     this@MainScreen, resources.getString(R.string.TripLoaded),
                     Toast.LENGTH_LONG
                 ).show()
-                updateDisplay()
             } else {
                 uploadedTrip = null
                 Toast.makeText(

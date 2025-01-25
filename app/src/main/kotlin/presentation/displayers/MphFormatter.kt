@@ -1,20 +1,18 @@
-package com.bartovapps.gpstriprec.displayers
+package com.bartovapps.gpstriprec.presentation.displayers
 
 import android.graphics.Color
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
-import android.widget.TextView
-import com.bartovapps.gpstriprec.presentation.displayers.DataDisplayer
 import java.util.Locale
 
-class MphDisplayer : DataDisplayer {
+class MphFormatter : UnitsFormatter {
     private val speedBuilder: StringBuilder = StringBuilder()
     private val unitBuilder: StringBuilder = StringBuilder("Mi/H")
 
-    override fun displayData(view: TextView, value: Double) {
+    override fun formatUnits(data: Double): SpannableString {
         // 1mph = 1 m/sec * 2.23694
-        val mph = value * 2.23694
+        val mph = data * 2.23694
 
         speedBuilder.replace(
             0, speedBuilder.length,
@@ -33,6 +31,7 @@ class MphDisplayer : DataDisplayer {
             ss1.length, 0
         ) // set color
 
-        view.text = ss1
+        return ss1
     }
+
 }

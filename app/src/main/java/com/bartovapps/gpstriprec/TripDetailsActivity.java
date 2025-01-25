@@ -38,16 +38,16 @@ import com.bartovapps.gpstriprec.core.map_helper.ImageMarker;
 import com.bartovapps.gpstriprec.core.map_helper.MapHelper;
 import com.bartovapps.gpstriprec.data.enums.AltitudeUnits;
 import com.bartovapps.gpstriprec.data.enums.Units;
-import com.bartovapps.gpstriprec.displayers.FeetAltDisplayer;
-import com.bartovapps.gpstriprec.displayers.MetricDisplayer;
-import com.bartovapps.gpstriprec.displayers.MileageDisplayer;
-import com.bartovapps.gpstriprec.displayers.MphDisplayer;
 import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
-import com.bartovapps.gpstriprec.presentation.displayers.DataDisplayer;
-import com.bartovapps.gpstriprec.presentation.displayers.HmsDisplayer;
-import com.bartovapps.gpstriprec.presentation.displayers.KmhDisplayer;
-import com.bartovapps.gpstriprec.presentation.displayers.MetricAltDisplayer;
-import com.bartovapps.gpstriprec.presentation.displayers.TimeDisplayer;
+import com.bartovapps.gpstriprec.presentation.displayers.FeetFormatter;
+import com.bartovapps.gpstriprec.presentation.displayers.MetricFormatter;
+import com.bartovapps.gpstriprec.presentation.displayers.MillageFormatter;
+import com.bartovapps.gpstriprec.presentation.displayers.MphFormatter;
+import com.bartovapps.gpstriprec.presentation.displayers.UnitsFormatter;
+import com.bartovapps.gpstriprec.presentation.displayers.HmsFormatter;
+import com.bartovapps.gpstriprec.presentation.displayers.KmhFormatter;
+import com.bartovapps.gpstriprec.presentation.displayers.MetricAltFormatter;
+import com.bartovapps.gpstriprec.presentation.displayers.TimeFormatter;
 import com.bartovapps.gpstriprec.utils.Utils;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapLoadedCallback;
@@ -125,11 +125,11 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
     TextView tvStopTime;
     TextView tvTripDetailsHead;
 
-    DataDisplayer speedDisplayer;
-    DataDisplayer moveSpeedDisplayer;
-    DataDisplayer distanceDisplayer;
-    DataDisplayer altitudeDisplayer;
-    TimeDisplayer timeDisplayer;
+    UnitsFormatter speedDisplayer;
+    UnitsFormatter moveSpeedDisplayer;
+    UnitsFormatter distanceDisplayer;
+    UnitsFormatter altitudeDisplayer;
+    TimeFormatter timeDisplayer;
 
     Units units = Units.Metric;
     AltitudeUnits altUnits = AltitudeUnits.Feet;
@@ -467,7 +467,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
     }
 
     private void getTripDetails() {
-        timeDisplayer = new HmsDisplayer();
+        timeDisplayer = new HmsFormatter();
 
         date = trip.getDate();
         distance = trip.getDistance();
@@ -495,37 +495,37 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
 
     private void setDisplayers() {
         if (this.units == Units.Millage) {
-            speedDisplayer = new MphDisplayer();
-            moveSpeedDisplayer = new MphDisplayer();
-            distanceDisplayer = new MileageDisplayer();
+            speedDisplayer = new MphFormatter();
+            moveSpeedDisplayer = new MphFormatter();
+            distanceDisplayer = new MillageFormatter();
         } else {
-            speedDisplayer = new KmhDisplayer();
-            moveSpeedDisplayer = new KmhDisplayer();
-            distanceDisplayer = new MetricDisplayer();
+            speedDisplayer = new KmhFormatter();
+            moveSpeedDisplayer = new KmhFormatter();
+            distanceDisplayer = new MetricFormatter();
         }
 
         if (this.altUnits == AltitudeUnits.Feet) {
-            altitudeDisplayer = new FeetAltDisplayer();
+            altitudeDisplayer = new FeetFormatter();
         } else {
-            altitudeDisplayer = new MetricAltDisplayer();
+            altitudeDisplayer = new MetricAltFormatter();
         }
     }
 
     private void updateDisplay() {
         tvWhen.setText("" + date);
-        timeDisplayer.displayTime(tvDuration, duration);
-        distanceDisplayer.displayData(tvDistance, distance);
-        speedDisplayer.displayData(tvAvSpeed,  averageSpeed);
-        speedDisplayer.displayData(tvMaxSpeed,  maxSpeed);
-        altitudeDisplayer.displayData(tvMaxAltitude, maxAltitude);
-        timeDisplayer.displayTime(tvMoveTime, moveTime);
-        timeDisplayer.displayTime(tvStopTime, stopTime);
+        tvDuration.setText(timeDisplayer.displayTime(duration));
+        tvDistance.setText(distanceDisplayer.formatUnits(distance));
+        tvAvSpeed.setText(speedDisplayer.formatUnits(averageSpeed));
+        tvMaxSpeed.setText(speedDisplayer.formatUnits(maxSpeed));
+        tvMaxAltitude.setText(altitudeDisplayer.formatUnits(maxAltitude));
+        tvMoveTime.setText(timeDisplayer.displayTime(moveTime));
+        tvStopTime.setText(timeDisplayer.displayTime(stopTime));
         tvTripDetailsHead.setText(tripTitle);
 
         if (averageMoveSpeed == 0) {
             tvAverageMoveSpeed.setText(getString(R.string.UnavailableData));
         } else {
-            moveSpeedDisplayer.displayData(tvAverageMoveSpeed, averageMoveSpeed);
+            tvAverageMoveSpeed.setText(moveSpeedDisplayer.formatUnits(averageMoveSpeed));
         }
     }
 

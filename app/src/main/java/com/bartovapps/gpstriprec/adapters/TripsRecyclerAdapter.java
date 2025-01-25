@@ -1,6 +1,5 @@
 package com.bartovapps.gpstriprec.adapters;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
@@ -17,8 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bartovapps.gpstriprec.R;
-import com.bartovapps.gpstriprec.presentation.displayers.HmsDisplayer;
-import com.bartovapps.gpstriprec.presentation.displayers.TimeDisplayer;
+import com.bartovapps.gpstriprec.presentation.displayers.HmsFormatter;
+import com.bartovapps.gpstriprec.presentation.displayers.TimeFormatter;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
@@ -36,7 +35,7 @@ public class TripsRecyclerAdapter extends RecyclerView.Adapter<TripsRecyclerAdap
     private static final String LOG_TAG = TripsRecyclerAdapter.class.getSimpleName();
     private final List<Trip> data = new ArrayList<>();
     private final SparseBooleanArray selectedItems;
-    private final TimeDisplayer timeDisplayer = new HmsDisplayer();
+    private final TimeFormatter timeDisplayer = new HmsFormatter();
 
     public TripsRecyclerAdapter() {
         selectedItems = new SparseBooleanArray();
@@ -60,7 +59,7 @@ public class TripsRecyclerAdapter extends RecyclerView.Adapter<TripsRecyclerAdap
             holder.tvTitle.setText(tripTitle);
         }
         holder.tvDate.setText(trip.getDate());
-        timeDisplayer.displayTime(holder.tvDuration, trip.getDuration());
+        holder.tvDuration.setText(timeDisplayer.displayTime(trip.getDuration()));
         holder.itemView.setActivated(selectedItems.get(position, false));
         Picasso.with(holder.itemView.getContext())
                 .load(new File(trip.getImageFileName())).transform(new CircleTransform())

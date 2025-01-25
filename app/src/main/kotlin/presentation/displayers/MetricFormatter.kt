@@ -1,19 +1,16 @@
-package com.bartovapps.gpstriprec.displayers
-
+package com.bartovapps.gpstriprec.presentation.displayers
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.RelativeSizeSpan
-import android.widget.TextView
-import com.bartovapps.gpstriprec.presentation.displayers.DataDisplayer
 
 @SuppressLint("DefaultLocale")
-class MetricDisplayer : DataDisplayer {
+class MetricFormatter : UnitsFormatter {
     private val distanceBuilder: StringBuilder = StringBuilder()
     private val unitBuilder: StringBuilder = StringBuilder("M")
 
-    override fun displayData(view: TextView, data: Double) {
+    override fun formatUnits( data: Double) : SpannableString{
         var distance = data
         if (distance < 1000) {
             unitBuilder.replace(0, unitBuilder.length, "M")
@@ -31,6 +28,7 @@ class MetricDisplayer : DataDisplayer {
             ss1.length,
             0
         ) // set color
-        view.text = ss1
+        return ss1
     }
+
 }
