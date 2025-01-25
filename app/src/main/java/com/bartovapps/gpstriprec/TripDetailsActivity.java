@@ -51,8 +51,8 @@ import com.bartovapps.gpstriprec.presentation.displayers.TimeDisplayer;
 import com.bartovapps.gpstriprec.utils.Utils;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMapLoadedCallback;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 
@@ -270,7 +270,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
     @SuppressLint("NewApi")
     private boolean initMap() {
         if (mMap == null) {
-            MapFragment mapFrag = (MapFragment) getFragmentManager()
+            SupportMapFragment mapFrag = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.savedMap);
             mapFrag.getMapAsync(this);
         }
@@ -413,7 +413,7 @@ public class TripDetailsActivity extends AppCompatActivity implements GoogleMap.
         // Do a null check to confirm that we have not already instantiated the
         // map.
         if (mMap == null && Utils.servicesOk(TripDetailsActivity.this)){
-            MapFragment mapFrag = (MapFragment) getFragmentManager()
+            SupportMapFragment mapFrag = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.savedMap);
             mapFrag.getMapAsync(this);
             // Check if we were successful in obtaining the map.

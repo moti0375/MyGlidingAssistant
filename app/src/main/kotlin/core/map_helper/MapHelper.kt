@@ -68,7 +68,7 @@ class MapHelper @Inject constructor(
     private val markersIdsMap: MutableMap<String, ImageMarker?> = LinkedHashMap()
 
     fun initMap(googleMap: GoogleMap) {
-        //Todo refactor this with a CustomMapFragment
+        //Todo refactor this with a com.bartovapps.gpstriprec.presentation.map.CustomMapFragment
         Log.i(LOG_TAG, "initMap: $this")
         this.mMap = googleMap
         clearEverything()
