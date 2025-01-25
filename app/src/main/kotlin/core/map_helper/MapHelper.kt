@@ -95,7 +95,7 @@ class MapHelper @Inject constructor(
     private fun drawLine(ll: LatLng) {
         if (lastMarker != null) {
             val options = PolylineOptions()
-                .add(lastMarker!!.position).add(marker!!.position)
+                .add(lastMarker?.position).add(marker?.position)
                 .width(lineWidth).color(lineColor)
 
             line = mMap.addPolyline(options)
@@ -567,7 +567,7 @@ class MapHelper @Inject constructor(
             e.printStackTrace()
         }
 
-        val orientation = exifInterface!!.getAttributeInt(
+        val orientation = exifInterface?.getAttributeInt(
             ExifInterface.TAG_ORIENTATION,
             ExifInterface.ORIENTATION_UNDEFINED
         )
