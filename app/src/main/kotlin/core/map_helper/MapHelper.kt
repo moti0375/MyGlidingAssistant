@@ -43,7 +43,6 @@ import kotlin.math.min
 
 import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.core.di.QTripsImagesDir
-import javax.inject.Singleton
 
 class MapHelper @Inject constructor(
     @QMainThread private val handler: Handler,
@@ -74,7 +73,7 @@ class MapHelper @Inject constructor(
         clearEverything()
         val update = CameraUpdateFactory.zoomBy(this.zoom)
         mMap.moveCamera(update)
-        mMap.setInfoWindowAdapter(CustomInfoWindowAdapter(LayoutInflater.from(context)))
+//        mMap.setInfoWindowAdapter(CustomInfoWindowAdapter(LayoutInflater.from(context)))
     }
 
     fun setLocation(location: Location) {
@@ -84,15 +83,16 @@ class MapHelper @Inject constructor(
     }
 
     fun goToLocation(location: Location) {
-        latLng = LatLng(location.latitude, location.longitude)
         this.bearing = location.bearing
-        moveCamera(latLng!!, this.bearing)
-        addMarker(latLng!!)
-        drawLine(latLng!!)
+        LatLng(location.latitude, location.longitude).also {
+            moveCamera(it, this.bearing)
+            addMarker(it)
+            drawLine()
+        }
     }
 
 
-    private fun drawLine(ll: LatLng) {
+    private fun drawLine() {
         if (lastMarker != null) {
             val options = PolylineOptions()
                 .add(lastMarker?.position).add(marker?.position)
@@ -439,84 +439,6 @@ class MapHelper @Inject constructor(
     }
 
 
-    inner class CustomInfoWindowAdapter internal constructor(inflater: LayoutInflater) :
-        InfoWindowAdapter {
-        // These a both viewgroups containing an ImageView with id "badge" and two TextViews with id
-        // "title" and "snippet".
-        private val mWindow: View = inflater.inflate(R.layout.custom_info_window, null)
-
-        override fun getInfoWindow(marker: Marker): View? {
-            render(marker, mWindow)
-            return mWindow
-        }
-
-        override fun getInfoContents(marker: Marker): View? {
-            return null
-        }
-
-        private fun render(marker: Marker, view: View) {
-            Log.i(LOG_TAG, "render function was called. marker id: " + marker.id)
-            val imageView = view.findViewById<View>(R.id.markerImage) as ImageView
-
-            if (markersIdsMap[marker.id] == null) {  //This means it's the a marker with no image.. (like trip start and end locations)
-                imageView.setImageDrawable(
-                    ResourcesCompat.getDrawable(
-                        context.resources,
-                        R.drawable.ic_launcher,
-                        context.theme
-                    )
-                )
-            } else {
-                val imageUri = markersIdsMap[marker.id]!!.imageUri
-                val imagePath = imageUri?.path
-                val imgFile = File(imagePath)
-
-                if (!imgFile.exists()) {  //This can happen if user erased the image from gallery
-                    imageView.setImageDrawable(
-                        ResourcesCompat.getDrawable(
-                            context.resources,
-                            R.drawable.image_broken,
-                            context.theme
-                        )
-                    )
-                    //                        Picasso.with(activity).load(R.drawable.ic_launcher).into(imageView);
-                } else {
-                    val rotation = getImageRotation(imagePath!!)
-                    val reducedSizeImage = getReducedImage(imageUri.path)
-                    imageView.setImageBitmap(rotateImage(reducedSizeImage, imageUri.path!!))
-                    //                        Picasso.with(activity).load(imageUri.getPath()).fit().centerInside().into(imageView);
-                }
-
-                //                    imageView.setImageBitmap(reducedSizeImage);
-
-//                    if(imgFile.exists()){
-//                    }else{
-//                    }
-            }
-
-            //            String title = marker.getTitle();
-//            TextView titleUi = ((TextView) view.findViewById(R.id.title));
-//            if (title != null) {
-//                // Spannable string allows us to edit the formatting of the text.
-//                SpannableString titleText = new SpannableString(title);
-//                titleText.setSpan(new ForegroundColorSpan(Color.RED), 0, titleText.length(), 0);
-//                titleUi.setText(titleText);
-//            } else {
-//                titleUi.setText("");
-//            }
-//
-//            String snippet = marker.getSnippet();
-//            TextView snippetUi = ((TextView) view.findViewById(R.id.snippet));
-//            if (snippet != null && snippet.length() > 12) {
-//                SpannableString snippetText = new SpannableString(snippet);
-//                snippetText.setSpan(new ForegroundColorSpan(Color.MAGENTA), 0, snippet.length()/2, 0);
-//                snippetText.setSpan(new ForegroundColorSpan(Color.BLUE), (snippet.length()/2)+1, snippet.length(), 0);
-//                snippetUi.setText(snippetText);
-//            } else {
-//                snippetUi.setText("");
-//            }
-        }
-    }
 
 
     fun getReducedImage(imageFileLocation: String?): Bitmap {

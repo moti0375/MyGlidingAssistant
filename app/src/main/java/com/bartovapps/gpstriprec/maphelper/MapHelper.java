@@ -102,7 +102,7 @@
 //        clearEverything();
 //        CameraUpdate update = CameraUpdateFactory.zoomBy(this.zoom);
 //        mMap.moveCamera(update);
-//        //mMap.setInfoWindowAdapter(new CustomInfoWindowAdapter(null));
+//        //mMap.setInfoWindowAdapter(new com.bartovapps.gpstriprec.presentation.map.CustomInfoWindowAdapter(null));
 //
 //    }
 //
@@ -512,13 +512,13 @@
 //
 //    }
 //
-//    public class CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
+//    public class com.bartovapps.gpstriprec.presentation.map.CustomInfoWindowAdapter implements GoogleMap.InfoWindowAdapter {
 //
 //        // These a both viewgroups containing an ImageView with id "badge" and two TextViews with id
 //        // "title" and "snippet".
 //        private final View mWindow;
 //
-//        CustomInfoWindowAdapter(LayoutInflater inflater) {
+//        com.bartovapps.gpstriprec.presentation.map.CustomInfoWindowAdapter(LayoutInflater inflater) {
 //            mWindow = inflater.inflate(R.layout.custom_info_window, null);
 //        }
 //

@@ -10,11 +10,10 @@ import android.net.Uri
 import android.util.Log
 import com.bartovapps.gpstriprec.core.db.TripsDataSource
 import com.bartovapps.gpstriprec.core.di.QTripsImagesDir
-import com.bartovapps.gpstriprec.core.di.QTripsKmlDir
 import com.bartovapps.gpstriprec.core.kml.KmlManager
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
-import com.bartovapps.gpstriprec.core.map_helper.MapHelper
 import com.bartovapps.gpstriprec.core.timer.TripTimer
+import com.bartovapps.gpstriprec.core.trip_manager.TripState
 import com.bartovapps.gpstriprec.data.enums.MovementState
 import com.bartovapps.gpstriprec.data.enums.SaveStatus
 import com.bartovapps.gpstriprec.kmlhleper.KmlParser
@@ -24,6 +23,12 @@ import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.qualifiers.ApplicationContext
 import data.model.Trip
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.sql.Date
 import java.text.SimpleDateFormat
 import javax.inject.Inject
@@ -41,20 +46,21 @@ interface TripManager {
     fun getAddress(location: LatLng): String?
     fun uploadTrip(trip: Trip): Int
     fun addImageMarker(capturedImageUri: Uri)
+    val tripStateFlow : StateFlow<TripState>
 }
 
 
 class TripManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    @QTripsKmlDir private val tripsKmlDir: String,
     @QTripsImagesDir private val tripsImagesDir: String,
-    private val mapHelper: MapHelper,
     private val datasource: TripsDataSource,
     private val timer: TripTimer,
     private val kmlManager: KmlManager,
     private val kmlParser: KmlParser,
     private val geocoder: Geocoder
 ) : TripManager {
+    private val tripMutableStateFlow = MutableStateFlow<TripState>(TripState.Initiated)
+    override val tripStateFlow: StateFlow<TripState> = tripMutableStateFlow.asStateFlow()
     private var startLocation: Location? = null
 
     /**
@@ -116,9 +122,9 @@ class TripManagerImpl @Inject constructor(
                 // required.
                 this.startLocation = newLocation
                 this.currentLocation = newLocation
-                mapHelper.goToLocation(newLocation)
                 locations.add(markplace.toString())
                 latLngList.add(LatLng(this.latitude, this.longitude))
+                publishTripState(TripState.NewLocation(newLocation))
             }
         } else { // all other locations
             // only locations that has speed, bearing, and bigger than the
@@ -139,7 +145,7 @@ class TripManagerImpl @Inject constructor(
                 this.distance += portionLength[0]
                 this.currentLocation = newLocation
                 this.speed = newLocation.speed.toDouble()
-                mapHelper.goToLocation(newLocation)
+                publishTripState(TripState.NewLocation(newLocation))
                 if (speed > maxSpeed) {
                     maxSpeed = speed
                 }
@@ -157,7 +163,7 @@ class TripManagerImpl @Inject constructor(
                     moveState = MovementState.Moving
                     stopTime = System.currentTimeMillis() - stopTime
                     overallStopTime += stopTime
-                    mapHelper.mapCameraCloseup()
+                    publishTripState(TripState.OnGoing)
                 }
             }
             updateRouteStatus(newLocation)
@@ -180,7 +186,7 @@ class TripManagerImpl @Inject constructor(
         this.maxAltitude = 0.0
         this.movementTime = 0
         if (resetMap) {
-            mapHelper.clearEverything()
+            publishTripState(TripState.Initiated)
         }
         locations.clear()
         latLngList.clear()
@@ -199,9 +205,9 @@ class TripManagerImpl @Inject constructor(
             if (moveState == MovementState.Moving) {
                 moveState = MovementState.Stopped
                 stopTime = System.currentTimeMillis()
-                mapHelper.mapCameraLongshot()
+                publishTripState(TripState.Stopped)
                 currentLocation?.let {
-                    mapHelper.goToLocation(it)
+                    publishTripState(TripState.NewLocation(it))
                 }
                 speed = location.speed.toDouble() // m/sec
             }
@@ -232,7 +238,6 @@ class TripManagerImpl @Inject constructor(
     override fun saveTrip(): SaveStatus {
         Log.i("TripManager", "About to save trip")
         return if (latLngList.size > 1) {
-            mapHelper.viewRoute(latLngList)
             kmlManager.openRawDocument()
             val timestamp = System.currentTimeMillis()
             val mapImageFile = "$tripsImagesDir/trip_$timestamp.jpeg"
@@ -253,8 +258,6 @@ class TripManagerImpl @Inject constructor(
             averageSpeed = (distance / (duration / 1000).toInt()).toDouble() // m/sec
             movementTime = duration - overallStopTime //mSec
             averageMoveSpeed = (distance / (movementTime / 1000).toInt()).toDouble() //m/sec
-
-
             val trip = Trip(
                 kml = mapFile,
                 date = date,
@@ -279,7 +282,7 @@ class TripManagerImpl @Inject constructor(
             datasource.close()
 
             Log.i(TAG, "data.model.Trip file $mapFile saved");
-            mapHelper.saveMapAsImage(mapImageFile)
+            publishTripState(TripState.TripSaved(latLngList, mapImageFile))
             SaveStatus.PASSED
         } else {
             SaveStatus.NOT_ENOUGH_DATA
@@ -317,13 +320,9 @@ class TripManagerImpl @Inject constructor(
         imageMarkers.clear()
         imageMarkers.addAll(datasource.findAllMarkersForTrip(trip.id))
         datasource.close()
-
-        mapHelper.clearEverything()
-        mapHelper.overlayRoute(latLngList, 10f, Color.CYAN)
-        for (marker in imageMarkers) {
-            mapHelper.addImageMarker(marker, context)
-        }
-        mapHelper.viewRoute(latLngList)
+        tripMutableStateFlow
+        publishTripState(TripState.Initiated)
+        publishTripState(TripState.OverlayRoute(latLngList, 10f, Color.CYAN, imageMarkers))
         return kmlStatus
     }
 
@@ -332,19 +331,12 @@ class TripManagerImpl @Inject constructor(
         val imageMarker =
             ImageMarker(markerUri, currentLocation!!.latitude, currentLocation!!.longitude)
         imageMarkers.add(imageMarker)
-        mapHelper.addImageMarker(imageMarker, context)
-        //        Log.i(LOG_TAG, imageMarkers.size() + " ImageMarkers for this trip");
-    }
-
-    fun addImageMarker(markerUri: Uri?, location: Location) {
-        val imageMarker = ImageMarker(markerUri, location.latitude, location.longitude)
-        imageMarkers!!.add(imageMarker)
-        mapHelper.addImageMarker(imageMarker, context)
-        //        Log.i(LOG_TAG, imageMarkers.size() + " ImageMarkers for this trip");
+        publishTripState(TripState.NewImageMarker(imageMarker))
     }
 
     override fun setCurrentLocation(location: Location) {
         currentLocation = location
+        publishTripState(TripState.StartLocation(location))
     }
 
     override fun updateAccuracy(accuracy: Float) {
@@ -471,6 +463,12 @@ class TripManagerImpl @Inject constructor(
         return address
     }
 
+
+    private fun publishTripState(state: TripState){
+        CoroutineScope(Dispatchers.Main).launch {
+            tripMutableStateFlow.value = state
+        }
+    }
 
     companion object {
         private const val TAG = "TripManager"

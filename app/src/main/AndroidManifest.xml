@@ -101,7 +101,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".GpsRecMain"
+            android:name=".presentation.screens.main_screen.MainScreen"
             android:alwaysRetainTaskState="true"
             android:exported="true"
             android:configChanges="orientation|screenSize"
@@ -119,7 +119,7 @@
             android:theme="@style/ListViewTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".GpsRecMain" />
+                android:value=".presentation.screens.main_screen.MainScreen" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -15,10 +15,10 @@ import android.preference.PreferenceManager;
 
 import androidx.core.app.NotificationCompat;
 
-import com.bartovapps.gpstriprec.GpsRecMain;
 import com.bartovapps.gpstriprec.R;
 import com.bartovapps.gpstriprec.data.enums.AltitudeUnits;
 import com.bartovapps.gpstriprec.data.enums.Units;
+import com.bartovapps.gpstriprec.presentation.screens.main_screen.MainScreen;
 
 /**
  * Created by BartovMoti on 03/11/15.
@@ -45,7 +45,7 @@ public class GpsTripRecService extends Service {
         String notificationService = Context.NOTIFICATION_SERVICE;
         notificationManager = (NotificationManager) getSystemService(notificationService);
         Intent notificationIntent = new Intent(this,
-                GpsRecMain.class);
+                MainScreen.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         String channelId = createNotificationChannel("GpsTripRecorderNotification");
 

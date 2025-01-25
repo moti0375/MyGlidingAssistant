@@ -6,12 +6,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.os.Looper;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bartovapps.gpstriprec.presentation.screens.main_screen.MainScreen;
 import com.bartovapps.gpstriprec.utils.Utils;
 import com.squareup.picasso.Picasso;
 
@@ -37,7 +39,7 @@ public class SplashScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splash_screen);
-        i = new Intent(SplashScreen.this, GpsRecMain.class);
+        i = new Intent(SplashScreen.this, MainScreen.class);
         attachmentFile = getExternalFilesDir(null) + "/" + "attachment.kml";
         version = Utils.getApplicationVersion(SplashScreen.this);
         iv = findViewById(R.id.splashImage);
@@ -49,7 +51,7 @@ public class SplashScreen extends AppCompatActivity {
                 .centerInside()
                 .into(iv);
 
-        new Handler().postDelayed(() -> startMainActivity(), SPLASH_TIMEOUT);
+        new Handler(Looper.getMainLooper()).postDelayed(this::startMainActivity, SPLASH_TIMEOUT);
     }
 
 
