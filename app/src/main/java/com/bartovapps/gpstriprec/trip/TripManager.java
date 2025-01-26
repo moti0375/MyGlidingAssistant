@@ -15,7 +15,7 @@
 //import com.bartovapps.gpstriprec.enums.com.bartovapps.gpstriprec.data.enums.MovementState;
 //import com.bartovapps.gpstriprec.enums.com.bartovapps.gpstriprec.data.enums.SaveStatus;
 //import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.kml.KmlManager;
-//import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
+//import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.trip_manager.KmlParser;
 //import com.bartovapps.gpstriprec.maphelper.ImageMarker;
 //import com.bartovapps.gpstriprec.maphelper.com.bartovapps.gpstriprec.core.map_helper.MapHelper;
 //import com.bartovapps.gpstriprec.timer.com.bartovapps.gpstriprec.core.timer.TimerManager;
@@ -396,8 +396,8 @@
 //            return KML_NOT_FOUND;
 //        }
 //
-//        KmlParser tripAParser = new KmlParser(tripA.getKml());
-//        KmlParser tripBParser = new KmlParser(tripB.getKml());
+//        com.bartovapps.gpstriprec.core.trip_manager.KmlParser tripAParser = new com.bartovapps.gpstriprec.core.trip_manager.KmlParser(tripA.getKml());
+//        com.bartovapps.gpstriprec.core.trip_manager.KmlParser tripBParser = new com.bartovapps.gpstriprec.core.trip_manager.KmlParser(tripB.getKml());
 //        tripAParser.openTripKml();
 //        tripBParser.openTripKml();
 //
@@ -461,7 +461,7 @@
 //    }
 //
 //    public int uploadTrip(Trip trip) {
-//        int kml_status = KmlParser.KML_OPENED;
+//        int kml_status = com.bartovapps.gpstriprec.core.trip_manager.KmlParser.KML_OPENED;
 //        this.uploadedTrip = trip;
 //        this.distance = this.uploadedTrip.getDistance();
 //        this.maxSpeed = this.uploadedTrip.getMaxSpeed();
@@ -470,17 +470,17 @@
 //        this.overallStopTime = this.uploadedTrip.getStopTime();
 //        this.timer.setStartTime(this.uploadedTrip.getDuration());
 //
-////        KmlParser parser = new KmlParser(this.uploadedTrip.getKml());
+////        com.bartovapps.gpstriprec.core.trip_manager.KmlParser parser = new com.bartovapps.gpstriprec.core.trip_manager.KmlParser(this.uploadedTrip.getKml());
 ////        kml_status = parser.openTripKml();
-////        if(kml_status != KmlParser.KML_OPENED){
+////        if(kml_status != com.bartovapps.gpstriprec.core.trip_manager.KmlParser.KML_OPENED){
 ////            return kml_status;
 ////        }
 //
 //        this.latLngList.clear();
-//        this.latLngList = KmlParser.getLocationsFromKml(trip.getKml());
+//        this.latLngList = com.bartovapps.gpstriprec.core.trip_manager.KmlParser.getLocationsFromKml(trip.getKml());
 //
 //        if (this.latLngList == null) {
-//            kml_status = KmlParser.FAIL_TO_OPEN_KML;
+//            kml_status = com.bartovapps.gpstriprec.core.trip_manager.KmlParser.FAIL_TO_OPEN_KML;
 //            return kml_status;
 //        }
 //

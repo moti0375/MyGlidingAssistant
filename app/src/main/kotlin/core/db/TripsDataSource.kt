@@ -12,15 +12,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TripsDataSource @Inject constructor(private val dbhelper: TripsDBOpenHelper) {
-    private lateinit var database: SQLiteDatabase
-    fun open() {
-        database = dbhelper.writableDatabase
-    }
-
-    fun close() {
-        database.close()
-    }
+class TripsDataSource @Inject constructor(dbhelper: TripsDBOpenHelper) {
+    private val database: SQLiteDatabase = dbhelper.writableDatabase
 
     fun create(trip: Trip): Long {
         val values = ContentValues()
@@ -176,18 +169,11 @@ class TripsDataSource @Inject constructor(private val dbhelper: TripsDBOpenHelpe
             ).use { cursor ->
                 if (cursor.count > 0) {
                     while (cursor.moveToNext()) {
-                        val marker = ImageMarker()
-                        marker.latitude =
-                            cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_LATITUDE))
-                        marker.longitude =
-                            cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_LONGITUDE))
-                        marker.imageUri = Uri.parse(
-                            cursor.getString(
-                                cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_URI)
-                            )
-                        )
+                        val latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_LATITUDE))
+                        val longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_LONGITUDE))
+                        val imageUri = Uri.parse(cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_URI)))
+                        val marker = ImageMarker(latitude = latitude, longitude = longitude, imageUri = imageUri)
                         markers.add(marker)
-                        //				Log.i(LOG_TAG, "data.model.Trip add: " + trip.toString());
                     }
                 }
             }

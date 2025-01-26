@@ -29,3 +29,7 @@ annotation class QTripsKmlDir
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class QTripsImagesDir
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class QShareImagesDir

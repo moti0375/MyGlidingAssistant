@@ -1,5 +1,5 @@
 package com.bartovapps.gpstriprec.presentation.map
 
-interface MapReadyCallback {
+interface MapReadyListener {
     fun onMapReady()
 }

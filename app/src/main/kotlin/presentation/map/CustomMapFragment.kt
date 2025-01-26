@@ -2,11 +2,16 @@ package com.bartovapps.gpstriprec.presentation.map
 import android.annotation.SuppressLint
 import android.graphics.Color
 import android.location.Location
+import android.util.Log
 import android.view.LayoutInflater
 import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
+import com.bartovapps.gpstriprec.core.map_helper.MapHelper
+import com.bartovapps.gpstriprec.core.map_helper.MapHelper.Companion
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
@@ -18,7 +23,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
 
-class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback {
+class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMarkerClickListener, OnInfoWindowClickListener {
 
     lateinit var map: GoogleMap
     var lineWidth = 5f
@@ -33,19 +38,26 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback {
     private var mapType = GoogleMap.MAP_TYPE_NORMAL
     private var bearing = 0f
     private val markersIdsMap = mutableMapOf<String, ImageMarker>()
-    private var mapReadyCallback : MapReadyCallback? = null
-
+    private var mapReadyListener : MapReadyListener? = null
+    private var mapInfoWindowClickedListener : InfoWindowClickListener? = null
     init {
         getMapAsync(this)
     }
 
+    @SuppressLint("PotentialBehaviorOverride")
     override fun onMapReady(map: GoogleMap) {
         setupMap(map)
-        mapReadyCallback?.onMapReady()
+        mapReadyListener?.onMapReady()
+        map.setOnMarkerClickListener(this)
+        map.setOnInfoWindowClickListener(this)
     }
 
-    fun setMapReadyCallback(mapReadyCallback: MapReadyCallback) {
-        this.mapReadyCallback = mapReadyCallback
+    fun setMapReadyCallback(mapReadyListener: MapReadyListener) {
+        this.mapReadyListener = mapReadyListener
+    }
+
+    fun setInfoWindowClickListener(listener: InfoWindowClickListener){
+        this.mapInfoWindowClickedListener = listener
     }
 
     fun setPadding(left: Int, top: Int, right: Int, bottom: Int) {
@@ -79,22 +91,41 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback {
         this.zoom += CAMERA_LONGSHOT_RAT
     }
 
+    fun overlayRoute(list: List<LatLng>) {
+        val options = PolylineOptions()
+            .width(lineWidth).color(lineColor)
+        val builder = LatLngBounds.Builder()
+        for (i in 0 until list.size - 1) {
+            Log.i(LOG_TAG, "Add polyline");
+            options.add(list[i]).add(list[i + 1])
+            builder.include(list[i])
+        }
+
+        Log.i(LOG_TAG, "About to overlay route.. list: $list")
+        addMarker(list[0])
+        addMarker(list[list.size - 1])
+        line = map.addPolyline(options)
+        fitCameraToRoute(list)
+    }
+
+
     fun fitCameraToRoute(list: List<LatLng>) {
         val builder = LatLngBounds.Builder()
-
         for (location in list) {
             builder.include(location)
         }
         val tmpBounds = builder.build()
         val update = CameraUpdateFactory.newLatLngBounds(
-            tmpBounds, 100
+            tmpBounds, MAP_PADDING
         )
+
         this.map.moveCamera(update)
     }
 
     fun takeMapSnapshot(callback: GoogleMap.SnapshotReadyCallback) {
         this.map.snapshot(callback)
     }
+
 
     @SuppressLint("PotentialBehaviorOverride")
     private fun setupMap(map: GoogleMap) {
@@ -169,6 +200,15 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback {
         }
     }
 
+    override fun onMarkerClick(marker: Marker): Boolean {
+        return true
+    }
+
+
+    override fun onInfoWindowClick(marker: Marker) {
+        mapInfoWindowClickedListener?.onInfoWindowClicked(marker, markersIdsMap[marker.id])
+    }
+
     fun addImageMarker(imageMarker: ImageMarker) {
         val ll = LatLng(imageMarker.latitude, imageMarker.longitude)
         this.map.addMarker(
@@ -196,8 +236,4 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback {
         private const val MAP_PADDING = 30
         private const val NORTH = 360f
     }
-
-
-
-
 }

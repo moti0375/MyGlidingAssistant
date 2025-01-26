@@ -15,12 +15,12 @@ import com.bartovapps.gpstriprec.core.di.QTripsImagesDir
 import com.bartovapps.gpstriprec.core.kml.KmlManager
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.core.timer.TripTimer
+import com.bartovapps.gpstriprec.core.trip_manager.KmlParser
+import com.bartovapps.gpstriprec.core.trip_manager.KmlParserImpl.Companion.FAIL_TO_OPEN_KML
+import com.bartovapps.gpstriprec.core.trip_manager.KmlParserImpl.Companion.KML_OPENED
 import com.bartovapps.gpstriprec.core.trip_manager.TripState
 import com.bartovapps.gpstriprec.data.enums.MovementState
 import com.bartovapps.gpstriprec.data.enums.SaveStatus
-import com.bartovapps.gpstriprec.kmlhleper.KmlParser
-import com.bartovapps.gpstriprec.kmlhleper.KmlParserImpl.Companion.FAIL_TO_OPEN_KML
-import com.bartovapps.gpstriprec.kmlhleper.KmlParserImpl.Companion.KML_OPENED
 import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -46,10 +46,9 @@ interface TripManager {
     fun updateAccuracy(accuracy: Float)
     fun setSpeedFilter(speedFilter: Double)
     fun mergeTrips(tripA: Trip, tripB: Trip): Int
-    fun getAddress(location: LatLng): String?
     fun uploadTrip(trip: Trip): Int
     fun addImageMarker(capturedImageUri: Uri)
-    val tripStateFlow : StateFlow<TripState>
+    val tripStateFlow: StateFlow<TripState>
 }
 
 
@@ -120,9 +119,7 @@ class TripManagerImpl @Inject constructor(
 
         //        Log.i(LOG_TAG, "new location accuracy " + newLocation.getAccuracy());
         if (this.startLocation == null) { // taking care the first location...
-            if (newLocation.accuracy < (accuracy + accuracy * ACCURACY_TOLERANCE)) { // for first location accuracy is
-                // less important, no speed
-                // required.
+            if (newLocation.accuracy < (accuracy + accuracy * ACCURACY_TOLERANCE)) { // for first location accuracy is less important, no speed required.
                 this.startLocation = newLocation
                 this.currentLocation = newLocation
                 locations.add(markplace.toString())
@@ -199,10 +196,7 @@ class TripManagerImpl @Inject constructor(
     override fun updateRouteStatus(location: Location) {
         if (location.hasBearing()) {
             heading = location.bearing
-        } else {
-//            Log.i(LOG_TAG, "Location has no bearing..");
         }
-
         if ((!location.hasSpeed() || location.speed == 0f) && !location.hasBearing()) { //this means that we stopped!!
             this.speed = 0.0
             if (moveState == MovementState.Moving) {
@@ -247,16 +241,10 @@ class TripManagerImpl @Inject constructor(
             val sdf = SimpleDateFormat("dd-MM-yyyy 'at' HH:mm")
             val date = sdf.format(Date(System.currentTimeMillis()))
             val mapFile = kmlManager.updateTripLatLng(latLngList) // creating and
+            val startAddress = startLocation?.let { getAddress(LatLng(it.latitude, it.longitude)) }
+            val stopAddress = currentLocation?.let { getAddress(LatLng(it.latitude, it.longitude)) }
 
-            // saving the
-            // trip kml file
-            // to external
-            // storage!
-//			startAddress = getAddress(new LatLng(startLocation.getLatitude(),
-//					startLocation.getLongitude()), context);
-//			stopAddress = getAddress(new LatLng(currentLocation.getLatitude(),
-//					currentLocation.getLongitude()), context);
-//			Log.i(LOG_TAG, "End address: " + stopAddress);
+            Log.i(TAG, "End address: " + stopAddress);
             duration = timer.getDuration() //mSec
             averageSpeed = (distance / (duration / 1000).toInt()).toDouble() // m/sec
             movementTime = duration - overallStopTime //mSec
@@ -276,16 +264,14 @@ class TripManagerImpl @Inject constructor(
                 maxAlt = this.maxAltitude,
             )
 
-            datasource.open()
             val tripId = datasource.create(trip)
 
             if (imageMarkers.isNotEmpty()) {
                 datasource.insertImageMarkers(imageMarkers, tripId.toDouble())
             }
-            datasource.close()
 
             Log.i(TAG, "data.model.Trip file $mapFile saved")
-            if(tripImage != null){
+            if (tripImage != null) {
                 saveTripImage(tripImage, tripId, mapImageFile)
             }
             publishTripState(TripState.TripSaved(latLngList))
@@ -307,9 +293,9 @@ class TripManagerImpl @Inject constructor(
         }
 
 
-        //        KmlParser parser = new KmlParser(this.uploadedTrip.getKml());
+        //        com.bartovapps.gpstriprec.core.trip_manager.KmlParser parser = new com.bartovapps.gpstriprec.core.trip_manager.KmlParser(this.uploadedTrip.getKml());
 //        kml_status = parser.openTripKml();
-//        if(kml_status != KmlParser.KML_OPENED){
+//        if(kml_status != com.bartovapps.gpstriprec.core.trip_manager.KmlParser.KML_OPENED){
 //            return kml_status;
 //        }
         latLngList.clear()
@@ -322,10 +308,8 @@ class TripManagerImpl @Inject constructor(
             return kmlStatus
         }
 
-        datasource.open()
         imageMarkers.clear()
         imageMarkers.addAll(datasource.findAllMarkersForTrip(trip.id))
-        datasource.close()
         tripMutableStateFlow
         publishTripState(TripState.Initiated)
         publishTripState(TripState.OverlayRoute(latLngList, 10f, Color.CYAN, imageMarkers))
@@ -341,27 +325,25 @@ class TripManagerImpl @Inject constructor(
     }
 
     private fun saveTripImage(image: Bitmap, tripId: Long, mapImageFile: String) {
-            try {
-                val out = FileOutputStream(mapImageFile)
-                val bm: Bitmap = Bitmap.createScaledBitmap(
-                    image, 500,
-                    500, false
-                )
-                bm.compress(Bitmap.CompressFormat.JPEG, 50, out)
-                bm.recycle()
+        try {
+            val out = FileOutputStream(mapImageFile)
+            val bm: Bitmap = Bitmap.createScaledBitmap(
+                image, 500,
+                500, false
+            )
+            bm.compress(Bitmap.CompressFormat.JPEG, 50, out)
+            bm.recycle()
 
-                datasource.open()
-                datasource.updateTripData(tripId, TripsDBOpenHelper.COLUMN_MAP_IMAGE, mapImageFile)
-                datasource.close()
-                out.flush()
-                out.close()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Log.e(
-                    "com.bartovapps.gpstriprec.core.map_helper.MapHelper",
-                    "There was an exception: " + e.message
-                )
-            }
+            datasource.updateTripData(tripId, TripsDBOpenHelper.COLUMN_MAP_IMAGE, mapImageFile)
+            out.flush()
+            out.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e(
+                "com.bartovapps.gpstriprec.core.map_helper.MapHelper",
+                "There was an exception: " + e.message
+            )
+        }
 
     }
 
@@ -387,7 +369,7 @@ class TripManagerImpl @Inject constructor(
         val latLngList = mutableListOf<LatLng>()
 
         val tripALastLoc: LatLng
-        val TripBFirstLoc: LatLng
+        val tripBFirstLoc: LatLng
         val gap = FloatArray(3)
 
         if (tripA.kml == null || tripB.kml == null) {
@@ -406,12 +388,12 @@ class TripManagerImpl @Inject constructor(
         latLngList.addAll(tripBLocations)
 
         tripALastLoc = tripALocations.last()
-        TripBFirstLoc = tripBLocations.first()
+        tripBFirstLoc = tripBLocations.first()
 
         Location.distanceBetween(
             tripALastLoc.latitude,
-            tripALastLoc.longitude, TripBFirstLoc.latitude,
-            TripBFirstLoc.longitude, gap
+            tripALastLoc.longitude, tripBFirstLoc.latitude,
+            tripBFirstLoc.longitude, gap
         )
 
         if (gap[0] > CONTINUE_TRIPS_GAP) {
@@ -433,6 +415,10 @@ class TripManagerImpl @Inject constructor(
         val tripsMoveTime = tripsDuration - tripsStopTime
         val averageMoveSpeed = (tripsDistance / (tripsMoveTime / 1000)).toDouble() //m/Sec
 
+        val stopLocation = tripBLocations.last()
+        val startAddress = startLocation?.let { getAddress(LatLng(it.latitude, it.longitude)) }
+        val stopAddress = stopLocation.let { getAddress(LatLng(it.latitude, it.longitude)) }
+
         val trip = Trip(
             kml = mapFile,
             date = date,
@@ -443,59 +429,42 @@ class TripManagerImpl @Inject constructor(
             maxSpeed = maxSpeed,
             maxAlt = maxAlt,
             stopTime = tripsStopTime,
-            moveTime = tripsMoveTime
+            moveTime = tripsMoveTime,
+            startAddress = startAddress,
+            stopAddress = stopAddress
         )
+
         val newTripMarkers = ArrayList<ImageMarker>()
         datasource.apply {
-            open()
             newTripMarkers.addAll(findAllMarkersForTrip(tripA.id))
             newTripMarkers.addAll(findAllMarkersForTrip(tripB.id))
             val insertId = create(trip)
             insertImageMarkers(newTripMarkers, insertId.toDouble())
-            close()
         }
         return MERGE_SUCCESS
     }
 
-
-    override fun getAddress(location: LatLng): String? {
-        var address: String?
-        try {
-            geocoder.getFromLocation(
-                location.latitude,
-                location.longitude, 1
-            )?.let {
-                list.addAll(it)
-            }
-
-            if (list.isNotEmpty()) { // list maybe not null
-                // but still with
-                // size of 0!
-                val returnedAddress: Address = list[0]
+    private fun getAddress(location: LatLng) = try {
+        geocoder.getFromLocation(location.latitude, location.longitude, 1)?.let {
+            if (it.isNotEmpty()) { // list maybe not null but still with size of 0!
+                val returnedAddress: Address = it.first()
                 val strReturnedAddress = StringBuilder("")
 
-                for (i in 0 until returnedAddress
-                    .maxAddressLineIndex) {
-                    strReturnedAddress.append(
-                        returnedAddress.getAddressLine(i)
-                    ).append("\n")
+                for (i in 0 until returnedAddress.maxAddressLineIndex) {
+                    strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n")
                 }
-                address = strReturnedAddress.toString()
+                strReturnedAddress.toString()
             } else {
-                address = "Unavailable"
+                null
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            address = "Unavailable"
-        } finally {
-            list.clear()
         }
-
-        return address
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
     }
 
 
-    private fun publishTripState(state: TripState){
+    private fun publishTripState(state: TripState) {
         CoroutineScope(Dispatchers.Main).launch {
             tripMutableStateFlow.value = state
         }
@@ -510,11 +479,6 @@ class TripManagerImpl @Inject constructor(
         const val ACCURACY_TOLERANCE = 0.1F
         const val DEFAULT_ACCURACY = 25.0F
         const val SPEED_FILTER: Float = 0.832f // 0.833 < 3km/h
-
         private const val CONTINUE_TRIPS_GAP = 300
-
-
-        var list = mutableListOf<Address>()
-
     }
 }

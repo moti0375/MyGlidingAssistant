@@ -88,13 +88,10 @@ public class TripsListAdapter extends BaseAdapter {
             if (!imgFile.exists()) {
                 Picasso.with(convertView.getContext()).load(R.drawable.ic_google_map_hdpi_active).transform(new CircleTransform()).
                         into(viewHolder.ivMapImage);
-//                viewHolder.ivMapImage.setImageDrawable(activity.getResources().getDrawable(R.drawable.ic_google_map_hdpi_active));
             } else {
-                Bitmap bitmap = Utils.getRoundedShape(BitmapFactory.decodeFile(imgFile.toString()), 200);
                 Picasso.with(convertView.getContext())
                         .load(imgFile).transform(new CircleTransform())
                         .into(viewHolder.ivMapImage);
-
             }
         }
 

@@ -87,7 +87,7 @@
 
     
     <!-- Recorded Trip Details Tabs Activity -->
-    <string name="UnavailableData">這個數據是不可用的.. </string>    
+    <string name="unavailable_data">這個數據是不可用的.. </string>
 
      <!-- Recorded Trips List Activity -->
     <string name="NoTripsHint"> 沒有車次...</string>    

@@ -46,19 +46,19 @@ import com.bartovapps.gpstriprec.GpsRecPrefs
 import com.bartovapps.gpstriprec.GpsRecTripsList
 import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.core.timer.TripTimer
+import com.bartovapps.gpstriprec.core.trip_manager.KmlParserImpl
 import com.bartovapps.gpstriprec.core.trip_manager.TripState
 import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
 import com.bartovapps.gpstriprec.data.enums.RecordingState
 import com.bartovapps.gpstriprec.data.enums.SaveStatus
 import com.bartovapps.gpstriprec.data.enums.Units
-import com.bartovapps.gpstriprec.kmlhleper.KmlParserImpl
 import com.bartovapps.gpstriprec.presentation.displayers.FeetFormatter
 import com.bartovapps.gpstriprec.presentation.displayers.UnitsFormatter
 import com.bartovapps.gpstriprec.presentation.displayers.HmsFormatter
 import com.bartovapps.gpstriprec.presentation.displayers.KmhFormatter
 import com.bartovapps.gpstriprec.presentation.displayers.MetricAltFormatter
 import com.bartovapps.gpstriprec.presentation.map.CustomSupportMapFragment
-import com.bartovapps.gpstriprec.presentation.map.MapReadyCallback
+import com.bartovapps.gpstriprec.presentation.map.MapReadyListener
 import com.bartovapps.gpstriprec.services.GpsTripRecService
 import com.bartovapps.gpstriprec.services.GpsTripRecService.LocalBinder
 import com.bartovapps.gpstriprec.utils.Utils
@@ -77,7 +77,7 @@ import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainScreen : AppCompatActivity(), MapReadyCallback {
+class MainScreen : AppCompatActivity(), MapReadyListener {
     private var cameraZoom = 15f
     private var lineWidth = 5f
     private lateinit var tvSpeed: TextView
@@ -110,9 +110,8 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
     private var recordingMode = NEW_TRIP
 
 
-    var gpsPd: ProgressDialog? = null
-    var savingTripPd: ProgressDialog? = null
-    var loadingTripPd: ProgressDialog? = null
+    private var progressDialog: ProgressDialog? = null
+
 
     private var recordingState = RecordingState.Idle
     private var imRecording: ImageView? = null
@@ -146,8 +145,7 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
         settings.registerOnSharedPreferenceChangeListener(prefListener)
         handler = Handler(Looper.getMainLooper())
         lm = getSystemService(LOCATION_SERVICE) as LocationManager
-        gpsPd = ProgressDialog(this)
-        savingTripPd = ProgressDialog(this)
+        progressDialog = ProgressDialog(this)
         serviceIntent = Intent(this, GpsTripRecService::class.java)
 
         // Create the interstitial.
@@ -172,13 +170,11 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
             is TripState.NewImageMarker -> mapFrag.addImageMarker(state.imageMarker)
             is TripState.TripUpdated -> processTripUpdate(state)
             is TripState.OnGoing -> mapFrag.mapCameraCloseup()
-            is TripState.OverlayRoute -> {
-                //todo implement when ready
-            }
+            is TripState.OverlayRoute ->  mapFrag.overlayRoute(state.locations)
             is TripState.Stopped -> mapFrag.mapCameraLongShot()
             is TripState.TripSaved -> {
                 mapFrag.fitCameraToRoute(state.locations)
-                savingTripPd?.dismiss()
+                progressDialog?.dismiss()
             }
             is TripState.StartLocation -> mapFrag.goToLocation(state.location)
         }
@@ -352,7 +348,7 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
         enableLocationListener(fixListener)
         mapFrag.zoom = cameraZoom
         mapFrag.tilt = 0f
-        gpsPd?.apply {
+        progressDialog?.apply {
             setCancelable(true)
             setOnCancelListener(pdOnCancelListener)
             setIcon(ResourcesCompat.getDrawable(resources, R.drawable.ic_launcher, theme))
@@ -405,8 +401,10 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
     private val fixListener = object : LocationListener{
         override fun onLocationChanged(location: Location) {
             disableGpsLocationListener(this)
-            if (gpsPd?.isShowing == true) {
-                gpsPd?.dismiss()
+            progressDialog?.let {
+                if(it.isShowing){
+                    it.dismiss()
+                }
             }
             startService()
             enableGPSLocationListener(trackLocationListener)
@@ -637,7 +635,7 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
 
     private fun saveTrip() {
         stopRecording()
-        savingTripPd?.apply {
+        progressDialog?.apply {
             setTitle(getString(R.string.app_name))
             setMessage(getString(R.string.SavingTrip))
             setCancelable(true)
@@ -811,7 +809,7 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
 
     private inner class UploadTripTask : AsyncTask<Trip?, Void?, String>() {
         override fun onPreExecute() {
-            loadingTripPd = ProgressDialog(this@MainScreen).apply {
+            progressDialog?.apply {
                 setIcon(
                     ResourcesCompat.getDrawable(
                         resources,
@@ -843,9 +841,9 @@ class MainScreen : AppCompatActivity(), MapReadyCallback {
         }
 
         override fun onPostExecute(result: String) {
-            loadingTripPd?.dismiss()
+            progressDialog?.dismiss()
             if (result == PASSED) {
-                loadingTripPd = null
+                progressDialog = null
                 Toast.makeText(
                     this@MainScreen, resources.getString(R.string.TripLoaded),
                     Toast.LENGTH_LONG

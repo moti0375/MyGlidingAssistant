@@ -31,6 +31,11 @@ abstract class FilesModule {
             return "$defaultFilesDir/map_images".also { mkdir(it) }
         }
 
+        @Provides
+        @QShareImagesDir
+        fun providesShareImagesDir(@QTripsImagesDir defaultFilesDir : String) : String {
+            return "$defaultFilesDir/shared".also { mkdir(it) }
+        }
 
         private fun mkdir(path: String){
             File(path).apply {

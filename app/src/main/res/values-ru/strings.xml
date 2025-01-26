@@ -68,7 +68,7 @@
   <string name="MapUnavailable">Сохраненные карта маршрута файл не может быть найден</string>
   <string name="displaying_trip">Открытие карту маршрута, пожалуйста, подождите...</string>
   <!-- Recorded Trip Details Tabs Activity -->
-  <string name="UnavailableData">Данные недоступны.. </string>
+  <string name="unavailable_data">Данные недоступны.. </string>
   <!-- Recorded Trips List Activity -->
   <string name="NoTripsHint">Нет сохраненных маршрутов...</string>
   <string name="TripTitleDialogTitle">Изменить название маршрута</string>

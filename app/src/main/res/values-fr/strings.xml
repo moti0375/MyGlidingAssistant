@@ -79,7 +79,7 @@
 
     
      <!-- Recorded Trip Details Tabs Activity -->
-    <string name="UnavailableData">Information non disponible...</string>    
+    <string name="unavailable_data">Information non disponible...</string>
 
      <!-- Recorded Trips List Activity -->
     <string name="NoTripsHint">Il n\'y a pas de trajet enregistrés...</string>    

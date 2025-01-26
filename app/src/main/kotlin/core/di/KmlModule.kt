@@ -1,7 +1,7 @@
 package com.bartovapps.gpstriprec.core.di
 
-import com.bartovapps.gpstriprec.kmlhleper.KmlParser
-import com.bartovapps.gpstriprec.kmlhleper.KmlParserImpl
+import com.bartovapps.gpstriprec.core.trip_manager.KmlParser
+import com.bartovapps.gpstriprec.core.trip_manager.KmlParserImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

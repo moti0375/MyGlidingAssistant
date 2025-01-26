@@ -43,6 +43,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bartovapps.gpstriprec.adapters.TripsListAdapter;
 import com.bartovapps.gpstriprec.adapters.TripsRecyclerAdapter;
 import com.bartovapps.gpstriprec.core.db.TripsDataSource;
+import com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity;
 import com.bartovapps.gpstriprec.utils.Utils;
 
 import java.io.File;
@@ -209,9 +210,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
         if (trips != null) {
             trips.clear();
         }
-        datasource.open();
         trips = datasource.findAll();
-        datasource.close();
         Log.i(LOG_TAG, "refreshDisplay: " + trips);
 
         int size = trips.size();
@@ -258,12 +257,10 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
                 .setPositiveButton(getResources().getString(R.string.YES),
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
-                                datasource.open();
                                 for (Trip trip : selectedTrips) {
                                     datasource.removeSavedTrip(trip);
                                     datasource.deleteMarkersForTrip(trip.getId());
                                 }
-                                datasource.close();
                                 refreshDisplay();
                                 dialog.cancel();
                             }
@@ -351,9 +348,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
                         String value = input.getText().toString();
                         // Toast.makeText(context, value + " entered..",
                         // Toast.LENGTH_LONG).show();
-                        datasource.open();
                         boolean status = datasource.updateTripTitle(selectedTrips.get(0), value);
-                        datasource.close();
                         if (status) {
                             // Toast.makeText(context, "Saved..",
                             // Toast.LENGTH_LONG).show();

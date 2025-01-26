@@ -102,7 +102,7 @@
 
 
     <!-- Recorded Trip Details Tabs Activity -->
-    <string name="UnavailableData">This data is unavailable.. </string>
+    <string name="unavailable_data">This data is unavailable.. </string>
     <string name="kml_mime_type" translatable="false">application/vnd.google-earth.kml+xml</string>
 
 

@@ -1,6 +1,4 @@
-package com.bartovapps.gpstriprec.kmlhleper
-
-import android.content.Context
+package com.bartovapps.gpstriprec.core.trip_manager
 import com.google.android.gms.maps.model.LatLng
 import org.jdom2.Document
 import org.jdom2.Element

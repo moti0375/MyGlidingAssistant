@@ -22,14 +22,10 @@ import javax.inject.Singleton
 class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.kml");
     private val resources: Resources,
     @QTripsKmlDir private val tripsKmlDir: String,
-    @QExternalDirectory private val externalDirectory: File?,
     private val saxBuilder: SAXBuilder
 ) {
     private var doc: Document? = null
     private var rootNode: Element? = null
-    init {
-        // Log.i(LOG_TAG, "KML Helper created");
-    }
 
     fun openRawDocument() {
         try {

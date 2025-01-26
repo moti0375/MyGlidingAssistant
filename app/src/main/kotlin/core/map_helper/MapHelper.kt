@@ -44,6 +44,7 @@ import kotlin.math.min
 import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.core.di.QTripsImagesDir
 
+@Deprecated("All this logic moved to CustomMapFragment")
 class MapHelper @Inject constructor(
     @QMainThread private val handler: Handler,
     @ApplicationContext private val context: Context,
@@ -313,12 +314,10 @@ class MapHelper @Inject constructor(
                     snapshot.compress(Bitmap.CompressFormat.JPEG, 50, out)
                     snapshot.recycle()
 
-                    tripsDataSource.open()
                     tripsDataSource.updateTripData(
                         tripId,
                         TripsDBOpenHelper.COLUMN_MAP_IMAGE, fileName
                     )
-                    tripsDataSource.close()
                     out.flush()
                     out.close()
                 } catch (e: Exception) {

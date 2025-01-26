@@ -22,23 +22,15 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
-import com.bartovapps.gpstriprec.core.db.TripsDataSource;
-import com.bartovapps.gpstriprec.kmlhleper.KmlParser;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.maps.model.LatLng;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
-
-import data.model.Trip;
 
 public class Utils {
 	
@@ -137,8 +129,8 @@ public class Utils {
 //
 //		   KmlManager kmlManager = new KmlManager(activity);
 //		   kmlManager.openRawDocument();
-//		   KmlParser tripAParser = new KmlParser(tripA.getKml());
-//		   KmlParser tripBParser = new KmlParser(tripB.getKml());
+//		   com.bartovapps.gpstriprec.core.trip_manager.KmlParser tripAParser = new com.bartovapps.gpstriprec.core.trip_manager.KmlParser(tripA.getKml());
+//		   com.bartovapps.gpstriprec.core.trip_manager.KmlParser tripBParser = new com.bartovapps.gpstriprec.core.trip_manager.KmlParser(tripB.getKml());
 //		   tripAParser.openTripKml();
 //		   tripBParser.openTripKml();
 //

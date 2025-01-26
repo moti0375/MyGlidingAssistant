@@ -183,9 +183,7 @@ public class GpsTripRecGallery extends AppCompatActivity implements View.OnClick
 
     private List<Uri> getImageMarkers() {
         List<Uri> markers;
-        tripsDataSource.open();
         markers = tripsDataSource.findAllMarkersUrisForTrip(tripId);
-        tripsDataSource.close();
 //        Log.i(LOG_TAG, "got " + markers.size() + " markers from databae");
         return markers;
     }

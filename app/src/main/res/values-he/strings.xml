@@ -75,7 +75,7 @@
 
     
      <!-- Recorded Trip Details Tabs Activity -->
-    <string name="UnavailableData">המידע אינו זמין...</string>    
+    <string name="unavailable_data">המידע אינו זמין...</string>
 
      <!-- Recorded Trips List Activity -->
     <string name="NoTripsHint">אין הקלטות עדיין...</string>    

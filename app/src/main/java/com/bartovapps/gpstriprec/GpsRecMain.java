@@ -1,6 +1,6 @@
 //package com.bartovapps.gpstriprec;
 //
-//import static com.bartovapps.gpstriprec.kmlhleper.KmlParserImpl.KML_OPENED;
+//import static com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.trip_manager.KmlParserImpl.KML_OPENED;
 //
 //import android.annotation.SuppressLint;
 //import android.app.AlertDialog;
