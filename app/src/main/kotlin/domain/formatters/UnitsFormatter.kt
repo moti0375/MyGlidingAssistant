@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.presentation.displayers
+package com.bartovapps.gpstriprec.domain.formatters
 
 import android.text.SpannableString
 

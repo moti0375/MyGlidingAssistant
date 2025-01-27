@@ -1,8 +1,8 @@
 package com.bartovapps.gpstriprec.presentation.screens.main_screen
 
-import com.bartovapps.gpstriprec.presentation.displayers.MetricFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.MillageFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.MphFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.MetricFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.MillageFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.MphFormatter
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
@@ -52,11 +52,11 @@ import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
 import com.bartovapps.gpstriprec.data.enums.RecordingState
 import com.bartovapps.gpstriprec.data.enums.SaveStatus
 import com.bartovapps.gpstriprec.data.enums.Units
-import com.bartovapps.gpstriprec.presentation.displayers.FeetFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.UnitsFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.HmsFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.KmhFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.MetricAltFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.FeetFormatter
+import com.bartovapps.gpstriprec.domain.formatters.UnitsFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.KmhFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.MetricAltFormatter
 import com.bartovapps.gpstriprec.presentation.map.CustomSupportMapFragment
 import com.bartovapps.gpstriprec.presentation.map.MapReadyListener
 import com.bartovapps.gpstriprec.services.GpsTripRecService
@@ -65,7 +65,7 @@ import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import core.trip_manager.TripManager
+import domain.trip_manager.TripManager
 import dagger.hilt.android.AndroidEntryPoint
 import data.model.Trip
 import kotlinx.coroutines.Job
@@ -189,7 +189,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     private fun subscribeTimerChanges() {
         lifecycleScope.launch {
             timerManager.timeMillisFlow.collect{
-                tvTimer.text = timeFormatter.displayTime(it)
+                tvTimer.text = timeFormatter.formatTime(it)
             }
         }
     }
@@ -569,7 +569,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             .setCancelable(false)
             .setPositiveButton(
                 resources.getString(R.string.YES)
-            ) { dialog: DialogInterface?, id: Int ->
+            ) { _: DialogInterface?, _: Int ->
                 startActivity(
                     Intent(
                         Settings.ACTION_LOCATION_SOURCE_SETTINGS
@@ -578,7 +578,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             }
             .setNegativeButton(
                 resources.getString(R.string.NO)
-            ) { dialog: DialogInterface, id: Int ->
+            ) { dialog: DialogInterface, _: Int ->
                 Toast.makeText(
                     this,
                     getString(R.string.GpsMustEnabled),
@@ -593,9 +593,12 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
 
     private fun setUpMapIfNeeded() {
         Log.i(TAG, "setUpMapIfNeeded: initializing map")
-        mapFrag = supportFragmentManager.findFragmentById(R.id.map) as CustomSupportMapFragment
-        mapFrag.lineWidth = lineWidth
-        mapFrag.setMapReadyCallback(this)
+        if(!this::mapFrag.isInitialized){
+            mapFrag = (supportFragmentManager.findFragmentById(R.id.map) as CustomSupportMapFragment).apply {
+                lineWidth = this@MainScreen.lineWidth
+                setMapReadyCallback(this@MainScreen)
+            }
+        }
     }
 
     private fun saveTripAlertDialog() {
@@ -606,13 +609,13 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             .setIcon(ResourcesCompat.getDrawable(resources, R.drawable.ic_launcher, this@MainScreen.theme))
             .setPositiveButton(
                 resources.getString(R.string.YES)
-            ) { dialog: DialogInterface, id: Int ->
+            ) { dialog: DialogInterface, _: Int ->
                 dialog.dismiss()
                 saveTrip()
             }
             .setNegativeButton(
                 resources.getString(R.string.NO)
-            ) { dialog: DialogInterface, id: Int ->
+            ) { dialog: DialogInterface, _: Int ->
                 stopRecording()
                 dialog.dismiss()
             }
@@ -645,13 +648,13 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     }
 
     private var pdOnCancelListener: DialogInterface.OnCancelListener =
-        DialogInterface.OnCancelListener { dialog: DialogInterface? ->
+        DialogInterface.OnCancelListener { _: DialogInterface? ->
             Toast.makeText(this, getString(R.string.Canceled), Toast.LENGTH_SHORT).show()
             stopRecording()
         }
 
     private var saveDialogCancelListener: DialogInterface.OnCancelListener =
-        DialogInterface.OnCancelListener { dialog: DialogInterface? ->
+        DialogInterface.OnCancelListener { _: DialogInterface? ->
             fabStartStop.setBackgroundDrawable(
                 ResourcesCompat.getDrawable(
                     resources, R.drawable.ic_action_new, theme
@@ -714,7 +717,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     }
 
     private var prefListener: OnSharedPreferenceChangeListener =
-        OnSharedPreferenceChangeListener { sharedPreferences: SharedPreferences?, key: String? -> updatePreferences() }
+        OnSharedPreferenceChangeListener { _: SharedPreferences?, _: String? -> updatePreferences() }
 
     private inner class SaveTripTask : AsyncTask<String?, Void?, String>() {
         override fun doInBackground(vararg params: String?): String {
@@ -751,10 +754,10 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             .setCancelable(false)
             .setPositiveButton(
                 resources.getString(R.string.YES)
-            ) { dialog: DialogInterface?, id: Int -> finish() }
+            ) { _: DialogInterface?, _: Int -> finish() }
             .setNegativeButton(
                 resources.getString(R.string.NO)
-            ) { dialog: DialogInterface, id: Int -> dialog.cancel() }
+            ) { dialog: DialogInterface, _: Int -> dialog.cancel() }
         val alert = builder.create()
         alert.show()
     }
@@ -854,13 +857,13 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             .setCancelable(false)
             .setPositiveButton(
                 resources.getString(R.string.YES)
-            ) { dialog: DialogInterface?, id: Int ->
+            ) { _: DialogInterface?, _: Int ->
                 recordingMode = CONTINUE_TRIP
                 startRecording()
             }
             .setNegativeButton(
                 resources.getString(R.string.NO)
-            ) { dialog: DialogInterface?, id: Int ->
+            ) { _: DialogInterface?, _: Int ->
                 recordingMode = FOLLOW_TRIP
                 mapFrag.clearMarkers()
                 startRecording()

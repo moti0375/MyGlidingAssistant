@@ -3,7 +3,6 @@ package com.bartovapps.gpstriprec.adapters;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -17,9 +16,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bartovapps.gpstriprec.R;
-import com.bartovapps.gpstriprec.presentation.displayers.HmsFormatter;
-import com.bartovapps.gpstriprec.presentation.displayers.TimeFormatter;
-import com.bartovapps.gpstriprec.utils.Utils;
+import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter;
+import com.bartovapps.gpstriprec.domain.formatters.TimeFormatter;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
@@ -97,7 +95,7 @@ public class TripsListAdapter extends BaseAdapter {
 
         // Setting all values in listview
         viewHolder.tvDate.setText(trip.getDate());
-        viewHolder.tvDuration.setText(timeDisplayer.displayTime(trip.getDuration()));
+        viewHolder.tvDuration.setText(timeDisplayer.formatTime(trip.getDuration()));
         String tripTitle = trip.getTripName();
         if (tripTitle == null || tripTitle.length() == 0) {
             viewHolder.tvTitle.setText("");

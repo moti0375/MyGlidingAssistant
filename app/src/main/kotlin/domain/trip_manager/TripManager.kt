@@ -1,4 +1,4 @@
-package core.trip_manager
+package domain.trip_manager
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
@@ -10,7 +10,6 @@ import android.net.Uri
 import android.util.Log
 import com.bartovapps.gpstriprec.core.db.TripsDBOpenHelper
 import com.bartovapps.gpstriprec.core.db.TripsDataSource
-import com.bartovapps.gpstriprec.core.di.QTripsImagesDir
 import com.bartovapps.gpstriprec.core.files.kml.KmlManager
 import com.bartovapps.gpstriprec.core.files.path_provider.PathProvider
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker

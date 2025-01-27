@@ -32,18 +32,18 @@ import com.bartovapps.gpstriprec.core.di.QMainThread
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
 import com.bartovapps.gpstriprec.data.enums.Units
-import com.bartovapps.gpstriprec.presentation.displayers.FeetFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.HmsFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.KmhFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.MetricAltFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.MetricFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.MillageFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.MphFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.TimeFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.UnitsFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter
+import com.bartovapps.gpstriprec.domain.formatters.TimeFormatter
+import com.bartovapps.gpstriprec.domain.formatters.UnitsFormatter
 import com.bartovapps.gpstriprec.presentation.map.CustomSupportMapFragment
 import com.bartovapps.gpstriprec.presentation.map.InfoWindowClickListener
 import com.bartovapps.gpstriprec.presentation.map.MapReadyListener
+import com.bartovapps.gpstriprec.presentation.units_formatters.FeetFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.KmhFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.MetricAltFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.MetricFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.MillageFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.MphFormatter
 import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.SnapshotReadyCallback
@@ -52,7 +52,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import data.model.Trip
 import kotlinx.coroutines.launch
 import java.io.File
-import java.io.OutputStream
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -317,13 +316,13 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
 
     private fun updateDisplay(trip: Trip) {
         tvWhen.text = trip.date
-        tvDuration.text = timeFormatter.displayTime(trip.duration)
+        tvDuration.text = timeFormatter.formatTime(trip.duration)
         tvDistance.text = distanceDisplayer.formatUnits(trip.distance.toDouble())
         tvAvSpeed.text = speedDisplayer.formatUnits(trip.averageSpeed)
         tvMaxSpeed.text = speedDisplayer.formatUnits(trip.maxSpeed)
         tvMaxAltitude.text = altitudeDisplayer.formatUnits(trip.maxAlt)
-        tvMoveTime.text = timeFormatter.displayTime(trip.moveTime)
-        tvStopTime.text = timeFormatter.displayTime(trip.stopTime)
+        tvMoveTime.text = timeFormatter.formatTime(trip.moveTime)
+        tvStopTime.text = timeFormatter.formatTime(trip.stopTime)
         tvTripDetailsHead.text = trip.tripName
         tvFrom.text = trip.startAddress ?: getString(R.string.unavailable_data)
         tvTo.text = trip.stopAddress ?: getString(R.string.unavailable_data)
@@ -413,9 +412,8 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
             setSingleChoiceItems(options, 0, null)
             setPositiveButton(
                 resources.getString(R.string.YES)
-            ) { dialog, id ->
+            ) { dialog, _ ->
                 val selectedPosition = (dialog as AlertDialog).listView.checkedItemPosition
-                //                                Log.i(LOG_TAG, "Option selected: " + selectedPosition);
                 when (selectedPosition) {
                     SHARE_IMAGE -> detailsViewModel.addEvent(TripDetailsEvent.ShareTripMapImage)
                     SHARE_KML -> detailsViewModel.addEvent(TripDetailsEvent.ShareTripKml)
@@ -424,7 +422,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
             }
             setNegativeButton(
                 resources.getString(R.string.NO)
-            ) { dialog: DialogInterface, id: Int -> dialog.cancel() }
+            ) { dialog: DialogInterface, _: Int -> dialog.cancel() }
         }.create().apply {
             setIcon(
                 ResourcesCompat.getDrawable(

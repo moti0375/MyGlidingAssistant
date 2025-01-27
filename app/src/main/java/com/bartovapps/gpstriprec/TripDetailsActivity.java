@@ -39,15 +39,15 @@
 //import com.bartovapps.gpstriprec.data.enums.AltitudeUnits;
 //import com.bartovapps.gpstriprec.data.enums.Units;
 //import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.trip_manager.KmlParser;
-//import com.bartovapps.gpstriprec.presentation.displayers.FeetFormatter;
-//import com.bartovapps.gpstriprec.presentation.displayers.MetricFormatter;
-//import com.bartovapps.gpstriprec.presentation.displayers.MillageFormatter;
-//import com.bartovapps.gpstriprec.presentation.displayers.MphFormatter;
-//import com.bartovapps.gpstriprec.presentation.displayers.UnitsFormatter;
-//import com.bartovapps.gpstriprec.presentation.displayers.HmsFormatter;
-//import com.bartovapps.gpstriprec.presentation.displayers.KmhFormatter;
-//import com.bartovapps.gpstriprec.presentation.displayers.MetricAltFormatter;
-//import com.bartovapps.gpstriprec.presentation.displayers.TimeFormatter;
+//import com.bartovapps.gpstriprec.presentation.displayers.com.bartovapps.gpstriprec.presentation.units_formatters.FeetFormatter;
+//import com.bartovapps.gpstriprec.presentation.displayers.com.bartovapps.gpstriprec.presentation.units_formatters.MetricFormatter;
+//import com.bartovapps.gpstriprec.presentation.displayers.com.bartovapps.gpstriprec.presentation.units_formatters.MillageFormatter;
+//import com.bartovapps.gpstriprec.presentation.displayers.com.bartovapps.gpstriprec.presentation.units_formatters.MphFormatter;
+//import com.bartovapps.gpstriprec.domain.formatters.UnitsFormatter;
+//import com.bartovapps.gpstriprec.presentation.displayers.com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter;
+//import com.bartovapps.gpstriprec.presentation.displayers.com.bartovapps.gpstriprec.presentation.units_formatters.KmhFormatter;
+//import com.bartovapps.gpstriprec.presentation.displayers.com.bartovapps.gpstriprec.presentation.units_formatters.MetricAltFormatter;
+//import com.bartovapps.gpstriprec.domain.formatters.TimeFormatter;
 //import com.bartovapps.gpstriprec.presentation.map.CustomSupportMapFragment;
 //import com.bartovapps.gpstriprec.utils.Utils;
 //import com.google.android.gms.maps.GoogleMap;
@@ -467,7 +467,7 @@
 //    }
 //
 //    private void getTripDetails() {
-//        timeDisplayer = new HmsFormatter();
+//        timeDisplayer = new com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter();
 //
 //        date = trip.getDate();
 //        distance = trip.getDistance();
@@ -495,19 +495,19 @@
 //
 //    private void setDisplayers() {
 //        if (this.units == Units.Millage) {
-//            speedDisplayer = new MphFormatter();
-//            moveSpeedDisplayer = new MphFormatter();
-//            distanceDisplayer = new MillageFormatter();
+//            speedDisplayer = new com.bartovapps.gpstriprec.presentation.units_formatters.MphFormatter();
+//            moveSpeedDisplayer = new com.bartovapps.gpstriprec.presentation.units_formatters.MphFormatter();
+//            distanceDisplayer = new com.bartovapps.gpstriprec.presentation.units_formatters.MillageFormatter();
 //        } else {
-//            speedDisplayer = new KmhFormatter();
-//            moveSpeedDisplayer = new KmhFormatter();
-//            distanceDisplayer = new MetricFormatter();
+//            speedDisplayer = new com.bartovapps.gpstriprec.presentation.units_formatters.KmhFormatter();
+//            moveSpeedDisplayer = new com.bartovapps.gpstriprec.presentation.units_formatters.KmhFormatter();
+//            distanceDisplayer = new com.bartovapps.gpstriprec.presentation.units_formatters.MetricFormatter();
 //        }
 //
 //        if (this.altUnits == AltitudeUnits.Feet) {
-//            altitudeDisplayer = new FeetFormatter();
+//            altitudeDisplayer = new com.bartovapps.gpstriprec.presentation.units_formatters.FeetFormatter();
 //        } else {
-//            altitudeDisplayer = new MetricAltFormatter();
+//            altitudeDisplayer = new com.bartovapps.gpstriprec.presentation.units_formatters.MetricAltFormatter();
 //        }
 //    }
 //

@@ -1,7 +1,6 @@
-package com.bartovapps.gpstriprec.core.di
-
-import com.bartovapps.gpstriprec.presentation.displayers.HmsFormatter
-import com.bartovapps.gpstriprec.presentation.displayers.TimeFormatter
+package com.bartovapps.gpstriprec.domain.di
+import com.bartovapps.gpstriprec.domain.formatters.TimeFormatter
+import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

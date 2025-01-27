@@ -16,8 +16,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bartovapps.gpstriprec.R;
-import com.bartovapps.gpstriprec.presentation.displayers.HmsFormatter;
-import com.bartovapps.gpstriprec.presentation.displayers.TimeFormatter;
+import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter;
+import com.bartovapps.gpstriprec.domain.formatters.TimeFormatter;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Transformation;
 
@@ -59,7 +59,7 @@ public class TripsRecyclerAdapter extends RecyclerView.Adapter<TripsRecyclerAdap
             holder.tvTitle.setText(tripTitle);
         }
         holder.tvDate.setText(trip.getDate());
-        holder.tvDuration.setText(timeDisplayer.displayTime(trip.getDuration()));
+        holder.tvDuration.setText(timeDisplayer.formatTime(trip.getDuration()));
         holder.itemView.setActivated(selectedItems.get(position, false));
         Picasso.with(holder.itemView.getContext())
                 .load(new File(trip.getImageFileName())).transform(new CircleTransform())

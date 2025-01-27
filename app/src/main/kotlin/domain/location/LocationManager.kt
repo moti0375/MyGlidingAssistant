@@ -1,4 +1,4 @@
-package core.location
+package domain.location
 
 interface LocationManager {
 
