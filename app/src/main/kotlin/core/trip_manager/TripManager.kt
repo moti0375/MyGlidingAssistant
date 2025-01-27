@@ -1,7 +1,6 @@
 package core.trip_manager
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.location.Address
@@ -12,7 +11,8 @@ import android.util.Log
 import com.bartovapps.gpstriprec.core.db.TripsDBOpenHelper
 import com.bartovapps.gpstriprec.core.db.TripsDataSource
 import com.bartovapps.gpstriprec.core.di.QTripsImagesDir
-import com.bartovapps.gpstriprec.core.kml.KmlManager
+import com.bartovapps.gpstriprec.core.files.kml.KmlManager
+import com.bartovapps.gpstriprec.core.files.path_provider.PathProvider
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.core.timer.TripTimer
 import com.bartovapps.gpstriprec.core.trip_manager.KmlParser
@@ -23,7 +23,6 @@ import com.bartovapps.gpstriprec.data.enums.MovementState
 import com.bartovapps.gpstriprec.data.enums.SaveStatus
 import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.maps.model.LatLng
-import dagger.hilt.android.qualifiers.ApplicationContext
 import data.model.Trip
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,8 +52,7 @@ interface TripManager {
 
 
 class TripManagerImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
-    @QTripsImagesDir private val tripsImagesDir: String,
+    private val pathProvider: PathProvider,
     private val datasource: TripsDataSource,
     private val timer: TripTimer,
     private val kmlManager: KmlManager,
@@ -237,7 +235,7 @@ class TripManagerImpl @Inject constructor(
         return if (latLngList.size > 1) {
             kmlManager.openRawDocument()
             val timestamp = System.currentTimeMillis()
-            val mapImageFile = "$tripsImagesDir/trip_$timestamp.jpeg"
+            val mapImageFile = "${pathProvider.providerImagesFilesPath()}/trip_$timestamp.jpeg"
             val sdf = SimpleDateFormat("dd-MM-yyyy 'at' HH:mm")
             val date = sdf.format(Date(System.currentTimeMillis()))
             val mapFile = kmlManager.updateTripLatLng(latLngList) // creating and

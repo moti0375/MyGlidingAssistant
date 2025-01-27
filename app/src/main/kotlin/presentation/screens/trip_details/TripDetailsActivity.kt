@@ -140,7 +140,6 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
                 tripDetailsState.file,
                 tripDetailsState.tripTitle
             )
-
             is TripDetailsState.TripKmlReady -> shareKml(
                 tripDetailsState.file,
                 tripDetailsState.tripTitle
@@ -268,7 +267,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
             }
 
             val tripId = intent.getLongExtra("trip_id", 0)
-            detailsViewModel.mapEventToState(TripDetailsEvent.LoadTrip(tripId))
+            detailsViewModel.addEvent(TripDetailsEvent.LoadTrip(tripId))
         }
     }
 
@@ -277,7 +276,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         Log.i(LOG_TAG, "Marker " + marker.id + " was clicked");
 
         imageMarker?.imageUri?.let {
-            detailsViewModel.mapEventToState(TripDetailsEvent.OnInfoWindowClicked(it))
+            detailsViewModel.addEvent(TripDetailsEvent.OnInfoWindowClicked(it))
         }
 
     }
@@ -418,8 +417,8 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
                 val selectedPosition = (dialog as AlertDialog).listView.checkedItemPosition
                 //                                Log.i(LOG_TAG, "Option selected: " + selectedPosition);
                 when (selectedPosition) {
-                    SHARE_IMAGE -> detailsViewModel.mapEventToState(TripDetailsEvent.ShareTripMapImage)
-                    SHARE_KML -> detailsViewModel.mapEventToState(TripDetailsEvent.ShareTripKml)
+                    SHARE_IMAGE -> detailsViewModel.addEvent(TripDetailsEvent.ShareTripMapImage)
+                    SHARE_KML -> detailsViewModel.addEvent(TripDetailsEvent.ShareTripKml)
                 }
                 dialog.cancel()
             }

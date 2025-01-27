@@ -14,7 +14,7 @@
 //import com.bartovapps.gpstriprec.db.TripsDataSource;
 //import com.bartovapps.gpstriprec.enums.com.bartovapps.gpstriprec.data.enums.MovementState;
 //import com.bartovapps.gpstriprec.enums.com.bartovapps.gpstriprec.data.enums.SaveStatus;
-//import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.kml.KmlManager;
+//import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.files.kml.KmlManager;
 //import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.trip_manager.KmlParser;
 //import com.bartovapps.gpstriprec.maphelper.ImageMarker;
 //import com.bartovapps.gpstriprec.maphelper.com.bartovapps.gpstriprec.core.map_helper.MapHelper;
@@ -283,7 +283,7 @@
 //
 //        if (latLngList.size() > 1) {
 //            mapHelper.viewRoute(latLngList);
-//            com.bartovapps.gpstriprec.core.kml.KmlManager kmlHelper = new com.bartovapps.gpstriprec.core.kml.KmlManager(context);
+//            com.bartovapps.gpstriprec.core.files.kml.KmlManager kmlHelper = new com.bartovapps.gpstriprec.core.files.kml.KmlManager(context);
 //            kmlHelper.openRawDocument();
 //            long timestamp = System.currentTimeMillis();
 //            String mapImageFile = context.getExternalFilesDir(null) + MAP_IMAGES_DIR + "/" + "trip_" + timestamp + ".jpeg";
@@ -418,7 +418,7 @@
 //        }
 //
 //
-//        com.bartovapps.gpstriprec.core.kml.KmlManager kmlCreator = new com.bartovapps.gpstriprec.core.kml.KmlManager(activity);
+//        com.bartovapps.gpstriprec.core.files.kml.KmlManager kmlCreator = new com.bartovapps.gpstriprec.core.files.kml.KmlManager(activity);
 //        kmlCreator.openRawDocument();
 //
 //        String mapFile = kmlCreator.updateTripLatLng(latLngList);

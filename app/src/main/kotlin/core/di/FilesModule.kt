@@ -1,6 +1,9 @@
 package com.bartovapps.gpstriprec.core.di
 
 import android.content.Context
+import com.bartovapps.gpstriprec.core.files.path_provider.PathProvider
+import com.bartovapps.gpstriprec.core.files.path_provider.PathProviderImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -11,6 +14,9 @@ import java.io.File
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class FilesModule {
+
+    @Binds
+    abstract fun bindFilesProvider(fileProviderImpl: PathProviderImpl) : PathProvider
 
     companion object{
         @Provides

@@ -1,9 +1,8 @@
-package com.bartovapps.gpstriprec.core.kml
+package com.bartovapps.gpstriprec.core.files.kml
 
 import android.content.res.Resources
 import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.core.di.QExternalDirectory
-import com.bartovapps.gpstriprec.core.di.QTripsKmlDir
+import com.bartovapps.gpstriprec.core.files.path_provider.PathProvider
 import com.google.android.gms.maps.model.LatLng
 import org.jdom2.Document
 import org.jdom2.Element
@@ -21,7 +20,7 @@ import javax.inject.Singleton
 @Singleton
 class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.kml");
     private val resources: Resources,
-    @QTripsKmlDir private val tripsKmlDir: String,
+    private val pathProvider: PathProvider,
     private val saxBuilder: SAXBuilder
 ) {
     private var doc: Document? = null
@@ -53,10 +52,7 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
                     Namespace.getNamespace(KML_NS)
                 )
 
-                // Log.i(LOG_TAG, "number of placemarks " + placemarks.size());
                 for (node in placemarks) {
-                    // Log.i(LOG_TAG, "Placemark : " +
-                    // node.getAttribute("id").getIntValue());
                     if (node.getAttribute("id").intValue == 1) {
                         startPoint = node.getChild(
                             "Point",
@@ -73,8 +69,6 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
             "coordinates",
             Namespace.getNamespace(KML_NS)
         ).setText(point)
-
-        // Log.i(LOG_TAG, "start point coordinates: " + coordinated.getValue());
     }
 
     fun updateEndPoint(point: String?) {
@@ -108,8 +102,6 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
             "coordinates",
             Namespace.getNamespace(KML_NS)
         )?.setText(point)
-
-        // Log.i(LOG_TAG, "end point coordinates: " + coordinated.getValue());
     }
 
     private fun updateRouteMarks(route: String) {
@@ -180,7 +172,6 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
             for (latlng in latlngs) {
                 route.append(latlng.longitude.toString() + "," + latlng.latitude + "\n")
             }
-            // Log.i(LOG_TAG, "route coordinates: ");
             updateRouteMarks(route.toString())
             mapFile = writeFile()
         }
@@ -189,18 +180,9 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
 
     private fun writeFile(): String {
         val timestamp = System.currentTimeMillis()
-        val fileDir = File(tripsKmlDir)
-
-//        if (!fileDir.exists()) {
-//            val mkdirs = fileDir.mkdirs()
-//            Log.i(
-//                "KmlManager",
-//                "fileDir make dir result: $mkdirs"
-//            )
-//        }
 
         val fileName = "/trip_$timestamp.kml"
-        val kmlFile = File(fileDir, fileName)
+        val kmlFile = File(pathProvider.provideTripKmlFilesPath(), fileName)
 
         val xmlOutput = XMLOutputter()
         xmlOutput.format = Format.getPrettyFormat()

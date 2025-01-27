@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bartovapps.gpstriprec.core.db.TripsDataSource
-import com.bartovapps.gpstriprec.core.di.QShareImagesDir
+import com.bartovapps.gpstriprec.core.files.path_provider.PathProvider
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.core.trip_manager.KmlParser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +20,7 @@ import javax.inject.Inject
 class TripDetailsViewModel @Inject constructor(
     private val tripsDataSource: TripsDataSource,
     private val kmlParser: KmlParser,
-    @QShareImagesDir private val shareImageDir: String
+    private val pathProvider: PathProvider,
 ) : ViewModel() {
 
     private val tripDetailsMutableStateFlow =
@@ -29,7 +29,12 @@ class TripDetailsViewModel @Inject constructor(
     private var trip: Trip? = null
     private var markerImages = mutableListOf<ImageMarker>()
 
-    fun mapEventToState(event: TripDetailsEvent) {
+
+    fun addEvent(event: TripDetailsEvent){
+        mapEventToState(event)
+    }
+
+    private fun mapEventToState(event: TripDetailsEvent) {
         when (event) {
             is TripDetailsEvent.LoadTrip -> loadTrip(event.tripId)
             is TripDetailsEvent.OnInfoWindowClicked -> handleInfoWindowClicked(event.markerUri)
@@ -70,7 +75,7 @@ class TripDetailsViewModel @Inject constructor(
 
 
     private fun handleShareImage() {
-        val filePath = File("$shareImageDir/${trip?.date}_map.png")
+        val filePath = File("${pathProvider.providesShareImagesDir()}/${trip?.date}_map.png")
         publishState(TripDetailsState.MapImageFileReady(filePath.path, trip?.tripName))
     }
 

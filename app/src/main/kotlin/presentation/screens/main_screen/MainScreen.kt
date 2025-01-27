@@ -115,13 +115,14 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
 
     private var recordingState = RecordingState.Idle
     private var imRecording: ImageView? = null
-    var handler: Handler = Handler(Looper.getMainLooper())
+    private var handler: Handler = Handler(Looper.getMainLooper())
 
     // Bool to track whether the app is already resolving an error
     private var uploadedTrip: Trip? = null
     private var recordingService: GpsTripRecService? = null
     private var serviceBounded: Boolean = false
-    private var serviceIntent: Intent? = null
+    private lateinit var serviceIntent: Intent
+
 
     private lateinit var mapFrag: CustomSupportMapFragment
 
@@ -278,14 +279,6 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         //btStartStop = (ToggleButton) findViewById(R.id.btStartStop);
         fabStartStop = findViewById(R.id.fabStartStop)
         fabStartCamera = findViewById(R.id.fabCamera)
-
-
-        // tvSpeed.setTypeface(typeFace);
-        // tvDistance.setTypeface(typeFace);
-        // tvTimer.setTypeface(typeFace);
-        // tvAccuracy.setTypeface(typeFace);
-
-//        btStartStop.setOnClickListener(btListener);
         fabStartStop.setOnClickListener(btListener)
         fabStartCamera.setOnClickListener(btListener)
         imRecording = findViewById<View>(R.id.imRecording) as ImageView
@@ -720,11 +713,6 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         }
     }
 
-
-    private fun removeLocationListener(listener: LocationListener) {
-        lm.removeUpdates(listener)
-    }
-
     private var prefListener: OnSharedPreferenceChangeListener =
         OnSharedPreferenceChangeListener { sharedPreferences: SharedPreferences?, key: String? -> updatePreferences() }
 
@@ -897,12 +885,16 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         }
     }
 
-    fun startService() {
-        startService(serviceIntent)
-        bindService(serviceIntent!!, mConnection, BIND_AUTO_CREATE)
+    private fun startService() {
+        if(this::serviceIntent.isInitialized){
+            serviceIntent.let {
+                startService(it)
+                bindService(it, mConnection, BIND_AUTO_CREATE)
+            }
+        }
     }
 
-    fun stopService() {
+    private fun stopService() {
         try {
             stopService(serviceIntent)
         } catch (e: Exception) {

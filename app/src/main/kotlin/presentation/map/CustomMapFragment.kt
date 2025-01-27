@@ -201,7 +201,7 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
-        return true
+        return false
     }
 
 
