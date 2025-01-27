@@ -129,8 +129,8 @@ public class Utils {
 //
 //		   KmlManager kmlManager = new KmlManager(activity);
 //		   kmlManager.openRawDocument();
-//		   com.bartovapps.gpstriprec.core.trip_manager.KmlParser tripAParser = new com.bartovapps.gpstriprec.core.trip_manager.KmlParser(tripA.getKml());
-//		   com.bartovapps.gpstriprec.core.trip_manager.KmlParser tripBParser = new com.bartovapps.gpstriprec.core.trip_manager.KmlParser(tripB.getKml());
+//		   com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser tripAParser = new com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser(tripA.getKml());
+//		   com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser tripBParser = new com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser(tripB.getKml());
 //		   tripAParser.openTripKml();
 //		   tripBParser.openTripKml();
 //

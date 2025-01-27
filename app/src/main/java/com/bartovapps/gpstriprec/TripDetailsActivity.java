@@ -38,7 +38,7 @@
 //import com.bartovapps.gpstriprec.core.map_helper.MapHelper;
 //import com.bartovapps.gpstriprec.data.enums.AltitudeUnits;
 //import com.bartovapps.gpstriprec.data.enums.Units;
-//import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.trip_manager.KmlParser;
+//import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser;
 //import com.bartovapps.gpstriprec.presentation.displayers.com.bartovapps.gpstriprec.presentation.units_formatters.FeetFormatter;
 //import com.bartovapps.gpstriprec.presentation.displayers.com.bartovapps.gpstriprec.presentation.units_formatters.MetricFormatter;
 //import com.bartovapps.gpstriprec.presentation.displayers.com.bartovapps.gpstriprec.presentation.units_formatters.MillageFormatter;
@@ -87,7 +87,7 @@
 //    MapHelper mapHelper;
 //
 //    @Inject
-//    com.bartovapps.gpstriprec.core.trip_manager.KmlParser parser;
+//    com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser parser;
 //    private List<LatLng> locations;
 //    private SharedPreferences settings;
 //    private int lineColor = Color.RED;

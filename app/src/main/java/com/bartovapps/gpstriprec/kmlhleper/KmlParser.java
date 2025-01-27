@@ -17,7 +17,7 @@
 //import java.util.ArrayList;
 //import java.util.List;
 //
-//public class com.bartovapps.gpstriprec.core.trip_manager.KmlParser {
+//public class com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser {
 //
 //    public static final int KML_OPENED = 0;
 //    public static final int FAIL_TO_OPEN_KML = 1;
@@ -33,7 +33,7 @@
 //    private Element rootNode;
 //    private List<LatLng> locations;
 //
-//    public com.bartovapps.gpstriprec.core.trip_manager.KmlParser(String fileName) {
+//    public com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser(String fileName) {
 //        this.xmlFile = new File(fileName);
 //        builder = new SAXBuilder();
 //    }

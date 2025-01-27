@@ -1,7 +1,8 @@
-package com.bartovapps.gpstriprec.core.di
-
-import com.bartovapps.gpstriprec.core.trip_manager.KmlParser
-import com.bartovapps.gpstriprec.core.trip_manager.KmlParserImpl
+package com.bartovapps.gpstriprec.domain.di
+import com.bartovapps.gpstriprec.core.files.kml.KmlManager
+import com.bartovapps.gpstriprec.core.files.kml.KmlManagerImpl
+import com.bartovapps.gpstriprec.domain.trip_manager.KmlParser
+import com.bartovapps.gpstriprec.domain.trip_manager.KmlParserImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -15,7 +16,10 @@ import javax.inject.Singleton
 abstract class KmlModule {
 
     @Binds
-    abstract fun bindsKmlManager(manager: KmlParserImpl) : KmlParser
+    abstract fun bindsKmlParser(manager: KmlParserImpl) : KmlParser
+
+    @Binds
+    abstract fun bindsKmlManager(kmlManager: KmlManagerImpl) : KmlManager
 
     companion object{
         @Provides

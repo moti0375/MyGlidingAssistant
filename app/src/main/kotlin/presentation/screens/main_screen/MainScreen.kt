@@ -46,7 +46,6 @@ import com.bartovapps.gpstriprec.GpsRecPrefs
 import com.bartovapps.gpstriprec.GpsRecTripsList
 import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.core.timer.TripTimer
-import com.bartovapps.gpstriprec.core.trip_manager.KmlParserImpl
 import com.bartovapps.gpstriprec.core.trip_manager.TripState
 import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
 import com.bartovapps.gpstriprec.data.enums.RecordingState
@@ -54,6 +53,7 @@ import com.bartovapps.gpstriprec.data.enums.SaveStatus
 import com.bartovapps.gpstriprec.data.enums.Units
 import com.bartovapps.gpstriprec.presentation.units_formatters.FeetFormatter
 import com.bartovapps.gpstriprec.domain.formatters.UnitsFormatter
+import com.bartovapps.gpstriprec.domain.trip_manager.KmlParserImpl
 import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter
 import com.bartovapps.gpstriprec.presentation.units_formatters.KmhFormatter
 import com.bartovapps.gpstriprec.presentation.units_formatters.MetricAltFormatter

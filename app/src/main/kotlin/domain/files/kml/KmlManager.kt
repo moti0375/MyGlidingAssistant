@@ -3,6 +3,7 @@ package com.bartovapps.gpstriprec.core.files.kml
 import android.content.res.Resources
 import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.core.files.path_provider.PathProvider
+import com.bartovapps.gpstriprec.domain.trip_manager.KmlParser
 import com.google.android.gms.maps.model.LatLng
 import org.jdom2.Document
 import org.jdom2.Element
@@ -17,34 +18,35 @@ import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface KmlManager {
+    fun generateKmlFromLocationList(locations: List<LatLng>) : String?
+    fun getLocationsFromKml(kmlPath: String) : List<LatLng>
+}
+
 @Singleton
-class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.kml");
+class KmlManagerImpl @Inject constructor(// File xmlFile = new File("/sdcard/route.kml");
     private val resources: Resources,
     private val pathProvider: PathProvider,
-    private val saxBuilder: SAXBuilder
-) {
-    private var doc: Document? = null
-    private var rootNode: Element? = null
+    private val saxBuilder: SAXBuilder,
+    private val kmlParser: KmlParser,
+) : KmlManager {
 
-    fun openRawDocument() {
+    private fun openRawDocument() : Document? {
         try {
-            resources.openRawResource(R.raw.trip_raw).use {
-                doc = saxBuilder.build(it) as Document
-                rootNode = doc?.rootElement
+            return resources.openRawResource(R.raw.trip_raw).use {
+                saxBuilder.build(it) as Document
             }
         } catch (e: JDOMException) {
             e.printStackTrace()
         } catch (e: IOException) {
             e.printStackTrace()
         }
+        return null
     }
 
-    fun updateStartPoint(point: String?) {
+    private fun updateStartPoint(rootNode: Element, point: String?) {
         var startPoint: Element? = null
-        val docElement = rootNode?.getChild(
-            "Document",
-            Namespace.getNamespace(KML_NS)
-        )
+        val docElement = rootNode.getChild("Document", Namespace.getNamespace(KML_NS))
         try {
             if (docElement != null) {
                 val placemarks = docElement.getChildren(
@@ -65,27 +67,19 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
         } catch (e: Exception) {
             e.message
         }
-        @Suppress("unused") val coordinated = startPoint!!.getChild(
+        @Suppress("unused") val coordinated = startPoint?.getChild(
             "coordinates",
             Namespace.getNamespace(KML_NS)
-        ).setText(point)
+        )?.setText(point)
     }
 
-    fun updateEndPoint(point: String?) {
+    private fun updateEndPoint(rootNode: Element, point: String?) {
         var startPoint: Element? = null
-        val docElement = rootNode!!.getChild(
-            "Document",
-            Namespace.getNamespace(KML_NS)
-        )
+        val docElement = rootNode.getChild("Document", Namespace.getNamespace(KML_NS))
         try {
             if (docElement != null) {
-                val placemarks = docElement.getChildren(
-                    "Placemark",
-                    Namespace.getNamespace(KML_NS)
-                )
-
+                val placemarks = docElement.getChildren("Placemark", Namespace.getNamespace(KML_NS))
                 for (node in placemarks) {
-
                     if (node.getAttribute("id").intValue == 2) {
                         startPoint = node.getChild(
                             "Point",
@@ -104,9 +98,9 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
         )?.setText(point)
     }
 
-    private fun updateRouteMarks(route: String) {
+    private fun updateRouteMarks(rootNode: Element, route: String) {
         var lineString: Element? = null
-        val docElement = rootNode!!.getChild(
+        val docElement = rootNode.getChild(
             "Document",
             Namespace.getNamespace(KML_NS)
         )
@@ -118,7 +112,6 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
                 )
 
                 for (node in placemarks) {
-                    // Log.i(LOG_TAG, "Placemark : " + node.getAttribute("id"));
                     if (node.getAttribute("id").value == "route") {
                         lineString = node.getChild(
                             "LineString",
@@ -140,45 +133,36 @@ class KmlManager @Inject constructor(// File xmlFile = new File("/sdcard/route.k
         // Log.i(LOG_TAG, "end point coordinates: " + coordinated.getValue());
     }
 
-    fun updateTrip(locations: List<String>): String? {
-        val route = StringBuilder()
+    override fun generateKmlFromLocationList(locations: List<LatLng>): String? {
+        val d = openRawDocument()
+        return d?.let {  doc ->
+            val rootNode = doc.rootElement
+            val route = StringBuilder()
+            if (locations.size > 1) {
+                val startPoint = locations.first()
+                val stopPoint = locations.last()
 
-        var mapFile: String? = null
-
-        if (locations.size > 1) {
-            updateStartPoint(locations[0])
-            updateEndPoint(locations[locations.size - 1])
-            for (mark in locations) {
-                route.append(mark + "\n")
+                updateStartPoint(rootNode ,startPoint.longitude.toString() + "," + startPoint.latitude)
+                updateEndPoint(rootNode, stopPoint.longitude.toString() + "," + stopPoint.latitude)
+                for (latlng in locations) {
+                    route.append(latlng.longitude.toString() + "," + latlng.latitude + "\n")
+                }
+                updateRouteMarks(rootNode, route.toString())
+                writeFile(doc)
+            } else {
+                null
             }
-            updateRouteMarks(route.toString())
-            mapFile = writeFile()
         }
 
-        return mapFile
+
     }
 
-    fun updateTripLatLng(latlngs: List<LatLng>): String? {
-        val route = StringBuilder()
-        var mapFile: String? = null
 
-
-        if (latlngs.size > 1) {
-            val startPoint = latlngs[0]
-            val stopPoint = latlngs[latlngs.size - 1]
-
-            updateStartPoint(startPoint.longitude.toString() + "," + startPoint.latitude)
-            updateEndPoint(stopPoint.longitude.toString() + "," + stopPoint.latitude)
-            for (latlng in latlngs) {
-                route.append(latlng.longitude.toString() + "," + latlng.latitude + "\n")
-            }
-            updateRouteMarks(route.toString())
-            mapFile = writeFile()
-        }
-        return mapFile
+    override fun getLocationsFromKml(kmlPath: String): List<LatLng> {
+        return kmlParser.parsKmlString(kmlPath)
     }
 
-    private fun writeFile(): String {
+    private fun writeFile(doc: Document): String {
         val timestamp = System.currentTimeMillis()
 
         val fileName = "/trip_$timestamp.kml"

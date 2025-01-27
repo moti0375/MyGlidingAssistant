@@ -5,9 +5,9 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.bartovapps.gpstriprec.core.db.TripsDataSource
+import com.bartovapps.gpstriprec.core.files.kml.KmlManager
 import com.bartovapps.gpstriprec.core.files.path_provider.PathProvider
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
-import com.bartovapps.gpstriprec.core.trip_manager.KmlParser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import data.model.Trip
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class TripDetailsViewModel @Inject constructor(
     private val tripsDataSource: TripsDataSource,
-    private val kmlParser: KmlParser,
+    private val kmlManager: KmlManager,
     private val pathProvider: PathProvider,
 ) : ViewModel() {
 
@@ -63,7 +63,7 @@ class TripDetailsViewModel @Inject constructor(
                     markerImages.addAll(markers)
                 }
                 val locations = trip.kml?.let { kmlPath ->
-                    kmlParser.parsKmlString(kmlPath)
+                    kmlManager.getLocationsFromKml(kmlPath)
                 } ?: emptyList()
                 Log.i(TAG, "Trip Loaded: $trip, markers: $markers, locations: $locations")
                 publishState(TripDetailsState.TripLoaded(trip, markers, locations))

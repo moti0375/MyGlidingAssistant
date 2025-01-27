@@ -1,4 +1,5 @@
-package com.bartovapps.gpstriprec.core.trip_manager
+package com.bartovapps.gpstriprec.domain.trip_manager
+
 import com.google.android.gms.maps.model.LatLng
 import org.jdom2.Document
 import org.jdom2.Element
@@ -11,7 +12,7 @@ import java.io.FileNotFoundException
 import java.io.IOException
 import javax.inject.Inject
 
-interface KmlParser{
+interface KmlParser {
     fun parsKmlString(kmlPath: String) : List<LatLng>
 }
 

@@ -14,12 +14,11 @@ import com.bartovapps.gpstriprec.core.files.kml.KmlManager
 import com.bartovapps.gpstriprec.core.files.path_provider.PathProvider
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.core.timer.TripTimer
-import com.bartovapps.gpstriprec.core.trip_manager.KmlParser
-import com.bartovapps.gpstriprec.core.trip_manager.KmlParserImpl.Companion.FAIL_TO_OPEN_KML
-import com.bartovapps.gpstriprec.core.trip_manager.KmlParserImpl.Companion.KML_OPENED
 import com.bartovapps.gpstriprec.core.trip_manager.TripState
 import com.bartovapps.gpstriprec.data.enums.MovementState
 import com.bartovapps.gpstriprec.data.enums.SaveStatus
+import com.bartovapps.gpstriprec.domain.trip_manager.KmlParserImpl.Companion.FAIL_TO_OPEN_KML
+import com.bartovapps.gpstriprec.domain.trip_manager.KmlParserImpl.Companion.KML_OPENED
 import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.maps.model.LatLng
 import data.model.Trip
@@ -55,7 +54,6 @@ class TripManagerImpl @Inject constructor(
     private val datasource: TripsDataSource,
     private val timer: TripTimer,
     private val kmlManager: KmlManager,
-    private val kmlParser: KmlParser,
     private val geocoder: Geocoder
 ) : TripManager {
     private val tripMutableStateFlow = MutableStateFlow<TripState>(TripState.Initiated)
@@ -232,12 +230,12 @@ class TripManagerImpl @Inject constructor(
     override fun saveTrip(tripImage: Bitmap?): SaveStatus {
         Log.i("TripManager", "About to save trip")
         return if (latLngList.size > 1) {
-            kmlManager.openRawDocument()
+
             val timestamp = System.currentTimeMillis()
             val mapImageFile = "${pathProvider.providerImagesFilesPath()}/trip_$timestamp.jpeg"
             val sdf = SimpleDateFormat("dd-MM-yyyy 'at' HH:mm")
             val date = sdf.format(Date(System.currentTimeMillis()))
-            val mapFile = kmlManager.updateTripLatLng(latLngList) // creating and
+            val mapFile = kmlManager.generateKmlFromLocationList(latLngList) // creating and
             val startAddress = startLocation?.let { getAddress(LatLng(it.latitude, it.longitude)) }
             val stopAddress = currentLocation?.let { getAddress(LatLng(it.latitude, it.longitude)) }
 
@@ -290,14 +288,14 @@ class TripManagerImpl @Inject constructor(
         }
 
 
-        //        com.bartovapps.gpstriprec.core.trip_manager.KmlParser parser = new com.bartovapps.gpstriprec.core.trip_manager.KmlParser(this.uploadedTrip.getKml());
+        //        com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser parser = new com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser(this.uploadedTrip.getKml());
 //        kml_status = parser.openTripKml();
-//        if(kml_status != com.bartovapps.gpstriprec.core.trip_manager.KmlParser.KML_OPENED){
+//        if(kml_status != com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser.KML_OPENED){
 //            return kml_status;
 //        }
         latLngList.clear()
         trip.kml?.let {
-            this.latLngList.addAll(kmlParser.parsKmlString(trip.kml))
+            this.latLngList.addAll(kmlManager.getLocationsFromKml(trip.kml))
         }
 
         if (this.latLngList.isEmpty()) {
@@ -377,9 +375,8 @@ class TripManagerImpl @Inject constructor(
             return KML_NOT_FOUND
         }
 
-
-        val tripALocations = kmlParser.parsKmlString(tripA.kml)
-        val tripBLocations = kmlParser.parsKmlString(tripB.kml)
+        val tripALocations = kmlManager.getLocationsFromKml(tripA.kml)
+        val tripBLocations = kmlManager.getLocationsFromKml(tripB.kml)
 
         latLngList.addAll(tripALocations)
         latLngList.addAll(tripBLocations)
@@ -396,10 +393,7 @@ class TripManagerImpl @Inject constructor(
         if (gap[0] > CONTINUE_TRIPS_GAP) {
             return UNABLE_TO_MERGE
         }
-
-        kmlManager.openRawDocument()
-        val mapFile = kmlManager.updateTripLatLng(latLngList)
-
+        val mapFile = kmlManager.generateKmlFromLocationList(latLngList)
         val tripsDuration = tripA.duration + tripB.duration
         val tripsDistance = tripA.distance + tripB.distance
         val averageSpeed = (tripsDistance / (tripsDuration / 1000).toInt()).toDouble() // m/sec
