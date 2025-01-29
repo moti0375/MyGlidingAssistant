@@ -1,13 +1,12 @@
-package com.bartovapps.gpstriprec.presentation.screens.trip_details
-
+package com.bartovapps.gpstriprec.presentation.screens.trip_details_screen
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bartovapps.gpstriprec.core.db.TripsDataSource
-import com.bartovapps.gpstriprec.core.files.kml.KmlManager
-import com.bartovapps.gpstriprec.core.files.path_provider.PathProvider
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
+import com.bartovapps.gpstriprec.domain.db.TripsDataSource
+import com.bartovapps.gpstriprec.domain.files.kml.KmlManager
+import com.bartovapps.gpstriprec.domain.files.path_provider.PathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import data.model.Trip
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -93,6 +92,6 @@ class TripDetailsViewModel @Inject constructor(
 
 
     companion object{
-        const val TAG = "TripDetailsViewModel"
+        const val TAG = "com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsViewModel"
     }
 }

@@ -20,15 +20,12 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.net.Uri
-import android.os.AsyncTask
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
-import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -36,6 +33,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
@@ -45,15 +43,10 @@ import com.bartovapps.gpstriprec.GpsRecLicense
 import com.bartovapps.gpstriprec.GpsRecPrefs
 import com.bartovapps.gpstriprec.GpsRecTripsList
 import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.core.timer.TripTimer
-import com.bartovapps.gpstriprec.core.trip_manager.TripState
 import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
-import com.bartovapps.gpstriprec.data.enums.RecordingState
-import com.bartovapps.gpstriprec.data.enums.SaveStatus
 import com.bartovapps.gpstriprec.data.enums.Units
 import com.bartovapps.gpstriprec.presentation.units_formatters.FeetFormatter
 import com.bartovapps.gpstriprec.domain.formatters.UnitsFormatter
-import com.bartovapps.gpstriprec.domain.trip_manager.KmlParserImpl
 import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter
 import com.bartovapps.gpstriprec.presentation.units_formatters.KmhFormatter
 import com.bartovapps.gpstriprec.presentation.units_formatters.MetricAltFormatter
@@ -61,11 +54,8 @@ import com.bartovapps.gpstriprec.presentation.map.CustomSupportMapFragment
 import com.bartovapps.gpstriprec.presentation.map.MapReadyListener
 import com.bartovapps.gpstriprec.services.GpsTripRecService
 import com.bartovapps.gpstriprec.services.GpsTripRecService.LocalBinder
-import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.common.GooglePlayServicesUtil
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import domain.trip_manager.TripManager
 import dagger.hilt.android.AndroidEntryPoint
 import data.model.Trip
 import kotlinx.coroutines.Job
@@ -74,7 +64,6 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainScreen : AppCompatActivity(), MapReadyListener {
@@ -89,11 +78,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     private lateinit var fabStartStop: FloatingActionButton
     private lateinit var fabStartCamera: FloatingActionButton
 
-    @Inject
-    lateinit var tripManager: TripManager
-
-    @Inject
-    lateinit var timerManager: TripTimer
+    private val tripManagerViewModel by viewModels<TripManagerViewModel>()
 
     private lateinit var speedFormatter: UnitsFormatter
     private lateinit var distanceFormatter: UnitsFormatter
@@ -103,22 +88,14 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     private lateinit var lm: LocationManager
     private lateinit var settings: SharedPreferences
     private var units = Units.Metric
-    private var autoSave = AUTO_SAVE
     private var altUnits = AltitudeUnits.Feet
-    private var lineColor = Color.RED
-    private val mapType = GoogleMap.MAP_TYPE_NORMAL
-    private var recordingMode = NEW_TRIP
-
 
     private var progressDialog: ProgressDialog? = null
 
-
-    private var recordingState = RecordingState.Idle
     private var imRecording: ImageView? = null
     private var handler: Handler = Handler(Looper.getMainLooper())
 
     // Bool to track whether the app is already resolving an error
-    private var uploadedTrip: Trip? = null
     private var recordingService: GpsTripRecService? = null
     private var serviceBounded: Boolean = false
     private lateinit var serviceIntent: Intent
@@ -138,7 +115,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         toolbar = findViewById(R.id.app_bar)
         setSupportActionBar(toolbar)
         supportActionBar?.apply {
-            setLogo(R.drawable.ic_launcher)
+            setLogo(R.mipmap.ic_lanucher)
             setDisplayShowTitleEnabled(false)
         }
 
@@ -158,7 +135,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     private fun observeTripState() {
         job?.cancel()
         job = lifecycleScope.launch {
-            tripManager.tripStateFlow.collect {
+            tripManagerViewModel.tripStateFlow.collect {
                 Log.i(TAG, "onTripStateChanged: $it")
                 processTripState(it)
             }
@@ -171,14 +148,69 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             is TripState.NewImageMarker -> mapFrag.addImageMarker(state.imageMarker)
             is TripState.TripUpdated -> processTripUpdate(state)
             is TripState.OnGoing -> mapFrag.mapCameraCloseup()
-            is TripState.OverlayRoute ->  mapFrag.overlayRoute(state.locations)
+            is TripState.TripLoaded -> processTripLoaded(state.tripUploadedResult)
             is TripState.Stopped -> mapFrag.mapCameraLongShot()
             is TripState.TripSaved -> {
-                mapFrag.fitCameraToRoute(state.locations)
-                progressDialog?.dismiss()
+                processTripSaved(state)
             }
+
             is TripState.StartLocation -> mapFrag.goToLocation(state.location)
+            is TripState.StartRecording -> startRecording()
+            is TripState.StopAndSave -> saveTrip()
+            is TripState.ShowSaveDialog -> saveTripAlertDialog()
+            is TripState.ShowRecordingInBackground -> processRecordingInBackground()
         }
+    }
+
+    private fun processRecordingInBackground() {
+        Toast.makeText(this, getString(R.string.StillRecording), Toast.LENGTH_SHORT).show()
+    }
+
+    private fun processTripLoaded(loadedResult: TripUploadedResult) {
+        progressDialog?.dismiss()
+        when (loadedResult) {
+            is TripUploadedResult.Success -> {
+                mapFrag.let {
+                    it.overlayRoute(loadedResult.route)
+                    it.zoom = loadedResult.zoom
+                    it.lineColor = loadedResult.color
+                    loadedResult.markers.forEach { marker ->
+                        it.addImageMarker(marker)
+                    }
+                }
+                Toast.makeText(this@MainScreen, getString(R.string.TripLoaded), Toast.LENGTH_LONG).show()
+            }
+
+            is TripUploadedResult.Failed -> {
+                when (loadedResult.failures) {
+                    TripLoadFailures.GenericUploadFailure -> {
+                        Toast.makeText(this@MainScreen, R.string.unable_to_open_kml, Toast.LENGTH_LONG).show()
+                    }
+                    TripLoadFailures.UnableLoadingDuringRecording -> {
+                        Toast.makeText(this, getString(R.string.upload_while_recording), Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun processTripSaved(state: TripState.TripSaved) {
+        when (state.saveStatus) {
+            is SaveStatus.Success -> {
+                mapFrag.fitCameraToRoute(state.saveStatus.locations)
+                Toast.makeText(this@MainScreen, getString(R.string.TripSaved), Toast.LENGTH_LONG)
+                    .show()
+            }
+
+            is SaveStatus.NotEnoughData -> {
+                Toast.makeText(
+                    this@MainScreen,
+                    getString(R.string.NotEnoughData),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+        progressDialog?.dismiss()
     }
 
     private fun processTripUpdate(state: TripState.TripUpdated) {
@@ -188,7 +220,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
 
     private fun subscribeTimerChanges() {
         lifecycleScope.launch {
-            timerManager.timeMillisFlow.collect{
+            tripManagerViewModel.timerStateFlow.collect {
                 tvTimer.text = timeFormatter.formatTime(it)
             }
         }
@@ -198,29 +230,17 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     // Invoke displayInterstitial() when you are ready to display an
     // interstitial.
     private fun updatePreferences() {
-        val units = settings.getString(
+        val units = settings.getInt(resources.getString(R.string.units), 1)
+        val color = settings.getInt(resources.getString(R.string.LineColorPref), 1)
+        val zoom = settings.getFloat(
             resources
-                .getString(R.string.units), "1"
-        )?.toInt()
-        val color = settings.getString(
+                .getString(R.string.ZoomPref), 15f
+        )
+        val width = settings.getFloat(resources.getString(R.string.LineWidthPref), 5f)
+        val altitudeUnits = settings.getInt(
             resources
-                .getString(R.string.LineColorPref), "1"
-        )?.toInt()
-        val zoom = settings.getString(
-            resources
-                .getString(R.string.ZoomPref), "15"
-        )?.toFloat()
-        val width = settings.getString(
-            resources
-                .getString(R.string.LineWidthPref), "5"
-        )?.toFloat()
-        this.autoSave = settings.getString(getString(R.string.AutoSavePrefKey), "0")!!
-            .toInt()
-
-        val altitudeUnits = settings.getString(
-            resources
-                .getString(R.string.altitudeUnitsKey), "1"
-        )!!.toInt()
+                .getString(R.string.altitudeUnitsKey), 1
+        )
 
         if (units == 2) {
             this.units = Units.Millage
@@ -237,19 +257,16 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         setFormatters()
 
         when (color) {
-            2 -> this.lineColor = Color.GREEN
-            3 -> this.lineColor = Color.YELLOW
-            4 -> this.lineColor = Color.BLUE
-            else -> this.lineColor = Color.RED
+            2 -> mapFrag.lineColor = Color.GREEN
+            3 -> mapFrag.lineColor = Color.YELLOW
+            4 -> mapFrag.lineColor = Color.BLUE
+            else -> mapFrag.lineColor = Color.RED
         }
 
-        this.lineWidth = width!!
-        this.cameraZoom = zoom!!
 
         mapFrag.let {
             it.lineWidth = width
             it.zoom = zoom
-            it.lineColor = lineColor
         }
     }
 
@@ -274,105 +291,47 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         tvDistance = findViewById(R.id.tvDistance)
         tvTimer = findViewById(R.id.tvTimer)
         tvAltitude = findViewById(R.id.tvAltitude)
-
-
-        //btStartStop = (ToggleButton) findViewById(R.id.btStartStop);
         fabStartStop = findViewById(R.id.fabStartStop)
         fabStartCamera = findViewById(R.id.fabCamera)
-        fabStartStop.setOnClickListener(btListener)
-        fabStartCamera.setOnClickListener(btListener)
+        fabStartStop.setOnClickListener(startStopClickListener)
+        fabStartCamera.setOnClickListener(camButtonClickListener)
         imRecording = findViewById<View>(R.id.imRecording) as ImageView
     }
 
-    private var btListener: View.OnClickListener = View.OnClickListener { view: View ->
-        if (view === fabStartStop) {
-            if (recordingState == RecordingState.Idle) {
-                if (!lm.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    fabStartStop.setImageDrawable(
-                        ResourcesCompat.getDrawable(
-                            resources, R.drawable.ic_action_new,
-                            theme
-                        )
-                    )
-                    buildAlertMessageNoGPS()
-                } else {
-                    if (uploadedTrip != null) {
-                        if (recordingMode == LOADED_FROM_INTENT) {
-                            startRecording()
-                        } else {
-                            loadedTripDialog()
-                        }
-                    } else {
-                        recordingMode = NEW_TRIP
-                        startRecording()
-                    }
-                }
-            } else {
-                if (autoSave == AUTO_SAVE) {
-                    saveTrip()
-                } else {
-                    saveTripAlertDialog()
-                }
-            }
-        }
-        if (view === fabStartCamera) {
-            //                Intent camIntent = new Intent(GpsRecMain.this, GpsTripRecCamera.class);
-//                startActivityForResult(camIntent, getResources().getInteger(R.integer.GPS_CAMERA_ACTIVITY));
+    private val startStopClickListener = View.OnClickListener{_: View ->
+        tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.StartStopButtonClicked)
+    }
 
+    private var camButtonClickListener: View.OnClickListener = View.OnClickListener { view: View ->
             takePhoto()
-        }
     }
 
 
     private fun startRecording() {
-        fabStartStop.setImageDrawable(
-            ResourcesCompat.getDrawable(
-                resources, R.drawable.ic_action_stop,
-                this.theme
-            )
-        )
+        fabStartStop.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_action_stop, this.theme))
         fabStartCamera.visibility = View.VISIBLE
-        when (recordingMode) {
-            CONTINUE_TRIP -> {}
-            FOLLOW_TRIP -> tripManager.resetRoute(false)
-            else -> tripManager.resetRoute(true)
-        }
-
         enableLocationListener(fixListener)
         mapFrag.zoom = cameraZoom
         mapFrag.tilt = 0f
         progressDialog?.apply {
             setCancelable(true)
             setOnCancelListener(pdOnCancelListener)
-            setIcon(ResourcesCompat.getDrawable(resources, R.drawable.ic_launcher, theme))
+            setIcon(ResourcesCompat.getDrawable(resources, R.mipmap.ic_lanucher, theme))
             setTitle(getString(R.string.app_name))
             setMessage(getString(R.string.WaitForGPS))
             show()
         }
 
-        recordingState = RecordingState.Recording
         imRecording?.visibility = View.VISIBLE
     }
 
     private fun stopRecording() {
-        timerManager.stopTimer()
         disableLocationListener(fixListener)
         disableGpsLocationListener(trackLocationListener)
-        recordingState = RecordingState.Idle
+        tripManagerViewModel.addTripEvent(mainScreenViewModelEvent = MainScreenViewModelEvent.StopTrip)
         imRecording?.visibility = View.GONE
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            fabStartStop.setImageDrawable(
-                resources.getDrawable(
-                    R.drawable.ic_action_new,
-                    this.theme
-                )
-            )
-        } else {
-            fabStartStop.setImageDrawable(resources.getDrawable(R.drawable.ic_action_new))
-        }
+        fabStartStop.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_action_new, this.theme))
         fabStartCamera.visibility = View.INVISIBLE
-        uploadedTrip = null
         stopService()
     }
 
@@ -383,33 +342,19 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     }
 
 
-    override fun onStop() {
-        super.onStop()
-        if (recordingState == RecordingState.Recording) {
-            Toast.makeText(this, getString(R.string.StillRecording), Toast.LENGTH_SHORT)
-                .show()
-        }
-    }
-
-    private val fixListener = object : LocationListener{
+    private val fixListener = object : LocationListener {
         override fun onLocationChanged(location: Location) {
             disableGpsLocationListener(this)
             progressDialog?.let {
-                if(it.isShowing){
+                if (it.isShowing) {
                     it.dismiss()
                 }
             }
             startService()
             enableGPSLocationListener(trackLocationListener)
-            tripManager.setCurrentLocation(location)
+            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.LocationFounded(location))
 
-            if (recordingState == RecordingState.Recording) {
-                if (recordingMode == CONTINUE_TRIP) {
-                    timerManager.resumeTimer()
-                } else {
-                    timerManager.startTimer()
-                }
-            }
+
             Toast.makeText(
                 this@MainScreen,
                 resources.getString(R.string.LocationFounded),
@@ -422,21 +367,9 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
 
 
     override fun onDestroy() {
-        if (recordingState == RecordingState.Recording) {
-            stopRecording()
-            mapFrag.takeMapSnapshot{
-                tripManager.saveTrip(it)
-            }
-        }
-
-        disableGpsLocationListener(trackLocationListener)
-        disableLocationListener(fixListener)
-        timerManager.pauseTimer()
-
-        try {
-            Utils.deleteCache(this)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        stopRecording()
+        mapFrag.takeMapSnapshot {
+            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.TripEnded(it))
         }
 
         try {
@@ -446,26 +379,9 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             e.printStackTrace()
         }
 
-        Toast.makeText(
-            this,
-            resources.getString(R.string.Goodbye), Toast.LENGTH_SHORT
-        )
-            .show()
-
+        Toast.makeText(this, resources.getString(R.string.Goodbye), Toast.LENGTH_SHORT).show()
         super.onDestroy()
     }
-
-
-    override fun finish() {
-        if (recordingState == RecordingState.Recording) {
-            val setIntent = Intent(Intent.ACTION_MAIN)
-            setIntent.addCategory(Intent.CATEGORY_HOME)
-            startActivity(setIntent)
-        } else {
-            super.finish()
-        }
-    }
-
 
     private fun enableGPSLocationListener(listener: LocationListener) {
         lm.requestLocationUpdates(
@@ -543,9 +459,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
 
     var trackLocationListener: LocationListener =
         LocationListener { location: Location ->
-            tripManager.updateLocation(
-                location
-            )
+            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.OnNewLocation(location))
         }
 
     private fun updateDisplay(tripUpdate: TripState.TripUpdated) {
@@ -559,78 +473,36 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     }
 
 
-    /**
-     * Alert in case GPS is disabled!
-     */
-    private fun buildAlertMessageNoGPS() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle(resources.getString(R.string.NoGPSHead))
-        builder.setMessage(resources.getString(R.string.NoGPSBody))
-            .setCancelable(false)
-            .setPositiveButton(
-                resources.getString(R.string.YES)
-            ) { _: DialogInterface?, _: Int ->
-                startActivity(
-                    Intent(
-                        Settings.ACTION_LOCATION_SOURCE_SETTINGS
-                    )
-                )
-            }
-            .setNegativeButton(
-                resources.getString(R.string.NO)
-            ) { dialog: DialogInterface, _: Int ->
-                Toast.makeText(
-                    this,
-                    getString(R.string.GpsMustEnabled),
-                    Toast.LENGTH_LONG
-                ).show()
-                dialog.cancel()
-            }
-        val alert = builder.create()
-        alert.show()
-    }
-
-
     private fun setUpMapIfNeeded() {
         Log.i(TAG, "setUpMapIfNeeded: initializing map")
-        if(!this::mapFrag.isInitialized){
-            mapFrag = (supportFragmentManager.findFragmentById(R.id.map) as CustomSupportMapFragment).apply {
-                lineWidth = this@MainScreen.lineWidth
-                setMapReadyCallback(this@MainScreen)
-            }
+        if (!this::mapFrag.isInitialized) {
+            mapFrag =
+                (supportFragmentManager.findFragmentById(R.id.map) as CustomSupportMapFragment).apply {
+                    lineWidth = this@MainScreen.lineWidth
+                    setMapReadyCallback(this@MainScreen)
+                }
         }
     }
 
     private fun saveTripAlertDialog() {
-        val alertDialogBuilder = AlertDialog.Builder(this).apply {
+        AlertDialog.Builder(this).apply {
             setTitle(resources.getString(R.string.SAVE_TRIP))
-            .setMessage(resources.getString(R.string.SaveDialog))
-            .setCancelable(true)
-            .setIcon(ResourcesCompat.getDrawable(resources, R.drawable.ic_launcher, this@MainScreen.theme))
-            .setPositiveButton(
-                resources.getString(R.string.YES)
-            ) { dialog: DialogInterface, _: Int ->
+            setMessage(resources.getString(R.string.SaveDialog))
+            setCancelable(true)
+            setIcon(ResourcesCompat.getDrawable(resources, R.mipmap.ic_lanucher, this@MainScreen.theme))
+            setPositiveButton(resources.getString(R.string.YES)) { dialog: DialogInterface, _: Int ->
                 dialog.dismiss()
                 saveTrip()
             }
-            .setNegativeButton(
-                resources.getString(R.string.NO)
-            ) { dialog: DialogInterface, _: Int ->
+            setNegativeButton(resources.getString(R.string.NO)) { dialog: DialogInterface, _: Int ->
                 stopRecording()
                 dialog.dismiss()
             }
-        }
-        // set title
-        // create alert dialog
-        val alertDialog = alertDialogBuilder.create()
-
-        alertDialog.setOnCancelListener(saveDialogCancelListener)
-        // show it
-        alertDialog.show()
+            setOnCancelListener(saveDialogCancelListener)
+        }.show()
     }
 
     private fun saveTrip() {
-        stopRecording()
         progressDialog?.apply {
             setTitle(getString(R.string.app_name))
             setMessage(getString(R.string.SavingTrip))
@@ -644,7 +516,10 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             )
             show()
         }
-        SaveTripTask().execute("")
+        stopRecording()
+        mapFrag.takeMapSnapshot {
+            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.TripEnded(it))
+        }
     }
 
     private var pdOnCancelListener: DialogInterface.OnCancelListener =
@@ -655,11 +530,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
 
     private var saveDialogCancelListener: DialogInterface.OnCancelListener =
         DialogInterface.OnCancelListener { _: DialogInterface? ->
-            fabStartStop.setBackgroundDrawable(
-                ResourcesCompat.getDrawable(
-                    resources, R.drawable.ic_action_new, theme
-                )
-            )
+            fabStartStop.setBackgroundDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_action_new, theme))
         }
 
 
@@ -719,47 +590,25 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     private var prefListener: OnSharedPreferenceChangeListener =
         OnSharedPreferenceChangeListener { _: SharedPreferences?, _: String? -> updatePreferences() }
 
-    private inner class SaveTripTask : AsyncTask<String?, Void?, String>() {
-        override fun doInBackground(vararg params: String?): String {
-            var result = ""
-            mapFrag.takeMapSnapshot{
-                val status = tripManager.saveTrip(it)
-                when (status) {
-                    SaveStatus.PASSED -> result = resources.getString(R.string.TripSaved)
-                    SaveStatus.NOT_ENOUGH_DATA -> result = resources.getString(R.string.NotEnoughData)
-                    else -> {}
-                }
-            }
-            return result
-        }
-
-        override fun onPostExecute(result: String) {
-            Toast.makeText(this@MainScreen, result, Toast.LENGTH_LONG).show()
-        }
-    }
-
     override fun onBackPressed() {
-        if (recordingState == RecordingState.Recording) {
-            finish()
-        } else {
-            super.onBackPressed()
-        }
+        finish()
+        super.onBackPressed()
+
     }
 
     private fun backPressedDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setIcon(resources.getDrawable(R.drawable.ic_launcher))
-        builder.setTitle(resources.getString(R.string.app_name))
-        builder.setMessage(resources.getString(R.string.StopAndExit))
-            .setCancelable(false)
-            .setPositiveButton(
+        AlertDialog.Builder(this).apply {
+            setIcon(ResourcesCompat.getDrawable(resources, R.mipmap.ic_lanucher, this@MainScreen.theme))
+            setTitle(resources.getString(R.string.app_name))
+            setMessage(resources.getString(R.string.StopAndExit))
+            setCancelable(false)
+            setPositiveButton(
                 resources.getString(R.string.YES)
             ) { _: DialogInterface?, _: Int -> finish() }
-            .setNegativeButton(
+            setNegativeButton(
                 resources.getString(R.string.NO)
             ) { dialog: DialogInterface, _: Int -> dialog.cancel() }
-        val alert = builder.create()
-        alert.show()
+        }.create().show()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -767,18 +616,9 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         // Check which request we're responding to
         val hasExtras = data?.hasExtra("UploadedTrip") == true
         if (requestCode == TRIP_LIST_ACTIVITY && resultCode == RESULT_OK && hasExtras) {
-            // uploadedTrip = (Trip) data.getSerializableExtra("UploadedTrip");
-            if (uploadedTrip != null) {
-                if (recordingState == RecordingState.Idle) {
-                    UploadTripTask().execute(uploadedTrip)
-                } else {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.upload_while_recording),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
+            val uploadedTrip = data?.getSerializableExtra("UploadedTrip") as Trip
+            showUploadTripDialog()
+            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.UploadTrip(uploadedTrip))
         }
 
 
@@ -786,7 +626,11 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             val capturedImageUri = Uri.fromFile(mImageMarkerFileLocation)
 
             try {
-                tripManager.addImageMarker(capturedImageUri)
+                tripManagerViewModel.addTripEvent(
+                    MainScreenViewModelEvent.PictureTaken(
+                        capturedImageUri
+                    )
+                )
             } catch (e: Exception) {
                 e.printStackTrace()
                 Toast.makeText(
@@ -798,79 +642,94 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         }
     }
 
-    private inner class UploadTripTask : AsyncTask<Trip?, Void?, String>() {
-        override fun onPreExecute() {
-            progressDialog?.apply {
-                setIcon(
-                    ResourcesCompat.getDrawable(
-                        resources,
-                        R.drawable.ic_launcher,
-                        this@MainScreen.theme
-                    )
+    private fun showUploadTripDialog() {
+        progressDialog?.apply {
+            setIcon(
+                ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_launcher,
+                    this@MainScreen.theme
                 )
-                setTitle(getString(R.string.app_name))
-                setMessage(getString(R.string.displaying_trip))
-                setCancelable(true)
-                show()
-            }
-        }
-
-        override fun doInBackground(vararg params: Trip?): String {
-            val trip = params[0]
-            trip?.let {
-                if (Utils.isFileExists(it.kml)) {
-                    val status = tripManager.uploadTrip(it)
-                    if (status != KmlParserImpl.KML_OPENED) {
-                        return FAILED
-                    }
-                } else {
-                    return FAILED
-                }
-                return PASSED
-            }
-            return FAILED
-        }
-
-        override fun onPostExecute(result: String) {
-            progressDialog?.dismiss()
-            if (result == PASSED) {
-                progressDialog = null
-                Toast.makeText(
-                    this@MainScreen, resources.getString(R.string.TripLoaded),
-                    Toast.LENGTH_LONG
-                ).show()
-            } else {
-                uploadedTrip = null
-                Toast.makeText(
-                    this@MainScreen, R.string.unable_to_open_kml,
-                    Toast.LENGTH_LONG
-                ).show()
-            }
+            )
+            setTitle(getString(R.string.app_name))
+            setMessage(getString(R.string.displaying_trip))
+            setCancelable(true)
+            show()
         }
     }
 
-    private fun loadedTripDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setIcon(ResourcesCompat.getDrawable(resources, R.drawable.ic_launcher, theme))
-        builder.setTitle(resources.getString(R.string.app_name))
-        builder.setMessage(resources.getString(R.string.ContinueLoadedTrip))
-            .setCancelable(false)
-            .setPositiveButton(
-                resources.getString(R.string.YES)
-            ) { _: DialogInterface?, _: Int ->
-                recordingMode = CONTINUE_TRIP
-                startRecording()
-            }
-            .setNegativeButton(
-                resources.getString(R.string.NO)
-            ) { _: DialogInterface?, _: Int ->
-                recordingMode = FOLLOW_TRIP
-                mapFrag.clearMarkers()
-                startRecording()
-            }
-        val alert = builder.create()
-        alert.show()
-    }
+//    private inner class UploadTripTask : AsyncTask<Trip?, Void?, String>() {
+//        override fun onPreExecute() {
+//            progressDialog?.apply {
+//                setIcon(
+//                    ResourcesCompat.getDrawable(
+//                        resources,
+//                        R.drawable.ic_launcher,
+//                        this@MainScreen.theme
+//                    )
+//                )
+//                setTitle(getString(R.string.app_name))
+//                setMessage(getString(R.string.displaying_trip))
+//                setCancelable(true)
+//                show()
+//            }
+//        }
+//
+//        override fun doInBackground(vararg params: Trip?): String {
+//            val trip = params[0]
+//            trip?.let {
+//                if (Utils.isFileExists(it.kml)) {
+//                    val status = tripManager.uploadTrip(it)
+//                    if (status != KmlParserImpl.KML_OPENED) {
+//                        return FAILED
+//                    }
+//                } else {
+//                    return FAILED
+//                }
+//                return PASSED
+//            }
+//            return FAILED
+//        }
+//
+//        override fun onPostExecute(result: String) {
+//            progressDialog?.dismiss()
+//            if (result == PASSED) {
+//                progressDialog = null
+//                Toast.makeText(
+//                    this@MainScreen, resources.getString(R.string.TripLoaded),
+//                    Toast.LENGTH_LONG
+//                ).show()
+//            } else {
+//                uploadedTrip = null
+//                Toast.makeText(
+//                    this@MainScreen, R.string.unable_to_open_kml,
+//                    Toast.LENGTH_LONG
+//                ).show()
+//            }
+//        }
+//    }
+
+//    private fun loadedTripDialog() {
+//        AlertDialog.Builder(this).apply {
+//            setIcon(ResourcesCompat.getDrawable(resources, R.mipmap.ic_lanucher, theme))
+//            setTitle(resources.getString(R.string.app_name))
+//            setMessage(resources.getString(R.string.ContinueLoadedTrip))
+//                .setCancelable(false)
+//                .setPositiveButton(
+//                    resources.getString(R.string.YES)
+//                ) { _: DialogInterface?, _: Int ->
+//                    recordingMode = CONTINUE_TRIP
+//                    startRecording()
+//                }
+//            setNegativeButton(
+//                resources.getString(R.string.NO)
+//            ) { _: DialogInterface?, _: Int ->
+//                recordingMode = FOLLOW_TRIP
+//                mapFrag.clearMarkers()
+//                startRecording()
+//            }
+//        }.create().show()
+//    }
 
     private val mConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(
@@ -889,7 +748,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     }
 
     private fun startService() {
-        if(this::serviceIntent.isInitialized){
+        if (this::serviceIntent.isInitialized) {
             serviceIntent.let {
                 startService(it)
                 bindService(it, mConnection, BIND_AUTO_CREATE)
@@ -949,10 +808,6 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         private const val CAMERA_INTENT_ACTIVITY = 200
         private const val TIME_INTERVAL: Long = 2000
 
-        private const val NEW_TRIP = 1
-        private const val CONTINUE_TRIP = 2
-        private const val FOLLOW_TRIP = 3
-        private const val LOADED_FROM_INTENT = 4
 
         private const val AUTO_SAVE = 0
 

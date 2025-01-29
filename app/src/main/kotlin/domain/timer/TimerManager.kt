@@ -1,20 +1,19 @@
-package com.bartovapps.gpstriprec.core.timer
-
+package com.bartovapps.gpstriprec.domain.timer
 import android.os.Handler
-import com.bartovapps.gpstriprec.core.di.QTimerThread
+import com.bartovapps.gpstriprec.domain.di.QTimerThread
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 interface TripTimer {
-    fun startTimer()
+    fun startTimer(reset: Boolean = true)
     fun stopTimer()
     fun pauseTimer()
     fun resetTimer()
     fun resumeTimer()
     fun setStartTime(timer: Long)
-    val timeMillisFlow: StateFlow<Long>
+    val timerStateFlow: StateFlow<Long>
     fun getDuration(): Long
 }
 
@@ -29,7 +28,7 @@ class TimerManager @Inject constructor(
     private var pausedMsec: Long = 0
 
     private val timerMutableStateFlow = MutableStateFlow<Long>(0)
-    override val timeMillisFlow = timerMutableStateFlow.asStateFlow()
+    override val timerStateFlow = timerMutableStateFlow.asStateFlow()
 
 
     private val timerRunnable = Runnable {
@@ -37,7 +36,11 @@ class TimerManager @Inject constructor(
         postTimerEvent(1000)
     }
 
-    override fun startTimer() {
+    override fun startTimer(reset: Boolean) {
+        if(reset){
+            resetTimer()
+        }
+
         startTime = System.currentTimeMillis()
         timerHandler.postDelayed(timerRunnable, 0)
     }

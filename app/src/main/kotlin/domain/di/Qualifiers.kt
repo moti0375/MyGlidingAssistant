@@ -1,5 +1,4 @@
-package com.bartovapps.gpstriprec.core.di
-
+package com.bartovapps.gpstriprec.domain.di
 import javax.inject.Qualifier
 
 /**

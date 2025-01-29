@@ -5,9 +5,9 @@
 //import android.database.sqlite.SQLiteOpenHelper;
 //import android.util.Log;
 //
-//public class TripsDBOpenHelper extends SQLiteOpenHelper{
+//public class com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper extends SQLiteOpenHelper{
 //
-//	private static final String LOG_TAG = TripsDBOpenHelper.class.getSimpleName();
+//	private static final String LOG_TAG = com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper.class.getSimpleName();
 //	private static final String DATABASE_NAME = "trips.db";
 //	private static final int DATABASE_VERSION = 6;
 //
@@ -74,7 +74,7 @@
 //					COLUMN_MARKER_PLACEHOLDER2 + " TEXT " +
 //					")";
 //
-//	public TripsDBOpenHelper(Context context) {
+//	public com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper(Context context) {
 //		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 //	}
 //

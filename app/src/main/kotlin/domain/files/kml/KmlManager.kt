@@ -1,9 +1,7 @@
-package com.bartovapps.gpstriprec.core.files.kml
-
+package com.bartovapps.gpstriprec.domain.files.kml
 import android.content.res.Resources
 import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.core.files.path_provider.PathProvider
-import com.bartovapps.gpstriprec.domain.trip_manager.KmlParser
+import com.bartovapps.gpstriprec.domain.files.path_provider.PathProvider
 import com.google.android.gms.maps.model.LatLng
 import org.jdom2.Document
 import org.jdom2.Element

@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bartovapps.gpstriprec.adapters.GalleryRecyclerAdapter;
-import com.bartovapps.gpstriprec.core.db.TripsDataSource;
+import com.bartovapps.gpstriprec.domain.db.TripsDataSource;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;

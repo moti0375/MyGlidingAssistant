@@ -11,14 +11,14 @@
 //import android.os.Environment;
 //import android.util.Log;
 //
-//import com.bartovapps.gpstriprec.db.TripsDataSource;
+//import com.bartovapps.gpstriprec.db.com.bartovapps.gpstriprec.domain.db.TripsDataSource;
 //import com.bartovapps.gpstriprec.enums.com.bartovapps.gpstriprec.data.enums.MovementState;
 //import com.bartovapps.gpstriprec.enums.com.bartovapps.gpstriprec.data.enums.SaveStatus;
-//import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.files.kml.KmlManager;
+//import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.files.kml.com.bartovapps.gpstriprec.domain.files.kml.KmlManager;
 //import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser;
 //import com.bartovapps.gpstriprec.maphelper.ImageMarker;
-//import com.bartovapps.gpstriprec.maphelper.com.bartovapps.gpstriprec.core.map_helper.MapHelper;
-//import com.bartovapps.gpstriprec.timer.com.bartovapps.gpstriprec.core.timer.TimerManager;
+//import com.bartovapps.gpstriprec.maphelper.com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper;
+//import com.bartovapps.gpstriprec.timer.com.bartovapps.gpstriprec.core.timer.com.bartovapps.gpstriprec.domain.timer.TimerManager;
 //import com.bartovapps.gpstriprec.utils.Utils;
 //import com.google.android.gms.maps.model.LatLng;
 //
@@ -27,7 +27,7 @@
 //import java.util.ArrayList;
 //import java.util.List;
 //
-//public class TripManager {
+//public class com.bartovapps.gpstriprec.presentation.screens.main_screen.TripManager {
 //
 //    public static final int MERGE_SUCCESS = 1;
 //    public static final int KML_NOT_FOUND = 2;
@@ -56,17 +56,17 @@
 //    private double speed = 0.0;
 //    private float accuracy = 0;
 //    private static double SPEED_FILTER = 1.5;
-//    private com.bartovapps.gpstriprec.core.map_helper.MapHelper mapHelper;
+//    private com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper mapHelper;
 //    private ArrayList<String> locations = new ArrayList<String>();
 //    private ArrayList<LatLng> latLngList = new ArrayList<>();
 //    private StringBuilder markplace;
-//    private TripsDataSource datasource;
+//    private com.bartovapps.gpstriprec.domain.db.TripsDataSource datasource;
 //    private double averageSpeed = 0;
 //    private double averageMoveSpeed = 0;
 //    private double maxSpeed = 0;
 //    private double altitude = 0;
 //    private double maxAltitude = 0;
-//    private com.bartovapps.gpstriprec.core.timer.TimerManager timer;
+//    private com.bartovapps.gpstriprec.core.timer.com.bartovapps.gpstriprec.domain.timer.TimerManager timer;
 //    private long stopTime = 0;
 //    private long overallStopTime = 0;
 //    private long movementTime = 0;
@@ -80,8 +80,8 @@
 //    public static final String TRIPS_DIR = "/GpsRecorder/trips";
 //    public static final String MAP_IMAGES_DIR = "/mapImages";
 //
-//    public TripManager(Context context, float accuracy, double speedFilter,
-//                       com.bartovapps.gpstriprec.core.map_helper.MapHelper helper, TripsDataSource datasource, com.bartovapps.gpstriprec.core.timer.TimerManager timer) {
+//    public com.bartovapps.gpstriprec.presentation.screens.main_screen.TripManager(Context context, float accuracy, double speedFilter,
+//                       com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper helper, com.bartovapps.gpstriprec.domain.db.TripsDataSource datasource, com.bartovapps.gpstriprec.core.timer.com.bartovapps.gpstriprec.domain.timer.TimerManager timer) {
 //        this.ACCURACY = accuracy;
 //        SPEED_FILTER = speedFilter;
 //        this.context = context;
@@ -283,7 +283,7 @@
 //
 //        if (latLngList.size() > 1) {
 //            mapHelper.viewRoute(latLngList);
-//            com.bartovapps.gpstriprec.core.files.kml.KmlManager kmlHelper = new com.bartovapps.gpstriprec.core.files.kml.KmlManager(context);
+//            com.bartovapps.gpstriprec.core.files.kml.com.bartovapps.gpstriprec.domain.files.kml.KmlManager kmlHelper = new com.bartovapps.gpstriprec.core.files.kml.com.bartovapps.gpstriprec.domain.files.kml.KmlManager(context);
 //            kmlHelper.openRawDocument();
 //            long timestamp = System.currentTimeMillis();
 //            String mapImageFile = context.getExternalFilesDir(null) + MAP_IMAGES_DIR + "/" + "trip_" + timestamp + ".jpeg";
@@ -384,7 +384,7 @@
 //        return address;
 //    }
 //
-//    public static int mergeTrips(Trip tripA, Trip tripB, Activity activity, TripsDataSource datasource) {
+//    public static int mergeTrips(Trip tripA, Trip tripB, Activity activity, com.bartovapps.gpstriprec.domain.db.TripsDataSource datasource) {
 //        int status = 1;
 //        ArrayList<LatLng> latLngList = new ArrayList<LatLng>();
 //
@@ -414,11 +414,11 @@
 //                TripBFirstLoc.longitude, gap);
 //
 //        if (gap[0] > CONTINUE_TRIPS_GAP) {
-//            return TripManager.UNABLE_TO_MERGE;
+//            return com.bartovapps.gpstriprec.presentation.screens.main_screen.TripManager.UNABLE_TO_MERGE;
 //        }
 //
 //
-//        com.bartovapps.gpstriprec.core.files.kml.KmlManager kmlCreator = new com.bartovapps.gpstriprec.core.files.kml.KmlManager(activity);
+//        com.bartovapps.gpstriprec.core.files.kml.com.bartovapps.gpstriprec.domain.files.kml.KmlManager kmlCreator = new com.bartovapps.gpstriprec.core.files.kml.com.bartovapps.gpstriprec.domain.files.kml.KmlManager(activity);
 //        kmlCreator.openRawDocument();
 //
 //        String mapFile = kmlCreator.updateTripLatLng(latLngList);
@@ -456,7 +456,7 @@
 //        datasource.insertImageMarkers(newTripMarkers, trip.getId());
 //        datasource.close();
 //
-//        return TripManager.MERGE_SUCCESS;
+//        return com.bartovapps.gpstriprec.presentation.screens.main_screen.TripManager.MERGE_SUCCESS;
 //
 //    }
 //

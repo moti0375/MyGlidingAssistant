@@ -7,7 +7,7 @@
 //import com.bartovapps.gpstriprec.displayers.HmsDisplayer;
 //import com.bartovapps.gpstriprec.displayers.com.bartovapps.gpstriprec.presentation.displayers.TimeDisplayer;
 //
-//public class com.bartovapps.gpstriprec.core.timer.TimerManager {
+//public class com.bartovapps.gpstriprec.core.timer.com.bartovapps.gpstriprec.domain.timer.TimerManager {
 //
 //	Context context;
 //	TextView tv;
@@ -31,13 +31,13 @@
 //		}
 //	};
 //
-//	public com.bartovapps.gpstriprec.core.timer.TimerManager(Context context, TextView tv){
+//	public com.bartovapps.gpstriprec.core.timer.com.bartovapps.gpstriprec.domain.timer.TimerManager(Context context, TextView tv){
 //		this.context = context;
 //		this.tv = tv;
 //		timeDisplayer = new HmsDisplayer();
 //	}
 //
-//    public com.bartovapps.gpstriprec.core.timer.TimerManager(Context context){
+//    public com.bartovapps.gpstriprec.core.timer.com.bartovapps.gpstriprec.domain.timer.TimerManager(Context context){
 //        this.context = context;
 //    }
 //

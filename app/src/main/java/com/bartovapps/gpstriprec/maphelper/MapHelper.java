@@ -22,9 +22,9 @@
 //import android.widget.ImageView;
 //
 //import com.bartovapps.gpstriprec.R;
-//import com.bartovapps.gpstriprec.core.db.TripsDBOpenHelper;
-//import com.bartovapps.gpstriprec.core.db.TripsDataSource;
-//import com.bartovapps.gpstriprec.core.di.QMainThread;
+//import com.bartovapps.gpstriprec.core.db.com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper;
+//import com.bartovapps.gpstriprec.core.db.com.bartovapps.gpstriprec.domain.db.TripsDataSource;
+//import com.bartovapps.gpstriprec.core.di.com.bartovapps.gpstriprec.domain.di.QMainThread;
 //import com.bartovapps.gpstriprec.utils.Utils;
 //import com.google.android.gms.maps.CameraUpdate;
 //import com.google.android.gms.maps.CameraUpdateFactory;
@@ -53,11 +53,11 @@
 //
 ////import android.util.Log;
 //
-//public class com.bartovapps.gpstriprec.core.map_helper.MapHelper {
+//public class com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper {
 //    private static final double EARTHRADIUS = 6366198;
 //    private static final float CAMERA_LONGSHOT_RAT = 2;
 //    private static final float CAMERA_LONGSHOT_TILT = 65;
-//    private static final String LOG_TAG = "com.bartovapps.gpstriprec.core.map_helper.MapHelper";
+//    private static final String LOG_TAG = "com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper";
 //    private static final int MAP_PADDING = 30;
 //
 //    // private static final String LOG_TAG = "MAP_HELPER";
@@ -78,11 +78,11 @@
 //    private final Context context;
 //
 //    private final Map<String, ImageMarker> markersIdsMap;
-//    private final TripsDataSource tripsDataSource;
+//    private final com.bartovapps.gpstriprec.domain.db.TripsDataSource tripsDataSource;
 //    @Inject
-//    public com.bartovapps.gpstriprec.core.map_helper.MapHelper(@QMainThread  Handler handler,
+//    public com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper(@com.bartovapps.gpstriprec.domain.di.QMainThread  Handler handler,
 //                     @ApplicationContext  Context context,
-//                     TripsDataSource tripsDatasource) {
+//                     com.bartovapps.gpstriprec.domain.db.TripsDataSource tripsDatasource) {
 //        this.handler = handler;
 //        this.tripsDataSource = tripsDatasource;
 //        //this.mMap = map;
@@ -224,7 +224,7 @@
 //    public void overlayRoute(final List<LatLng> list) {
 //
 //        final PolylineOptions options = new PolylineOptions()
-//                .width(lineWidth).color(com.bartovapps.gpstriprec.core.map_helper.MapHelper.this.lineColor);
+//                .width(lineWidth).color(com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper.this.lineColor);
 //        final LatLngBounds.Builder builder = new LatLngBounds.Builder();
 //        for (int i = 0; i < list.size() - 1; i++) {
 ////                    Log.i(LOG_TAG, "Add polyline");
@@ -354,7 +354,7 @@
 //
 //    public void saveMapAsImage(final Activity activity, final long tripId) {
 //
-//        Log.i("com.bartovapps.gpstriprec.core.map_helper.MapHelper", "saveMapAsImage: ");
+//        Log.i("com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper", "saveMapAsImage: ");
 //        long timestamp = System.currentTimeMillis();
 //
 //        String root = Environment.getExternalStorageDirectory().toString();
@@ -381,19 +381,19 @@
 //
 //                    tripsDataSource.open();
 //                    tripsDataSource.updateTripData(tripId,
-//                            TripsDBOpenHelper.COLUMN_MAP_IMAGE, fileName);
+//                            com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper.COLUMN_MAP_IMAGE, fileName);
 //                    tripsDataSource.close();
 //                    out.flush();
 //                    out.close();
 //                } catch (Exception e) {
 //                    e.printStackTrace();
-//                    Log.e("com.bartovapps.gpstriprec.core.map_helper.MapHelper", "There was an exception: " +e.getMessage());
+//                    Log.e("com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper", "There was an exception: " +e.getMessage());
 //                }
 //            };
 //
 //            mMap.snapshot(callback);
 //        } else {
-//            Log.i("com.bartovapps.gpstriprec.core.map_helper.MapHelper", "checkExternalStorageState false");
+//            Log.i("com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper", "checkExternalStorageState false");
 //        }
 //    }
 //

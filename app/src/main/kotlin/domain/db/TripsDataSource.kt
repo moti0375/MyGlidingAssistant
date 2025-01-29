@@ -1,5 +1,4 @@
-package com.bartovapps.gpstriprec.core.db
-
+package com.bartovapps.gpstriprec.domain.db
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
@@ -169,9 +168,12 @@ class TripsDataSource @Inject constructor(dbhelper: TripsDBOpenHelper) {
             ).use { cursor ->
                 if (cursor.count > 0) {
                     while (cursor.moveToNext()) {
-                        val latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_LATITUDE))
-                        val longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_LONGITUDE))
-                        val imageUri = Uri.parse(cursor.getString(cursor.getColumnIndexOrThrow(TripsDBOpenHelper.COLUMN_MARKER_URI)))
+                        val latitude = cursor.getDouble(cursor.getColumnIndexOrThrow(
+                            TripsDBOpenHelper.COLUMN_MARKER_LATITUDE))
+                        val longitude = cursor.getDouble(cursor.getColumnIndexOrThrow(
+                            TripsDBOpenHelper.COLUMN_MARKER_LONGITUDE))
+                        val imageUri = Uri.parse(cursor.getString(cursor.getColumnIndexOrThrow(
+                            TripsDBOpenHelper.COLUMN_MARKER_URI)))
                         val marker = ImageMarker(latitude = latitude, longitude = longitude, imageUri = imageUri)
                         markers.add(marker)
                     }

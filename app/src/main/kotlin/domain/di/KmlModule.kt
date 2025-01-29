@@ -1,8 +1,8 @@
 package com.bartovapps.gpstriprec.domain.di
-import com.bartovapps.gpstriprec.core.files.kml.KmlManager
-import com.bartovapps.gpstriprec.core.files.kml.KmlManagerImpl
-import com.bartovapps.gpstriprec.domain.trip_manager.KmlParser
-import com.bartovapps.gpstriprec.domain.trip_manager.KmlParserImpl
+import com.bartovapps.gpstriprec.domain.files.kml.KmlManager
+import com.bartovapps.gpstriprec.domain.files.kml.KmlManagerImpl
+import com.bartovapps.gpstriprec.domain.files.kml.KmlParser
+import com.bartovapps.gpstriprec.domain.files.kml.KmlParserImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

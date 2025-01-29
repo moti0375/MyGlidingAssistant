@@ -1,9 +1,8 @@
-package com.bartovapps.gpstriprec.core.files.path_provider
-
-import com.bartovapps.gpstriprec.core.di.QDefaultFilesDir
-import com.bartovapps.gpstriprec.core.di.QShareImagesDir
-import com.bartovapps.gpstriprec.core.di.QTripsImagesDir
-import com.bartovapps.gpstriprec.core.di.QTripsKmlDir
+package com.bartovapps.gpstriprec.domain.files.path_provider
+import com.bartovapps.gpstriprec.domain.di.QDefaultFilesDir
+import com.bartovapps.gpstriprec.domain.di.QShareImagesDir
+import com.bartovapps.gpstriprec.domain.di.QTripsImagesDir
+import com.bartovapps.gpstriprec.domain.di.QTripsKmlDir
 import java.io.File
 import javax.inject.Inject
 

@@ -12,8 +12,6 @@ import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
 import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
-import com.bartovapps.gpstriprec.core.map_helper.MapHelper
-import com.bartovapps.gpstriprec.core.map_helper.MapHelper.Companion
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter
 import com.google.android.gms.maps.model.Marker
 import java.io.File
@@ -23,7 +21,6 @@ import kotlin.math.min
 class CustomInfoWindowAdapter(
     inflater: LayoutInflater,
     private val markersIdsMap: MutableMap<String, ImageMarker>,
-    private val context: Context
 ) :
     InfoWindowAdapter {
     // These a both viewgroups containing an ImageView with id "badge" and two TextViews with id
@@ -45,9 +42,9 @@ class CustomInfoWindowAdapter(
         if (markersIdsMap[marker.id] == null) {  //This means it's the a marker with no image.. (like trip start and end locations)
             imageView.setImageDrawable(
                 ResourcesCompat.getDrawable(
-                    context.resources,
+                    view.context.resources,
                     R.drawable.ic_launcher,
-                    context.theme
+                    view.context.theme
                 )
             )
         } else {
@@ -59,13 +56,13 @@ class CustomInfoWindowAdapter(
                     if (!imgFile.exists()) {  //This can happen if user erased the image from gallery
                         imageView.setImageDrawable(
                             ResourcesCompat.getDrawable(
-                                context.resources,
+                                view.context.resources,
                                 R.drawable.image_broken,
-                                context.theme
+                                view.context.theme
                             )
                         )
                     } else {
-                        val reducedSizeImage = getReducedImage(imagePath)
+                        val reducedSizeImage = getReducedImage(view.context, imagePath)
                         imageView.setImageBitmap(rotateImage(reducedSizeImage, imagePath))
                     }
                 }
@@ -73,7 +70,7 @@ class CustomInfoWindowAdapter(
         }
     }
 
-    private fun getReducedImage(imageFileLocation: String?): Bitmap {
+    private fun getReducedImage(context: Context, imageFileLocation: String?): Bitmap {
         Log.i(LOG_TAG, "image file path: $imageFileLocation")
         val targetImageWidth = context.resources.getDimension(R.dimen.image_marker_width).toInt()
         val targetImageHeight = context.resources.getDimension(R.dimen.image_marker_height).toInt()
@@ -92,8 +89,7 @@ class CustomInfoWindowAdapter(
         val scaleFactor = min(
             (cameraImageWidth / targetImageWidth).toDouble(),
             (cameraImageHeight / targetImageHeight).toDouble()
-        )
-            .toInt()
+        ).toInt()
         options.inSampleSize = scaleFactor
         options.inJustDecodeBounds = false
 

@@ -1,5 +1,4 @@
-package com.bartovapps.gpstriprec.core.di
-
+package com.bartovapps.gpstriprec.domain.di
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper

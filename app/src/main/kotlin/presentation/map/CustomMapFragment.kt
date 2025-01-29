@@ -6,8 +6,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
-import com.bartovapps.gpstriprec.core.map_helper.MapHelper
-import com.bartovapps.gpstriprec.core.map_helper.MapHelper.Companion
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener
@@ -133,7 +131,7 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
         val update = CameraUpdateFactory.zoomBy(this.zoom)
         this.map.apply {
             moveCamera(update)
-            setInfoWindowAdapter(CustomInfoWindowAdapter(LayoutInflater.from(context), markersIdsMap, requireContext()))
+            setInfoWindowAdapter(CustomInfoWindowAdapter(LayoutInflater.from(context), markersIdsMap))
         }
     }
 

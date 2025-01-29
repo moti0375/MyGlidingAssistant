@@ -12,7 +12,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
@@ -40,10 +39,9 @@ import androidx.core.app.NavUtils;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bartovapps.gpstriprec.adapters.TripsListAdapter;
 import com.bartovapps.gpstriprec.adapters.TripsRecyclerAdapter;
-import com.bartovapps.gpstriprec.core.db.TripsDataSource;
-import com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity;
+import com.bartovapps.gpstriprec.domain.db.TripsDataSource;
+import com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity;
 import com.bartovapps.gpstriprec.utils.Utils;
 
 import java.io.File;
@@ -492,7 +490,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
 //        @Override
 //        protected String doInBackground(String... params) {
 //
-//            int MergeStatus = TripManager.mergeTrips(selectedTrips.get(1), selectedTrips.get(0), GpsRecTripsList.this, datasource);
+//            int MergeStatus = com.bartovapps.gpstriprec.presentation.screens.main_screen.TripManager.mergeTrips(selectedTrips.get(1), selectedTrips.get(0), GpsRecTripsList.this, datasource);
 //            String result = new String();
 //            switch (MergeStatus) {
 //                case MERGE_SUCCESS:

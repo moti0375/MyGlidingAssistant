@@ -1,5 +1,4 @@
-package com.bartovapps.gpstriprec.core.map_helper
-
+package com.bartovapps.gpstriprec.domain.map_helper
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -13,16 +12,8 @@ import android.location.Location
 import android.media.ExifInterface
 import android.os.Handler
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.ImageView
-import androidx.core.content.res.ResourcesCompat
-import com.bartovapps.gpstriprec.core.db.TripsDBOpenHelper
-import com.bartovapps.gpstriprec.core.db.TripsDataSource
-import com.bartovapps.gpstriprec.core.di.QMainThread
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter
 import com.google.android.gms.maps.GoogleMap.SnapshotReadyCallback
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -42,7 +33,11 @@ import kotlin.math.min
 
 
 import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.core.di.QTripsImagesDir
+import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
+import com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper
+import com.bartovapps.gpstriprec.domain.db.TripsDataSource
+import com.bartovapps.gpstriprec.domain.di.QMainThread
+import com.bartovapps.gpstriprec.domain.di.QTripsImagesDir
 
 @Deprecated("All this logic moved to CustomMapFragment")
 class MapHelper @Inject constructor(
@@ -297,7 +292,7 @@ class MapHelper @Inject constructor(
     }
 
     fun saveMapAsImage( tripId: Long) {
-        Log.i("MapHelper", "saveMapAsImage: ")
+        Log.i("com.bartovapps.gpstriprec.domain.map_helper.MapHelper", "saveMapAsImage: ")
         val timestamp = System.currentTimeMillis()
 
         val fileName = "$tripImagesDir/trip_$timestamp.jpeg"
@@ -323,7 +318,7 @@ class MapHelper @Inject constructor(
                 } catch (e: Exception) {
                     e.printStackTrace()
                     Log.e(
-                        "com.bartovapps.gpstriprec.core.map_helper.MapHelper",
+                        "com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper",
                         "There was an exception: " + e.message
                     )
                 }
@@ -515,7 +510,7 @@ class MapHelper @Inject constructor(
         private const val EARTHRADIUS = 6366198.0
         private const val CAMERA_LONGSHOT_RAT = 2f
         private const val CAMERA_LONGSHOT_TILT = 65f
-        private const val LOG_TAG = "MapHelper"
+        private const val LOG_TAG = "com.bartovapps.gpstriprec.domain.map_helper.MapHelper"
         private const val MAP_PADDING = 30
 
         private const val NORTH = 360f

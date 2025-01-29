@@ -123,11 +123,11 @@ public class Utils {
 		   return Version;
 	   }
 	   
-//	   public static int mergeTrips(Trip tripA, Trip tripB, Activity activity, TripsDataSource datasource){
+//	   public static int mergeTrips(Trip tripA, Trip tripB, Activity activity, com.bartovapps.gpstriprec.domain.db.TripsDataSource datasource){
 //		   int status = 1;
 //		   ArrayList<LatLng> latLngList = new ArrayList<>();
 //
-//		   KmlManager kmlManager = new KmlManager(activity);
+//		   com.bartovapps.gpstriprec.domain.files.kml.KmlManager kmlManager = new com.bartovapps.gpstriprec.domain.files.kml.KmlManager(activity);
 //		   kmlManager.openRawDocument();
 //		   com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser tripAParser = new com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser(tripA.getKml());
 //		   com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser tripBParser = new com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser(tripB.getKml());

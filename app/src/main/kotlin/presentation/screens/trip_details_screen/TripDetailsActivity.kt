@@ -1,5 +1,4 @@
-package com.bartovapps.gpstriprec.presentation.screens.trip_details
-
+package com.bartovapps.gpstriprec.presentation.screens.trip_details_screen
 import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
@@ -27,8 +26,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import com.bartovapps.gpstriprec.GpsTripRecGallery
 import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.core.db.TripsDataSource
-import com.bartovapps.gpstriprec.core.di.QMainThread
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
 import com.bartovapps.gpstriprec.data.enums.Units
@@ -52,7 +49,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import data.model.Trip
 import kotlinx.coroutines.launch
 import java.io.File
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
@@ -86,13 +82,6 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     private lateinit var mapFragment: CustomSupportMapFragment
     private var units: Units = Units.Metric
     private var altUnits: AltitudeUnits = AltitudeUnits.Feet
-
-    @Inject
-    @QMainThread
-    lateinit var handler: Handler
-
-    @Inject
-    lateinit var tripsDataSource: TripsDataSource
 
     private val detailsViewModel by viewModels<TripDetailsViewModel>()
 

@@ -1,12 +1,9 @@
-package com.bartovapps.gpstriprec.core.di
-
+package com.bartovapps.gpstriprec.domain.di
 import android.content.Context
 import android.content.res.Resources
 import android.location.Geocoder
-import com.bartovapps.gpstriprec.core.timer.TimerManager
-import com.bartovapps.gpstriprec.core.timer.TripTimer
-import domain.trip_manager.TripManager
-import domain.trip_manager.TripManagerImpl
+import com.bartovapps.gpstriprec.domain.timer.TimerManager
+import com.bartovapps.gpstriprec.domain.timer.TripTimer
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -22,11 +19,7 @@ abstract class CoreModule {
 
     @Binds
     @Singleton
-    abstract fun bindTripManager(tripManager: TripManagerImpl) : TripManager
-
-    @Binds
-    @Singleton
-    abstract fun bindTimerManager(timerManager: TimerManager) : TripTimer
+    abstract fun bindTripManager(tripManager: TimerManager) : TripTimer
 
     companion object{
 

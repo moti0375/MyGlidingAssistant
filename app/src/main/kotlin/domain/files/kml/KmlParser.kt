@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.domain.trip_manager
+package com.bartovapps.gpstriprec.domain.files.kml
 
 import com.google.android.gms.maps.model.LatLng
 import org.jdom2.Document

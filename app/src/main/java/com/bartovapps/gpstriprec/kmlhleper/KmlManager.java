@@ -31,7 +31,7 @@
 //import dagger.hilt.android.qualifiers.ApplicationContext;
 //
 //@Singleton
-//public class com.bartovapps.gpstriprec.core.files.kml.KmlManager {
+//public class com.bartovapps.gpstriprec.core.files.kml.com.bartovapps.gpstriprec.domain.files.kml.KmlManager {
 //
 ////	private static final String LOG_TAG = "GPS RECORDER";
 //	private static final String KML_NS = "http://www.opengis.net/kml/2.2";
@@ -44,7 +44,7 @@
 //	private Element rootNode;
 //
 //	@Inject
-//	public com.bartovapps.gpstriprec.core.files.kml.KmlManager(@ApplicationContext  Context context) {
+//	public com.bartovapps.gpstriprec.core.files.kml.com.bartovapps.gpstriprec.domain.files.kml.KmlManager(@ApplicationContext  Context context) {
 //		this.context = context;
 //		this.stream = context.getResources().openRawResource(R.raw.trip_raw);
 //		builder = new SAXBuilder();
@@ -208,7 +208,7 @@
 //
 //			if (!fileDir.exists()) {
 //				boolean mkdirs = fileDir.mkdirs();
-//				Log.i("com.bartovapps.gpstriprec.core.files.kml.KmlManager", "fileDir make dir result: " + mkdirs);
+//				Log.i("com.bartovapps.gpstriprec.core.files.kml.com.bartovapps.gpstriprec.domain.files.kml.KmlManager", "fileDir make dir result: " + mkdirs);
 //			}
 //
 //			String fileName = "/trip_" + timestamp + ".kml";

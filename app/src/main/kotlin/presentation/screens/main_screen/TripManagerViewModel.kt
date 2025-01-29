@@ -1,6 +1,7 @@
-package domain.trip_manager
+package com.bartovapps.gpstriprec.presentation.screens.main_screen
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.location.Address
@@ -8,19 +9,21 @@ import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
 import android.util.Log
-import com.bartovapps.gpstriprec.core.db.TripsDBOpenHelper
-import com.bartovapps.gpstriprec.core.db.TripsDataSource
-import com.bartovapps.gpstriprec.core.files.kml.KmlManager
-import com.bartovapps.gpstriprec.core.files.path_provider.PathProvider
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
 import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
-import com.bartovapps.gpstriprec.core.timer.TripTimer
-import com.bartovapps.gpstriprec.core.trip_manager.TripState
 import com.bartovapps.gpstriprec.data.enums.MovementState
-import com.bartovapps.gpstriprec.data.enums.SaveStatus
-import com.bartovapps.gpstriprec.domain.trip_manager.KmlParserImpl.Companion.FAIL_TO_OPEN_KML
-import com.bartovapps.gpstriprec.domain.trip_manager.KmlParserImpl.Companion.KML_OPENED
+import com.bartovapps.gpstriprec.data.enums.RecordingMode
+import com.bartovapps.gpstriprec.data.enums.RecordingState
+import com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper
+import com.bartovapps.gpstriprec.domain.db.TripsDataSource
+import com.bartovapps.gpstriprec.domain.files.kml.KmlManager
+import com.bartovapps.gpstriprec.domain.files.path_provider.PathProvider
+import com.bartovapps.gpstriprec.domain.timer.TripTimer
 import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.maps.model.LatLng
+import dagger.hilt.android.lifecycle.HiltViewModel
 import data.model.Trip
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -34,31 +37,21 @@ import java.text.SimpleDateFormat
 import javax.inject.Inject
 import kotlin.math.max
 
-interface TripManager {
-    fun updateLocation(location: Location)
-    fun resetRoute(resetMap: Boolean)
-    fun updateRouteStatus(location: Location)
-    fun saveTrip(tripImage: Bitmap?): SaveStatus
-    fun setCurrentLocation(location: Location)
-    fun updateAccuracy(accuracy: Float)
-    fun setSpeedFilter(speedFilter: Double)
-    fun mergeTrips(tripA: Trip, tripB: Trip): Int
-    fun uploadTrip(trip: Trip): Int
-    fun addImageMarker(capturedImageUri: Uri)
-    val tripStateFlow: StateFlow<TripState>
-}
-
-
-class TripManagerImpl @Inject constructor(
+@HiltViewModel
+class TripManagerViewModel @Inject constructor(
     private val pathProvider: PathProvider,
     private val datasource: TripsDataSource,
     private val timer: TripTimer,
     private val kmlManager: KmlManager,
-    private val geocoder: Geocoder
-) : TripManager {
+    private val geocoder: Geocoder,
+    private val sharedPreferences: SharedPreferences
+) : ViewModel(), DefaultLifecycleObserver {
     private val tripMutableStateFlow = MutableStateFlow<TripState>(TripState.Initiated)
-    override val tripStateFlow: StateFlow<TripState> = tripMutableStateFlow.asStateFlow()
+    val tripStateFlow: StateFlow<TripState> = tripMutableStateFlow.asStateFlow()
+    val timerStateFlow = timer.timerStateFlow
+
     private var startLocation: Location? = null
+    private var recordingMode = RecordingMode.NEW_TRIP
 
     /**
      * The current location
@@ -90,16 +83,79 @@ class TripManagerImpl @Inject constructor(
     private var moveState: MovementState? = null
     private var uploadedTrip: Trip? = null
     private var imageMarkers = mutableListOf<ImageMarker>()
+    private var recordingState = RecordingState.Idle
+    private var autoSave: Boolean = false
 
     init {
         resetRoute(true)
+        autoSave = sharedPreferences.getBoolean("AutoSavePrefKey", true)
+    }
+
+
+    fun addTripEvent(mainScreenViewModelEvent: MainScreenViewModelEvent) {
+        mapEventToState(mainScreenViewModelEvent)
+    }
+
+    private fun mapEventToState(event: MainScreenViewModelEvent) {
+        when (event) {
+            is MainScreenViewModelEvent.AccuracyChanged -> updateAccuracy(event.accuracy)
+            is MainScreenViewModelEvent.LocationFounded -> setCurrentLocation(event.location)
+            is MainScreenViewModelEvent.MergeTrips -> mergeTrips(event.tripA, event.tripB)
+            is MainScreenViewModelEvent.OnNewLocation -> updateLocation(event.location)
+            is MainScreenViewModelEvent.PictureTaken -> addImageMarker(event.capturedImageUri)
+            is MainScreenViewModelEvent.SpeedFilterUpdated -> setSpeedFilter(event.filter)
+            is MainScreenViewModelEvent.TripEnded -> saveTrip(event.bitmap)
+            is MainScreenViewModelEvent.UploadTrip -> uploadTrip(event.trip)
+            is MainScreenViewModelEvent.RecordingModeChanged -> updateRecordingMode(event.recordingMode)
+            is MainScreenViewModelEvent.StartTrip -> startTrip()
+            is MainScreenViewModelEvent.StopTrip -> stopTrip()
+            is MainScreenViewModelEvent.StartStopButtonClicked -> handleStartStopClicked()
+        }
+    }
+
+    private fun handleStartStopClicked() {
+
+        if (recordingState == RecordingState.Idle) {
+            if (uploadedTrip != null) {
+                if (recordingMode == RecordingMode.LOADED_FROM_INTENT) {
+                    startTrip()
+                } else {
+                    //todo implement logic
+                    //loadedTripDialog()
+                }
+            } else {
+                resetRoute(true)
+                recordingMode = RecordingMode.NEW_TRIP
+                startTrip()
+            }
+        } else {
+            if (autoSave) {
+                publishTripState(TripState.StopAndSave)
+            } else {
+                publishTripState(TripState.ShowSaveDialog)
+            }
+        }
+    }
+
+    private fun startTrip() {
+        resetRoute(recordingMode != RecordingMode.FOLLOW_TRIP && recordingMode != RecordingMode.CONTINUE_TRIP)
+        timer.apply {
+            resetTimer()
+            startTimer()
+        }
+        publishTripState(TripState.StartRecording)
+        recordingState = RecordingState.Recording
+    }
+
+    private fun stopTrip() {
+        timer.stopTimer()
     }
 
     /**
      * @param newLocation update the current with the new location and calculate the
      * distance between them
      */
-    override fun updateLocation(newLocation: Location) {
+    private fun updateLocation(newLocation: Location) {
         Log.i(
             TAG,
             "New Location accuracy: " + newLocation.accuracy + ", speed: " + newLocation.speed + ", hasSpeed: " + newLocation.hasSpeed()
@@ -168,7 +224,7 @@ class TripManagerImpl @Inject constructor(
     /**
      * Initialize the measured distance to 0.0
      */
-    override fun resetRoute(resetMap: Boolean) {
+    private fun resetRoute(resetMap: Boolean) {
         this.distance = 0f
         this.speed = 0.0
         this.altitude = 0.0
@@ -180,15 +236,17 @@ class TripManagerImpl @Inject constructor(
         this.overallStopTime = 0
         this.maxAltitude = 0.0
         this.movementTime = 0
+
         if (resetMap) {
             publishTripState(TripState.Initiated)
         }
+
         locations.clear()
         latLngList.clear()
         imageMarkers.clear()
     }
 
-    override fun updateRouteStatus(location: Location) {
+    private fun updateRouteStatus(location: Location) {
         if (location.hasBearing()) {
             heading = location.bearing
         }
@@ -227,10 +285,9 @@ class TripManagerImpl @Inject constructor(
 
 
     @SuppressLint("SimpleDateFormat")
-    override fun saveTrip(tripImage: Bitmap?): SaveStatus {
+    fun saveTrip(tripImage: Bitmap?) {
         Log.i("TripManager", "About to save trip")
-        return if (latLngList.size > 1) {
-
+        if (latLngList.size > 1) {
             val timestamp = System.currentTimeMillis()
             val mapImageFile = "${pathProvider.providerImagesFilesPath()}/trip_$timestamp.jpeg"
             val sdf = SimpleDateFormat("dd-MM-yyyy 'at' HH:mm")
@@ -239,7 +296,7 @@ class TripManagerImpl @Inject constructor(
             val startAddress = startLocation?.let { getAddress(LatLng(it.latitude, it.longitude)) }
             val stopAddress = currentLocation?.let { getAddress(LatLng(it.latitude, it.longitude)) }
 
-            Log.i(TAG, "End address: " + stopAddress);
+            Log.i(TAG, "End address: $stopAddress");
             duration = timer.getDuration() //mSec
             averageSpeed = (distance / (duration / 1000).toInt()).toDouble() // m/sec
             movementTime = duration - overallStopTime //mSec
@@ -269,15 +326,28 @@ class TripManagerImpl @Inject constructor(
             if (tripImage != null) {
                 saveTripImage(tripImage, tripId, mapImageFile)
             }
-            publishTripState(TripState.TripSaved(latLngList))
-            SaveStatus.PASSED
+            publishTripState(TripState.TripSaved(SaveStatus.Success(latLngList)))
         } else {
-            SaveStatus.NOT_ENOUGH_DATA
+            publishTripState(TripState.TripSaved(SaveStatus.NotEnoughData))
         }
+        recordingState = RecordingState.Idle
     }
 
-    override fun uploadTrip(trip: Trip): Int {
-        var kmlStatus = KML_OPENED
+    private fun uploadTrip(trip: Trip) {
+        val tripRoute = trip.kml?.let {
+            kmlManager.getLocationsFromKml(it)
+        } ?: emptyList()
+
+        if (tripRoute.isEmpty()) {
+            publishTripState(TripState.TripLoaded(TripUploadedResult.Failed(TripLoadFailures.GenericUploadFailure)))
+            return
+        } else {
+            latLngList.apply {
+                clear()
+                addAll(tripRoute)
+            }
+        }
+
         this.uploadedTrip = trip.also {
             this.distance = it.distance
             this.maxSpeed = it.maxSpeed
@@ -287,32 +357,24 @@ class TripManagerImpl @Inject constructor(
             timer.setStartTime(it.duration)
         }
 
-
-        //        com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser parser = new com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser(this.uploadedTrip.getKml());
-//        kml_status = parser.openTripKml();
-//        if(kml_status != com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser.KML_OPENED){
-//            return kml_status;
-//        }
-        latLngList.clear()
-        trip.kml?.let {
-            this.latLngList.addAll(kmlManager.getLocationsFromKml(trip.kml))
+        imageMarkers.apply {
+            clear()
+            addAll(datasource.findAllMarkersForTrip(trip.id))
         }
-
-        if (this.latLngList.isEmpty()) {
-            kmlStatus = FAIL_TO_OPEN_KML
-            return kmlStatus
-        }
-
-        imageMarkers.clear()
-        imageMarkers.addAll(datasource.findAllMarkersForTrip(trip.id))
-        tripMutableStateFlow
-        publishTripState(TripState.Initiated)
-        publishTripState(TripState.OverlayRoute(latLngList, 10f, Color.CYAN, imageMarkers))
-        return kmlStatus
+        publishTripState(
+            TripState.TripLoaded(
+                tripUploadedResult = TripUploadedResult.Success(
+                    latLngList,
+                    10f,
+                    Color.CYAN,
+                    imageMarkers
+                )
+            )
+        )
     }
 
     @Throws(Exception::class)
-    override fun addImageMarker(markerUri: Uri) {
+    fun addImageMarker(markerUri: Uri) {
         val imageMarker =
             ImageMarker(markerUri, currentLocation!!.latitude, currentLocation!!.longitude)
         imageMarkers.add(imageMarker)
@@ -335,28 +397,39 @@ class TripManagerImpl @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             Log.e(
-                "com.bartovapps.gpstriprec.core.map_helper.MapHelper",
+                "com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper",
                 "There was an exception: " + e.message
             )
         }
 
     }
 
-    override fun setCurrentLocation(location: Location) {
-        currentLocation = location
-        publishTripState(TripState.StartLocation(location))
-    }
-
-    override fun updateAccuracy(accuracy: Float) {
+    private fun updateAccuracy(accuracy: Float) {
         this.accuracy = accuracy
     }
 
-    override fun setSpeedFilter(speedFilter: Double) {
-        TODO("Not yet implemented")
+    private fun setCurrentLocation(location: Location) {
+        currentLocation = location
+        publishTripState(TripState.StartLocation(location))
+        if (recordingState == RecordingState.Recording) {
+            if (recordingMode == RecordingMode.CONTINUE_TRIP) {
+                timer.resumeTimer()
+            } else {
+                timer.startTimer(true)
+            }
+        }
+    }
+
+    private fun updateRecordingMode(recordingMode: RecordingMode) {
+        this.recordingMode = recordingMode
+    }
+
+    private fun setSpeedFilter(speedFilter: Double) {
+        SPEED_FILTER
     }
 
 
-    override fun mergeTrips(
+    fun mergeTrips(
         tripA: Trip,
         tripB: Trip,
     ): Int {
@@ -455,6 +528,13 @@ class TripManagerImpl @Inject constructor(
     }
 
 
+    override fun onStop(owner: LifecycleOwner) {
+        super.onStop(owner)
+        if (recordingState == RecordingState.Recording) {
+            publishTripState(TripState.ShowRecordingInBackground)
+        }
+    }
+
     private fun publishTripState(state: TripState) {
         CoroutineScope(Dispatchers.Main).launch {
             tripMutableStateFlow.value = state
@@ -462,7 +542,8 @@ class TripManagerImpl @Inject constructor(
     }
 
     companion object {
-        private const val TAG = "TripManager"
+        private const val TAG =
+            "com.bartovapps.gpstriprec.presentation.screens.main_screen.TripManager"
 
         const val MERGE_SUCCESS: Int = 1
         const val KML_NOT_FOUND: Int = 2
@@ -472,4 +553,6 @@ class TripManagerImpl @Inject constructor(
         const val SPEED_FILTER: Float = 0.832f // 0.833 < 3km/h
         private const val CONTINUE_TRIPS_GAP = 300
     }
+
+
 }

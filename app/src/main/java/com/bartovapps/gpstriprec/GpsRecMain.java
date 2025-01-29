@@ -48,9 +48,9 @@
 //import androidx.core.content.FileProvider;
 //import androidx.core.content.res.ResourcesCompat;
 //
-//import com.bartovapps.gpstriprec.core.db.TripsDataSource;
-//import com.bartovapps.gpstriprec.core.map_helper.MapHelper;
-//import com.bartovapps.gpstriprec.core.timer.TripTimer;
+//import com.bartovapps.gpstriprec.core.db.com.bartovapps.gpstriprec.domain.db.TripsDataSource;
+//import com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper;
+//import com.bartovapps.gpstriprec.core.timer.com.bartovapps.gpstriprec.domain.timer.TripTimer;
 //import com.bartovapps.gpstriprec.data.enums.AltitudeUnits;
 //import com.bartovapps.gpstriprec.data.enums.RecordingState;
 //import com.bartovapps.gpstriprec.data.enums.SaveStatus;
@@ -77,7 +77,7 @@
 //
 //import javax.inject.Inject;
 //
-//import core.trip_manager.TripManager;
+//import core.trip_manager.com.bartovapps.gpstriprec.presentation.screens.main_screen.TripManager;
 //import core.trip_manager.TripManagerImpl;
 //import dagger.hilt.android.AndroidEntryPoint;
 //import data.model.Trip;
@@ -118,13 +118,13 @@
 //    private FloatingActionButton fabStartCamera;
 //
 //    @Inject
-//    public TripManager tripManager;
+//    public com.bartovapps.gpstriprec.presentation.screens.main_screen.TripManager tripManager;
 //    @Inject
-//    public TripsDataSource datasource;
+//    public com.bartovapps.gpstriprec.domain.db.TripsDataSource datasource;
 //    @Inject
-//    TripTimer timerManager;
+//    com.bartovapps.gpstriprec.domain.timer.TripTimer timerManager;
 //    @Inject
-//    MapHelper mapHelper;
+//    com.bartovapps.gpstriprec.domain.map_helper.MapHelper mapHelper;
 //
 //    private DataDisplayer speedDisplayer;
 //    private DataDisplayer distanceDisplayer;

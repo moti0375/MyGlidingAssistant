@@ -1,7 +1,7 @@
 //package com.bartovapps.gpstriprec;
 //
-//import static com.bartovapps.gpstriprec.core.db.TripsDBOpenHelper.COLUMN_FROM;
-//import static com.bartovapps.gpstriprec.core.db.TripsDBOpenHelper.COLUMN_TO;
+//import static com.bartovapps.gpstriprec.core.db.com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper.COLUMN_FROM;
+//import static com.bartovapps.gpstriprec.core.db.com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper.COLUMN_TO;
 //
 //import android.annotation.SuppressLint;
 //import android.app.AlertDialog;
@@ -32,10 +32,10 @@
 //import androidx.appcompat.app.AppCompatActivity;
 //import androidx.appcompat.widget.Toolbar;
 //
-//import com.bartovapps.gpstriprec.core.db.TripsDataSource;
-//import com.bartovapps.gpstriprec.core.di.QMainThread;
+//import com.bartovapps.gpstriprec.core.db.com.bartovapps.gpstriprec.domain.db.TripsDataSource;
+//import com.bartovapps.gpstriprec.core.di.com.bartovapps.gpstriprec.domain.di.QMainThread;
 //import com.bartovapps.gpstriprec.core.map_helper.ImageMarker;
-//import com.bartovapps.gpstriprec.core.map_helper.MapHelper;
+//import com.bartovapps.gpstriprec.core.map_helper.com.bartovapps.gpstriprec.domain.map_helper.MapHelper;
 //import com.bartovapps.gpstriprec.data.enums.AltitudeUnits;
 //import com.bartovapps.gpstriprec.data.enums.Units;
 //import com.bartovapps.gpstriprec.kmlhleper.com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser;
@@ -69,7 +69,7 @@
 //import data.model.Trip;
 //
 //@AndroidEntryPoint
-//public class com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity extends AppCompatActivity implements GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener, OnMapReadyCallback,
+//public class com.bartovapps.gpstriprec.presentation.screens.trip_details.com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity extends AppCompatActivity implements GoogleMap.OnInfoWindowClickListener, GoogleMap.OnMarkerClickListener, OnMapReadyCallback,
 //        GoogleMap.OnMapLoadedCallback {
 //    private static final String TAG = "TAG_TripDetailsActivity";
 //    private static final String GOOGLE_EARTH_PACKAGE = "com.google.earth";
@@ -79,12 +79,12 @@
 //    private static final int GALLERY_ACTIVITY_REQ = 100;
 //    private static final int SHARE_IMAGE = 0;
 //    private static final int SHARE_KML = 1;
-//    private static final String LOG_TAG = com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity.class.getSimpleName();
+//    private static final String LOG_TAG = com.bartovapps.gpstriprec.presentation.screens.trip_details.com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity.class.getSimpleName();
 //    private static final float CAM_ZOOM = 15f;
 //    private GoogleMap mMap;
 //    Context context = this;
 //    @Inject
-//    MapHelper mapHelper;
+//    com.bartovapps.gpstriprec.domain.map_helper.MapHelper mapHelper;
 //
 //    @Inject
 //    com.bartovapps.gpstriprec.core.trip_manager.com.bartovapps.gpstriprec.domain.trip_manager.KmlParser parser;
@@ -136,11 +136,11 @@
 //    AltitudeUnits altUnits = AltitudeUnits.Feet;
 //
 //    @Inject
-//    @QMainThread
+//    @com.bartovapps.gpstriprec.domain.di.QMainThread
 //    Handler handler;
 //
 //    @Inject
-//    TripsDataSource tripsDataSource;
+//    com.bartovapps.gpstriprec.domain.db.TripsDataSource tripsDataSource;
 //
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
@@ -364,8 +364,8 @@
 //
 //        @Override
 //        protected void onPreExecute() {
-////            Log.i(com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity.LOG_TAG, "About to load trip #: " + trip.getId());
-//            progressDialog = new ProgressDialog(com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity.this);
+////            Log.i(com.bartovapps.gpstriprec.presentation.screens.trip_details.com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity.LOG_TAG, "About to load trip #: " + trip.getId());
+//            progressDialog = new ProgressDialog(com.bartovapps.gpstriprec.presentation.screens.trip_details.com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity.this);
 //            progressDialog.setIcon(getResources().getDrawable(R.drawable.ic_launcher));
 //            progressDialog.setTitle(getString(R.string.app_name));
 //            progressDialog.setMessage(getString(R.string.displaying_trip));
@@ -384,7 +384,7 @@
 //            List<ImageMarker> imageMarkers = tripsDataSource.findAllMarkersForTrip(trip.getId());
 //            tripsDataSource.close();
 //
-////            Log.i(com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity.LOG_TAG, "There are " + imageMarkers.size() + " imageMarkers for this trip");
+////            Log.i(com.bartovapps.gpstriprec.presentation.screens.trip_details.com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity.LOG_TAG, "There are " + imageMarkers.size() + " imageMarkers for this trip");
 //            if (imageMarkers != null) {
 //                for (ImageMarker imageMarker : imageMarkers) {
 //                    mapHelper.addImageMarker(imageMarker, context);
@@ -412,13 +412,13 @@
 //    private void setUpMapIfNeeded() {
 //        // Do a null check to confirm that we have not already instantiated the
 //        // map.
-//        if (mMap == null && Utils.servicesOk(com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity.this)){
+//        if (mMap == null && Utils.servicesOk(com.bartovapps.gpstriprec.presentation.screens.trip_details.com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity.this)){
 //            SupportMapFragment mapFrag = (SupportMapFragment) getSupportFragmentManager()
 //                    .findFragmentById(R.id.savedMap);
 //            mapFrag.getMapAsync(this);
 //            // Check if we were successful in obtaining the map.
 //        }else {
-//            Toast.makeText(com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity.this,
+//            Toast.makeText(com.bartovapps.gpstriprec.presentation.screens.trip_details.com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity.this,
 //                    getResources().getString(R.string.UnableInitMap),
 //                    Toast.LENGTH_LONG).show();
 //        }
@@ -429,7 +429,7 @@
 //
 //    @Override
 //    public boolean onMarkerClick(Marker marker) {
-////        Toast.makeText(com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity.this, "Marker was clicked", Toast.LENGTH_SHORT).show();
+////        Toast.makeText(com.bartovapps.gpstriprec.presentation.screens.trip_details.com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity.this, "Marker was clicked", Toast.LENGTH_SHORT).show();
 ////        Log.i(LOG_TAG, "Marker " + marker.getId() + " was clicked");
 //        System.gc();
 //        return false;
@@ -437,12 +437,12 @@
 //
 //    @Override
 //    public void onInfoWindowClick(Marker marker) {
-////        Toast.makeText(com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity.this, "InfoWindow was clicked", Toast.LENGTH_SHORT).show();
+////        Toast.makeText(com.bartovapps.gpstriprec.presentation.screens.trip_details.com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity.this, "InfoWindow was clicked", Toast.LENGTH_SHORT).show();
 ////        Log.i(LOG_TAG, "Marker " + marker.getId() + " was clicked");
 //        ImageMarker imageMarker = mapHelper.getImageMarkerUri(marker.getId());
 //
 //        if (imageMarker != null) {
-//            Intent galleryIntent = new Intent(com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity.this, GpsTripRecGallery.class);
+//            Intent galleryIntent = new Intent(com.bartovapps.gpstriprec.presentation.screens.trip_details.com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity.this, GpsTripRecGallery.class);
 //            galleryIntent.setData(imageMarker.getImageUri());
 //            galleryIntent.putExtra("TripId", trip.getId());
 //            startActivityForResult(galleryIntent, GALLERY_ACTIVITY_REQ);
@@ -531,8 +531,8 @@
 //
 //    private void displayAddresses() {
 //        if (startAddress == null || startAddress.contains("Unavailable") || startAddress.contains("none")) { // trying to get address if wasn't
-//            // Refactor after make TripManager singleton
-//           // startAddress = TripManager.getAddress(locations.get(0)).trim(); //getting first location address
+//            // Refactor after make com.bartovapps.gpstriprec.presentation.screens.main_screen.TripManager singleton
+//           // startAddress = com.bartovapps.gpstriprec.presentation.screens.main_screen.TripManager.getAddress(locations.get(0)).trim(); //getting first location address
 ////            Log.i(LOG_TAG, "Got start address: " + startAddress);
 //
 //            if (startAddress.contains("Unavailable") || startAddress == null) { //if it still unavailable, might be location without address at all or no Internet at this time..
@@ -547,7 +547,7 @@
 //
 //        if (stopAddress == null || stopAddress.contains("Unavailable") || stopAddress.contains("none")) { // trying to get address if wasn't
 //            // Todo, refactor after making Trip
-//           // stopAddress = TripManager.getAddress(locations.get(locations.size() - 1), context).trim(); //getting first location address
+//           // stopAddress = com.bartovapps.gpstriprec.presentation.screens.main_screen.TripManager.getAddress(locations.get(locations.size() - 1), context).trim(); //getting first location address
 ////            Log.i(LOG_TAG, "Got stop address: " + stopAddress);
 //
 //            if (stopAddress.contains("Unavailable") || stopAddress == null) { //if it still unavailable, might be location without address at all or no Internet at this time..
@@ -575,7 +575,7 @@
 //        boolean googleEarthInstalled = Utils.isPackageInstalled(GOOGLE_EARTH_PACKAGE, context);
 //        if (googleEarthInstalled) {
 //            if (!Utils.isFileExists(trip.getKml())) {
-//                Toast.makeText(com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity.this, getString(R.string.MapUnavailable), Toast.LENGTH_LONG).show();
+//                Toast.makeText(com.bartovapps.gpstriprec.presentation.screens.trip_details.com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity.this, getString(R.string.MapUnavailable), Toast.LENGTH_LONG).show();
 //                return;
 //            }
 //
@@ -618,7 +618,7 @@
 //                                startActivity(marketIntent);
 //                            } catch (ActivityNotFoundException e) {
 //                                e.printStackTrace();
-//                                Toast.makeText(com.bartovapps.gpstriprec.presentation.screens.trip_details.TripDetailsActivity.this, getString(R.string.GooglePlayError), Toast.LENGTH_LONG).show();
+//                                Toast.makeText(com.bartovapps.gpstriprec.presentation.screens.trip_details.com.bartovapps.gpstriprec.presentation.screens.trip_details_screen.TripDetailsActivity.this, getString(R.string.GooglePlayError), Toast.LENGTH_LONG).show();
 //                            }
 //                        })
 //                .setNegativeButton(getResources().getString(R.string.NO),

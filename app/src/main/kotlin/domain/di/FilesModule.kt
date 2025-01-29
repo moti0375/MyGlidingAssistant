@@ -1,8 +1,7 @@
-package com.bartovapps.gpstriprec.core.di
-
+package com.bartovapps.gpstriprec.domain.di
 import android.content.Context
-import com.bartovapps.gpstriprec.core.files.path_provider.PathProvider
-import com.bartovapps.gpstriprec.core.files.path_provider.PathProviderImpl
+import com.bartovapps.gpstriprec.domain.files.path_provider.PathProvider
+import com.bartovapps.gpstriprec.domain.files.path_provider.PathProviderImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

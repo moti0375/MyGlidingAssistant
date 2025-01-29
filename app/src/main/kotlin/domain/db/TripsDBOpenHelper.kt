@@ -1,5 +1,4 @@
-package com.bartovapps.gpstriprec.core.db
-
+package com.bartovapps.gpstriprec.domain.db
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper

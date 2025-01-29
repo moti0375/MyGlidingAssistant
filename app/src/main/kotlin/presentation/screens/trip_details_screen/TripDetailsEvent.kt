@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.presentation.screens.trip_details
+package com.bartovapps.gpstriprec.presentation.screens.trip_details_screen
 
 import android.net.Uri
 
