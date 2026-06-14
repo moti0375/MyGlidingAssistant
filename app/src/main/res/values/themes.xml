@@ -1,0 +1,23 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.App" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Semantic Colors -->
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/black</item>
+
+        <!-- 1. Fix Status Bar Icons (Turn clock/battery black) -->
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <!-- 2. Fix Toolbar Icon/Text Tinting globally -->
+        <item name="colorControlNormal">@color/black</item>
+
+        <!-- 3. Fix the Overflow menu (3 dots) specifically -->
+        <item name="actionOverflowButtonStyle">@style/Widget.ActionButton.Overflow</item>
+    </style>
+
+    <!-- Style to force 3-dots to black if the above doesn't catch it -->
+    <style name="Widget.ActionButton.Overflow" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:tint">@color/black</item>
+    </style>
+</resources>

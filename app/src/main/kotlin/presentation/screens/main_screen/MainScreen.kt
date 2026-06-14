@@ -32,13 +32,15 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.ImageView
-import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.bartovapps.gpstriprec.GpsRecLicense
 import com.bartovapps.gpstriprec.GpsRecPrefs
@@ -112,14 +114,17 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContentView(R.layout.gps_recorder_main_material)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
 
         toolbar = findViewById(R.id.app_bar)
         setSupportActionBar(toolbar)
-        supportActionBar?.apply {
-            setLogo(R.mipmap.ic_lanucher)
-            setDisplayShowTitleEnabled(false)
-        }
 
         settings = this.getSharedPreferences("GPS_TRIP_RECORDER", MODE_PRIVATE)
         settings.registerOnSharedPreferenceChangeListener(prefListener)
@@ -441,19 +446,6 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             R.id.action_license -> {
                 val license_intent = Intent(this, GpsRecLicense::class.java)
                 startActivity(license_intent)
-            }
-
-            R.id.action_musicPlayer -> try {
-                val intent = Intent(
-                    MediaStore.INTENT_ACTION_MUSIC_PLAYER
-                )
-                startActivity(intent)
-            } catch (e: ActivityNotFoundException) {
-                Toast.makeText(
-                    this,
-                    resources.getString(R.string.noMusicPlayer),
-                    Toast.LENGTH_LONG
-                ).show()
             }
         }
         return true
