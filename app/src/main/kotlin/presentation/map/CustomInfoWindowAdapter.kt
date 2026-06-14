@@ -11,7 +11,7 @@ import android.view.View
 import android.widget.ImageView
 import androidx.core.content.res.ResourcesCompat
 import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
+import com.bartovapps.gpstriprec.domain.map_helper.ImageMarker
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter
 import com.google.android.gms.maps.model.Marker
 import java.io.File

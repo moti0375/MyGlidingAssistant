@@ -112,7 +112,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.screens.trip_details.TripDetailsActivity"
+            android:name=".presentation.screens.trip_details_screen.TripDetailsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
@@ -151,11 +151,11 @@
         <activity
             android:name=".GpsTripRecGallery"
             android:label="@string/title_activity_gps_trip_rec_gallery"
-            android:parentActivityName=".presentation.screens.trip_details.TripDetailsActivity"
+            android:parentActivityName=".presentation.screens.trip_details_screen.TripDetailsActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".presentation.screens.trip_details.TripDetailsActivity" />
+                android:value=".presentation.screens.trip_details_screen.TripDetailsActivity" />
         </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

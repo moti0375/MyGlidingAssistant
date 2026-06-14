@@ -1,7 +1,7 @@
 package com.bartovapps.gpstriprec.presentation.screens.main_screen
 
 import android.location.Location
-import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
+import com.bartovapps.gpstriprec.domain.map_helper.ImageMarker
 import com.google.android.gms.maps.model.LatLng
 
 sealed class TripState {

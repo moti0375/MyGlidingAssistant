@@ -3,10 +3,10 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.domain.db.TripsDataSource
 import com.bartovapps.gpstriprec.domain.files.kml.KmlManager
 import com.bartovapps.gpstriprec.domain.files.path_provider.PathProvider
+import com.bartovapps.gpstriprec.domain.map_helper.ImageMarker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import data.model.Trip
 import kotlinx.coroutines.flow.MutableStateFlow

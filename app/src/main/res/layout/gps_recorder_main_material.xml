@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/Black">
 
     <include layout="@layout/status_bar" />
@@ -40,59 +40,66 @@
             android:alpha="1">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="60dp"
                 android:layout_height="match_parent"
-                style="@style/material_textviews_style">
+                android:gravity="center"
+                style="@style/material_indicator_style"
+                android:layout_marginHorizontal="4dp">
 
                 <ImageView
+
                     android:id="@+id/imRecording"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_recording"
-                    android:visibility="gone"
+                    android:visibility="invisible"
                     android:elevation="1dp" />
             </LinearLayout>
 
-            <TextView
+
+            <com.bartovapps.gpstriprec.views.text_indicator.TextIndicator
                 android:id="@+id/tvTimer"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="8"
-                android:layout_gravity="center"
-                android:layout_centerHorizontal="true"
-                android:drawableRight="@drawable/ic_timer_white_24dp"
-                android:paddingRight="5dp"
-                style="@style/material_textviews_style"
-                android:text="00:00" />
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                app:indicator_text="00:00"
+                app:end_icon="@drawable/ic_timer_white_24dp"
+                android:layout_marginEnd="4dp"
+                style="@style/material_indicator_style">
 
+            </com.bartovapps.gpstriprec.views.text_indicator.TextIndicator>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:alpha="1">
+            android:alpha="1"
+            android:padding="4dp">
 
-            <TextView
+            <com.bartovapps.gpstriprec.views.text_indicator.TextIndicator
                 android:id="@+id/tvSpeed"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                style="@style/material_textviews_style"
-                android:text="0.0"
-                android:drawableLeft="@drawable/ic_action_speedometer"/>
+                app:indicator_text="0.0"
+                app:start_icon="@drawable/ic_action_speedometer"
+                style="@style/material_indicator_style"
+                android:layout_marginEnd="2dp"/>
 
-            <TextView
+
+            <com.bartovapps.gpstriprec.views.text_indicator.TextIndicator
                 android:id="@+id/tvDistance"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                style="@style/material_textviews_style"
-                android:text="0.0"
-                android:drawableRight="@drawable/ic_action_distance_meter"/>
-        </LinearLayout>
+                app:indicator_text="0.0"
+                android:layout_marginStart="2dp"
+                app:end_icon="@drawable/ic_action_distance_meter"
+                style="@style/material_indicator_style"/>
+
+            </LinearLayout>
 
     </LinearLayout>
 
@@ -120,18 +127,13 @@
         android:src="@drawable/ic_action_new"
         android:contentDescription="Start Stop Trip"/>
 
-    <TextView
+    <com.bartovapps.gpstriprec.views.text_indicator.TextIndicator
         android:id="@+id/tvAltitude"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        app:indicator_text="0"
         android:layout_alignParentBottom="true"
-        android:paddingRight="5dp"
-        android:paddingLeft="10dp"
-        style="@style/material_textviews_style"
-        android:text="0.0"
-        android:drawableRight="@drawable/ic_terrain"/>
-
-
-
-
+        app:end_icon="@drawable/ic_terrain"
+        style="@style/material_indicator_style"/>
 </RelativeLayout>

@@ -1,17 +1,23 @@
 package com.bartovapps.gpstriprec.presentation.map
 import android.annotation.SuppressLint
+import android.graphics.Canvas
 import android.graphics.Color
 import android.location.Location
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
+import com.bartovapps.gpstriprec.domain.map_helper.ImageMarker
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -38,8 +44,21 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
     private val markersIdsMap = mutableMapOf<String, ImageMarker>()
     private var mapReadyListener : MapReadyListener? = null
     private var mapInfoWindowClickedListener : InfoWindowClickListener? = null
+
+    private var gliderMarker : BitmapDescriptor? = null
+
     init {
         getMapAsync(this)
+    }
+
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        gliderMarker = bitmapDescriptorFromVector(R.drawable.glider_marker, 100)
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     @SuppressLint("PotentialBehaviorOverride")
@@ -168,7 +187,8 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
             .draggable(false)
             .title("End Point")
             .snippet(ll.latitude.toString() + "," + ll.longitude)
-            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
+            .anchor(0.5f, 0.5f)
+            .icon(gliderMarker)
         marker = this.map.addMarker(options)
     }
 
@@ -224,6 +244,24 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
         this.marker = null
         this.line = null
         markersIdsMap.clear()
+    }
+
+    private fun bitmapDescriptorFromVector(vectorResId: Int, sizeDp: Int): BitmapDescriptor? {
+        val density = resources.displayMetrics.density
+        val sizePx = (sizeDp * density).toInt()
+
+        val vectorDrawable = ContextCompat.getDrawable(requireContext(), vectorResId) ?: return null
+        val bitmap = android.graphics.Bitmap.createBitmap(
+            sizePx,
+            sizePx,
+            android.graphics.Bitmap.Config.ARGB_8888
+        )
+
+        Log.i("CustomMapFragment", "bitmapDescriptorFromVector: width: ${bitmap.width}, height: ${bitmap.height} ")
+        val canvas = Canvas(bitmap)
+        vectorDrawable.setBounds(0, 0, canvas.width, canvas.height)
+        vectorDrawable.draw(canvas)
+        return BitmapDescriptorFactory.fromBitmap(bitmap)
     }
 
     companion object {

@@ -1,6 +1,6 @@
 package com.bartovapps.gpstriprec.presentation.screens.trip_details_screen
 import android.net.Uri
-import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
+import com.bartovapps.gpstriprec.domain.map_helper.ImageMarker
 import com.google.android.gms.maps.model.LatLng
 import data.model.Trip
 

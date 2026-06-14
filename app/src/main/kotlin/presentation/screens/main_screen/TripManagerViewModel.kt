@@ -12,7 +12,6 @@ import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.data.enums.MovementState
 import com.bartovapps.gpstriprec.data.enums.RecordingMode
 import com.bartovapps.gpstriprec.data.enums.RecordingState
@@ -20,6 +19,7 @@ import com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper
 import com.bartovapps.gpstriprec.domain.db.TripsDataSource
 import com.bartovapps.gpstriprec.domain.files.kml.KmlManager
 import com.bartovapps.gpstriprec.domain.files.path_provider.PathProvider
+import com.bartovapps.gpstriprec.domain.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.domain.timer.TripTimer
 import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.maps.model.LatLng

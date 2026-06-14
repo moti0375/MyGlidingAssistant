@@ -33,7 +33,6 @@ import kotlin.math.min
 
 
 import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper
 import com.bartovapps.gpstriprec.domain.db.TripsDataSource
 import com.bartovapps.gpstriprec.domain.di.QMainThread

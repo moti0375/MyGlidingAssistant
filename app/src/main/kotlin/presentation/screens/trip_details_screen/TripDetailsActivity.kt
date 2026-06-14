@@ -26,12 +26,12 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import com.bartovapps.gpstriprec.GpsTripRecGallery
 import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.core.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
 import com.bartovapps.gpstriprec.data.enums.Units
 import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter
 import com.bartovapps.gpstriprec.domain.formatters.TimeFormatter
 import com.bartovapps.gpstriprec.domain.formatters.UnitsFormatter
+import com.bartovapps.gpstriprec.domain.map_helper.ImageMarker
 import com.bartovapps.gpstriprec.presentation.map.CustomSupportMapFragment
 import com.bartovapps.gpstriprec.presentation.map.InfoWindowClickListener
 import com.bartovapps.gpstriprec.presentation.map.MapReadyListener

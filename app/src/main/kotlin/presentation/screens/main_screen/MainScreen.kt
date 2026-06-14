@@ -26,6 +26,7 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
 import android.provider.MediaStore
+import android.text.SpannableString
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -54,6 +55,7 @@ import com.bartovapps.gpstriprec.presentation.map.CustomSupportMapFragment
 import com.bartovapps.gpstriprec.presentation.map.MapReadyListener
 import com.bartovapps.gpstriprec.services.GpsTripRecService
 import com.bartovapps.gpstriprec.services.GpsTripRecService.LocalBinder
+import com.bartovapps.gpstriprec.views.text_indicator.TextIndicator
 import com.google.android.gms.common.GooglePlayServicesUtil
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
@@ -69,10 +71,10 @@ import java.util.Date
 class MainScreen : AppCompatActivity(), MapReadyListener {
     private var cameraZoom = 15f
     private var lineWidth = 5f
-    private lateinit var tvSpeed: TextView
-    private lateinit var tvDistance: TextView
-    private lateinit var tvTimer: TextView
-    private lateinit var tvAltitude: TextView
+    private lateinit var tvSpeed: TextIndicator
+    private lateinit var tvDistance: TextIndicator
+    private lateinit var tvTimer: TextIndicator
+    private lateinit var tvAltitude: TextIndicator
 
     //    private ToggleButton btStartStop;
     private lateinit var fabStartStop: FloatingActionButton
@@ -221,7 +223,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     private fun subscribeTimerChanges() {
         lifecycleScope.launch {
             tripManagerViewModel.timerStateFlow.collect {
-                tvTimer.text = timeFormatter.formatTime(it)
+                tvTimer.text = SpannableString(timeFormatter.formatTime(it))
             }
         }
     }
