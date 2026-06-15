@@ -49,6 +49,8 @@ import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
 import com.bartovapps.gpstriprec.data.enums.DistanceUnits
 import com.bartovapps.gpstriprec.data.enums.data.enums.SpeedUnits
+import com.bartovapps.gpstriprec.databinding.GpsRecorderMainMaterialBinding
+import com.bartovapps.gpstriprec.domain.files.kml.KmlParserImpl
 import com.bartovapps.gpstriprec.presentation.units_formatters.FeetFormatter
 import com.bartovapps.gpstriprec.domain.formatters.UnitsFormatter
 import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter
@@ -60,9 +62,8 @@ import com.bartovapps.gpstriprec.presentation.screens.settings_screen.SettingsAc
 import com.bartovapps.gpstriprec.presentation.units_formatters.presentation.units_formatters.KnotsFormatter
 import com.bartovapps.gpstriprec.services.GpsTripRecService
 import com.bartovapps.gpstriprec.services.GpsTripRecService.LocalBinder
-import com.bartovapps.gpstriprec.views.text_indicator.TextIndicator
+import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.common.GooglePlayServicesUtil
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import dagger.hilt.android.AndroidEntryPoint
 import data.model.Trip
 import kotlinx.coroutines.Job
@@ -73,17 +74,10 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 @AndroidEntryPoint
-class MainScreen : AppCompatActivity(), MapReadyListener {
+class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChangeListener {
     private var cameraZoom = 15f
     private var lineWidth = 5f
-    private lateinit var tvSpeed: TextIndicator
-    private lateinit var tvDistance: TextIndicator
-    private lateinit var tvTimer: TextIndicator
-    private lateinit var tvAltitude: TextIndicator
-
-    //    private ToggleButton btStartStop;
-    private lateinit var fabStartStop: FloatingActionButton
-    private lateinit var fabStartCamera: FloatingActionButton
+    private lateinit var binding: GpsRecorderMainMaterialBinding
 
     private val tripManagerViewModel by viewModels<TripManagerViewModel>()
 
@@ -111,15 +105,15 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
 
     private lateinit var mapFrag: CustomSupportMapFragment
 
-    private var toolbar: Toolbar? = null
 
     private var job: Job? = null
 
     @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        binding = GpsRecorderMainMaterialBinding.inflate(layoutInflater)
         enableEdgeToEdge()
-        setContentView(R.layout.gps_recorder_main_material)
+        setContentView(binding.root)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -127,11 +121,10 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             insets
         }
 
-        toolbar = findViewById(R.id.app_bar)
-        setSupportActionBar(toolbar)
+        setSupportActionBar(binding.appBar)
 
         settings = PreferenceManager.getDefaultSharedPreferences(this)
-        settings.registerOnSharedPreferenceChangeListener(prefListener)
+        settings.registerOnSharedPreferenceChangeListener(this)
         handler = Handler(Looper.getMainLooper())
         lm = getSystemService(LOCATION_SERVICE) as LocationManager
         progressDialog = ProgressDialog(this)
@@ -139,7 +132,6 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
 
         // Create the interstitial.
         setUpMapIfNeeded()
-        setUiComponents()
         subscribeTimerChanges()
     }
 
@@ -153,6 +145,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun processTripState(state: TripState) {
         when (state) {
             is TripState.Initiated -> mapFrag.clearEverything()
@@ -232,7 +225,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     private fun subscribeTimerChanges() {
         lifecycleScope.launch {
             tripManagerViewModel.timerStateFlow.collect {
-                tvTimer.text = SpannableString(timeFormatter.formatTime(it))
+                binding.tvTimer.text = SpannableString(timeFormatter.formatTime(it))
             }
         }
     }
@@ -308,18 +301,6 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         }
     }
 
-    private fun setUiComponents() {
-        tvSpeed = findViewById(R.id.tvSpeed)
-        tvDistance = findViewById(R.id.tvDistance)
-        tvTimer = findViewById(R.id.tvTimer)
-        tvAltitude = findViewById(R.id.tvAltitude)
-        fabStartStop = findViewById(R.id.fabStartStop)
-        fabStartCamera = findViewById(R.id.fabCamera)
-        fabStartStop.setOnClickListener(startStopClickListener)
-        fabStartCamera.setOnClickListener(camButtonClickListener)
-        imRecording = findViewById<View>(R.id.imRecording) as ImageView
-    }
-
     private val startStopClickListener = View.OnClickListener{_: View ->
         tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.StartStopButtonClicked)
     }
@@ -329,9 +310,10 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     }
 
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun startRecording() {
-        fabStartStop.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_action_stop, this.theme))
-        fabStartCamera.visibility = View.VISIBLE
+        binding.fabStartStop.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_action_stop, this.theme))
+        binding.fabCamera.visibility = View.VISIBLE
         enableLocationListener(fixListener)
         mapFrag.zoom = cameraZoom
         mapFrag.tilt = 0f
@@ -352,8 +334,8 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         disableGpsLocationListener(trackLocationListener)
         tripManagerViewModel.addTripEvent(mainScreenViewModelEvent = MainScreenViewModelEvent.StopTrip)
         imRecording?.visibility = View.GONE
-        fabStartStop.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_action_new, this.theme))
-        fabStartCamera.visibility = View.INVISIBLE
+        binding.fabStartStop.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_action_new, this.theme))
+        binding.fabCamera.visibility = View.INVISIBLE
         stopService()
     }
 
@@ -475,9 +457,11 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         }
 
     private fun updateDisplay(tripUpdate: TripState.TripUpdated) {
-        tvSpeed.text = speedFormatter.formatUnits(tripUpdate.location.speed.toDouble())
-        tvDistance.text = distanceFormatter.formatUnits(tripUpdate.distance.toDouble())
-        tvAltitude.text = altitudeFormatter.formatUnits(tripUpdate.location.altitude)
+        binding.apply {
+            tvSpeed.text = speedFormatter.formatUnits(tripUpdate.location.speed.toDouble())
+            tvDistance.text = distanceFormatter.formatUnits(tripUpdate.distance.toDouble())
+            tvAltitude.text = altitudeFormatter.formatUnits(tripUpdate.location.altitude)
+        }
 
         if (recordingService != null && serviceBounded) {
             recordingService?.updateService(tripUpdate.distance)
@@ -542,7 +526,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
 
     private var saveDialogCancelListener: DialogInterface.OnCancelListener =
         DialogInterface.OnCancelListener { _: DialogInterface? ->
-            fabStartStop.setBackgroundDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_action_new, theme))
+            binding.fabStartStop.setBackgroundDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_action_new, theme))
         }
 
 
@@ -553,7 +537,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     override fun onMapReady() {
         Log.i(TAG, "onMapReady: ")
         val topPadding = findViewById<View>(R.id.llGauges).measuredHeight
-        val bottomPadding = tvAltitude.measuredHeight
+        val bottomPadding = binding.tvAltitude.measuredHeight
         mapFrag.setPadding(0, topPadding, 0, bottomPadding + 5)
         updatePreferences()
         moveMapToInitialPosition()
@@ -608,7 +592,6 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     override fun onBackPressed() {
         finish()
         super.onBackPressed()
-
     }
 
     private fun backPressedDialog() {
@@ -815,6 +798,10 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
 
         mImageMarkerFileLocation = File.createTempFile(imageFileName, ".jpg", storageDirectory)
+    }
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        updatePreferences()
     }
 
     companion object {
