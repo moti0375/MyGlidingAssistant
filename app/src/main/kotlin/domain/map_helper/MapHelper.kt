@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.domain.map_helper
+package com.dunihuliapps.myglidingassistnat.domain.map_helper
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -12,6 +12,7 @@ import android.location.Location
 import android.media.ExifInterface
 import android.os.Handler
 import android.util.Log
+import com.dunihuliapps.myglidingassistant.R
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.SnapshotReadyCallback
@@ -32,11 +33,10 @@ import kotlin.math.cos
 import kotlin.math.min
 
 
-import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper
-import com.bartovapps.gpstriprec.domain.db.TripsDataSource
-import com.bartovapps.gpstriprec.domain.di.QMainThread
-import com.bartovapps.gpstriprec.domain.di.QTripsImagesDir
+import com.dunihuliapps.myglidingassistnat.domain.db.TripsDBOpenHelper
+import com.dunihuliapps.myglidingassistnat.domain.db.TripsDataSource
+import com.dunihuliapps.myglidingassistnat.domain.di.QMainThread
+import com.dunihuliapps.myglidingassistnat.domain.di.QTripsImagesDir
 
 @Deprecated("All this logic moved to CustomMapFragment")
 class MapHelper @Inject constructor(

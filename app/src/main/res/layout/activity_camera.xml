@@ -50,7 +50,7 @@
         android:visibility="invisible"
         android:src="@drawable/ic_action_replay"/>
 
-    <com.bartovapps.gpstriprec.utils.FlashButton
+    <com.dunihuliapps.myglidingassistnat.utils.FlashButton
         android:id="@+id/fbFlashMode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

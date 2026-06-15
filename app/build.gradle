@@ -20,7 +20,7 @@ android {
     compileSdk project.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.bartovapps.gpstriprec"
+        applicationId "com.dunihuliapps.myglidingassistant"
         minSdkVersion project.ext.minSdkVersion
         targetSdkVersion project.ext.targetSdkVersion
         versionCode 1
@@ -28,7 +28,7 @@ android {
         manifestPlaceholders = [googleMapsApiKey: appLocalProperties.getProperty("GOOGLE_MAPS_API_KEY") ?: ""]
     }
 
-    namespace "com.bartovapps.gpstriprec"
+    namespace "com.dunihuliapps.myglidingassistant"
     buildTypes {
         release {
             minifyEnabled false

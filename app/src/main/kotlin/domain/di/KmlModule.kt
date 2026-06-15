@@ -1,8 +1,8 @@
-package com.bartovapps.gpstriprec.domain.di
-import com.bartovapps.gpstriprec.domain.files.kml.KmlManager
-import com.bartovapps.gpstriprec.domain.files.kml.KmlManagerImpl
-import com.bartovapps.gpstriprec.domain.files.kml.KmlParser
-import com.bartovapps.gpstriprec.domain.files.kml.KmlParserImpl
+package com.dunihuliapps.myglidingassistnat.domain.di
+import com.dunihuliapps.myglidingassistnat.domain.files.kml.KmlManager
+import com.dunihuliapps.myglidingassistnat.domain.files.kml.KmlManagerImpl
+import com.dunihuliapps.myglidingassistnat.domain.files.kml.KmlParser
+import com.dunihuliapps.myglidingassistnat.domain.files.kml.KmlParserImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

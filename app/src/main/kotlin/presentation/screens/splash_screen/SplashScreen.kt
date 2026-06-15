@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.presentation.screens.splash_screen
+package com.dunihuliapps.myglidingassistnat.presentation.screens.splash_screen
 
 import android.Manifest
 import android.content.Intent
@@ -17,9 +17,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.presentation.screens.main_screen.MainScreen
-import com.bartovapps.gpstriprec.utils.Utils
+import com.dunihuliapps.myglidingassistant.R
+import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen
+import com.dunihuliapps.myglidingassistnat.utils.Utils
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.BufferedInputStream
@@ -68,7 +68,7 @@ class SplashScreen : AppCompatActivity() {
 
 
         Picasso.with(this)
-            .load(R.drawable.splash)
+            .load(R.drawable.gliding_assistant_splash)
             .fit()
             .centerInside()
             .into(iv)

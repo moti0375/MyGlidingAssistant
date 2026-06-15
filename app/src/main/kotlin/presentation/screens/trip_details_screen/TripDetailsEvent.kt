@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.presentation.screens.trip_details_screen
+package com.dunihuliapps.myglidingassistnat.presentation.screens.trip_details_screen
 
 import android.net.Uri
 

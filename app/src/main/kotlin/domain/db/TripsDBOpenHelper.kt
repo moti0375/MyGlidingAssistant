@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.domain.db
+package com.dunihuliapps.myglidingassistnat.domain.db
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper

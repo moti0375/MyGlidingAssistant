@@ -1,7 +1,7 @@
-package com.bartovapps.gpstriprec.domain.files.kml
+package com.dunihuliapps.myglidingassistnat.domain.files.kml
 import android.content.res.Resources
-import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.domain.files.path_provider.PathProvider
+import com.dunihuliapps.myglidingassistant.R
+import com.dunihuliapps.myglidingassistnat.domain.files.path_provider.PathProvider
 import com.google.android.gms.maps.model.LatLng
 import org.jdom2.Document
 import org.jdom2.Element

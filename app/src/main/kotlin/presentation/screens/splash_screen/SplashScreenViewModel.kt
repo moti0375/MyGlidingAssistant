@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.presentation.screens.splash_screen
+package com.dunihuliapps.myglidingassistnat.presentation.screens.splash_screen
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

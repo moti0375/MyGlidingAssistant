@@ -1,5 +1,5 @@
-package com.bartovapps.gpstriprec.presentation.units_formatters
-import com.bartovapps.gpstriprec.domain.formatters.TimeFormatter
+package com.dunihuliapps.myglidingassistnat.presentation.units_formatters
+import com.dunihuliapps.myglidingassistnat.domain.formatters.TimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 

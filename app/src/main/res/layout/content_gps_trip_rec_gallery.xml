@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.bartovapps.gpstriprec.GpsTripRecGallery"
+    tools:context="com.dunihuliapps.myglidingassistnat.GpsTripRecGallery"
     tools:showIn="@layout/activity_gps_trip_rec_gallery">
 
     <ImageView

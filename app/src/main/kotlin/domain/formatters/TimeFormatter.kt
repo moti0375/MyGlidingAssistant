@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.domain.formatters
+package com.dunihuliapps.myglidingassistnat.domain.formatters
 
 interface TimeFormatter {
     fun formatTime(millis: Long) : String

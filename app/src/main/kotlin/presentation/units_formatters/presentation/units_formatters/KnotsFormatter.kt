@@ -1,6 +1,6 @@
-package com.bartovapps.gpstriprec.presentation.units_formatters.presentation.units_formatters
+package com.dunihuliapps.myglidingassistnat.presentation.units_formatters.presentation.units_formatters
 import android.text.SpannableString
-import com.bartovapps.gpstriprec.presentation.units_formatters.BaseUnitFormatter
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.BaseUnitFormatter
 import java.util.Locale
 
 class KnotsFormatter : BaseUnitFormatter() {

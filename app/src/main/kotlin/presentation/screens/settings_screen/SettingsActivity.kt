@@ -1,11 +1,11 @@
-package com.bartovapps.gpstriprec.presentation.screens.settings_screen
+package com.dunihuliapps.myglidingassistnat.presentation.screens.settings_screen
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.databinding.ActivitySettingsBinding
+import com.dunihuliapps.myglidingassistant.R
+import com.dunihuliapps.myglidingassistant.databinding.ActivitySettingsBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

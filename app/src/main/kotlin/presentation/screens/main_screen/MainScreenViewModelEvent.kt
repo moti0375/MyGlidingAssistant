@@ -1,9 +1,9 @@
-package com.bartovapps.gpstriprec.presentation.screens.main_screen
+package com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen
 
 import android.graphics.Bitmap
 import android.location.Location
 import android.net.Uri
-import com.bartovapps.gpstriprec.data.enums.RecordingMode
+import com.dunihuliapps.myglidingassistnat.data.enums.RecordingMode
 import data.model.Trip
 
 sealed class MainScreenViewModelEvent {

@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.data.enums
+package com.dunihuliapps.myglidingassistnat.data.enums
 
 enum class RecordingMode {
     NEW_TRIP,

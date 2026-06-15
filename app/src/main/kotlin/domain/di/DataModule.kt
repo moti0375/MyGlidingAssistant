@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.domain.di
+package com.dunihuliapps.myglidingassistnat.domain.di
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences

@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.domain.di
+package com.dunihuliapps.myglidingassistnat.domain.di
 import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper

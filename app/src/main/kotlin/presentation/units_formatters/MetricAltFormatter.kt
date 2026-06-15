@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.presentation.units_formatters
+package com.dunihuliapps.myglidingassistnat.presentation.units_formatters
 
 import android.text.SpannableString
 import java.text.DecimalFormat

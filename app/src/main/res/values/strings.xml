@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="MissingTranslation">
 
-    <string name="app_name">GPS Trip Recorder</string>
+    <string name="app_name">My Gliding Assistant</string>
     <string name="action_settings">Settings</string>
     <string name="NUMERIC_ZERO">0.0</string>
     <string name="SpeedHeader">SPEED</string>

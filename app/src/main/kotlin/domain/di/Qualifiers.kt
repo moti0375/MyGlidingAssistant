@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.domain.di
+package com.dunihuliapps.myglidingassistnat.domain.di
 import javax.inject.Qualifier
 
 /**

@@ -13,7 +13,7 @@
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginTop="4dp"
-        android:name="com.bartovapps.gpstriprec.presentation.map.CustomSupportMapFragment" />
+        android:name="com.dunihuliapps.myglidingassistnat.presentation.map.CustomSupportMapFragment" />
 
 
 

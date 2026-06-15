@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.presentation.screens.main_screen
+package com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen
 
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
@@ -12,16 +12,16 @@ import android.util.Log
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
-import com.bartovapps.gpstriprec.data.enums.MovementState
-import com.bartovapps.gpstriprec.data.enums.RecordingMode
-import com.bartovapps.gpstriprec.data.enums.RecordingState
-import com.bartovapps.gpstriprec.domain.db.TripsDBOpenHelper
-import com.bartovapps.gpstriprec.domain.db.TripsDataSource
-import com.bartovapps.gpstriprec.domain.files.kml.KmlManager
-import com.bartovapps.gpstriprec.domain.files.path_provider.PathProvider
-import com.bartovapps.gpstriprec.domain.map_helper.ImageMarker
-import com.bartovapps.gpstriprec.domain.timer.TripTimer
-import com.bartovapps.gpstriprec.utils.Utils
+import com.dunihuliapps.myglidingassistnat.data.enums.MovementState
+import com.dunihuliapps.myglidingassistnat.data.enums.RecordingMode
+import com.dunihuliapps.myglidingassistnat.data.enums.RecordingState
+import com.dunihuliapps.myglidingassistnat.domain.db.TripsDBOpenHelper
+import com.dunihuliapps.myglidingassistnat.domain.db.TripsDataSource
+import com.dunihuliapps.myglidingassistnat.domain.files.kml.KmlManager
+import com.dunihuliapps.myglidingassistnat.domain.files.path_provider.PathProvider
+import com.dunihuliapps.myglidingassistnat.domain.map_helper.ImageMarker
+import com.dunihuliapps.myglidingassistnat.domain.timer.TripTimer
+import com.dunihuliapps.myglidingassistnat.utils.Utils
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import data.model.Trip

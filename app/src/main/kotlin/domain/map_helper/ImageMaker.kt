@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.domain.map_helper
+package com.dunihuliapps.myglidingassistnat.domain.map_helper
 import android.net.Uri
 data class ImageMarker (
     val imageUri: Uri? = null,

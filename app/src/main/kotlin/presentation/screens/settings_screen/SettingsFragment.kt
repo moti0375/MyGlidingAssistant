@@ -1,10 +1,10 @@
-package com.bartovapps.gpstriprec.presentation.screens.settings_screen
+package com.dunihuliapps.myglidingassistnat.presentation.screens.settings_screen
 
 import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.fragment.app.viewModels
 import androidx.preference.PreferenceFragmentCompat
-import com.bartovapps.gpstriprec.R
+import com.dunihuliapps.myglidingassistant.R
 
 class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
 

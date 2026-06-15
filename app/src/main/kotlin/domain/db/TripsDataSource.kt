@@ -1,10 +1,10 @@
-package com.bartovapps.gpstriprec.domain.db
+package com.dunihuliapps.myglidingassistnat.domain.db
 import android.content.ContentValues
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteException
 import android.net.Uri
 import android.util.Log
-import com.bartovapps.gpstriprec.domain.map_helper.ImageMarker
+import com.dunihuliapps.myglidingassistnat.domain.map_helper.ImageMarker
 import data.model.Trip
 import java.io.File
 import javax.inject.Inject

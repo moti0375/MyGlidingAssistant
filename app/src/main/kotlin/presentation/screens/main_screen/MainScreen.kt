@@ -1,8 +1,8 @@
-package com.bartovapps.gpstriprec.presentation.screens.main_screen
+package com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen
 
 import android.Manifest
-import com.bartovapps.gpstriprec.presentation.units_formatters.MetricFormatter
-import com.bartovapps.gpstriprec.presentation.units_formatters.MillageFormatter
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricFormatter
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MillageFormatter
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
@@ -36,31 +36,30 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
-import com.bartovapps.gpstriprec.GpsRecLicense
-import com.bartovapps.gpstriprec.GpsRecTripsList
-import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
-import com.bartovapps.gpstriprec.data.enums.DistanceUnits
-import com.bartovapps.gpstriprec.data.enums.data.enums.SpeedUnits
-import com.bartovapps.gpstriprec.databinding.GpsRecorderMainMaterialBinding
-import com.bartovapps.gpstriprec.presentation.units_formatters.FeetFormatter
-import com.bartovapps.gpstriprec.domain.formatters.UnitsFormatter
-import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter
-import com.bartovapps.gpstriprec.presentation.units_formatters.KmhFormatter
-import com.bartovapps.gpstriprec.presentation.units_formatters.MetricAltFormatter
-import com.bartovapps.gpstriprec.presentation.map.CustomSupportMapFragment
-import com.bartovapps.gpstriprec.presentation.map.MapReadyListener
-import com.bartovapps.gpstriprec.presentation.screens.settings_screen.SettingsActivity
-import com.bartovapps.gpstriprec.presentation.units_formatters.presentation.units_formatters.KnotsFormatter
-import com.bartovapps.gpstriprec.services.GpsTripRecService
-import com.bartovapps.gpstriprec.services.GpsTripRecService.LocalBinder
+import com.dunihuliapps.myglidingassistant.R
+import com.dunihuliapps.myglidingassistant.databinding.GpsRecorderMainMaterialBinding
+import com.dunihuliapps.myglidingassistnat.GpsRecLicense
+import com.dunihuliapps.myglidingassistnat.GpsRecTripsList
+import com.dunihuliapps.myglidingassistnat.data.enums.AltitudeUnits
+import com.dunihuliapps.myglidingassistnat.data.enums.DistanceUnits
+import com.dunihuliapps.myglidingassistnat.data.enums.data.enums.SpeedUnits
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.FeetFormatter
+import com.dunihuliapps.myglidingassistnat.domain.formatters.UnitsFormatter
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.HmsFormatter
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.KmhFormatter
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricAltFormatter
+import com.dunihuliapps.myglidingassistnat.presentation.map.CustomSupportMapFragment
+import com.dunihuliapps.myglidingassistnat.presentation.map.MapReadyListener
+import com.dunihuliapps.myglidingassistnat.presentation.screens.settings_screen.SettingsActivity
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.presentation.units_formatters.KnotsFormatter
+import com.dunihuliapps.myglidingassistnat.services.GlidingAssistanceService
+
 import com.google.android.gms.common.GooglePlayServicesUtil
 import dagger.hilt.android.AndroidEntryPoint
 import data.model.Trip
@@ -70,6 +69,7 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
+import kotlin.jvm.java
 
 @AndroidEntryPoint
 class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChangeListener {
@@ -96,7 +96,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
     private var handler: Handler = Handler(Looper.getMainLooper())
 
     // Bool to track whether the app is already resolving an error
-    private var recordingService: GpsTripRecService? = null
+    private var recordingService: GlidingAssistanceService? = null
     private var serviceBounded: Boolean = false
     private lateinit var serviceIntent: Intent
 
@@ -126,7 +126,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
         handler = Handler(Looper.getMainLooper())
         lm = getSystemService(LOCATION_SERVICE) as LocationManager
         progressDialog = ProgressDialog(this)
-        serviceIntent = Intent(this, GpsTripRecService::class.java)
+        serviceIntent = Intent(this, GlidingAssistanceService::class.java)
 
         // Create the interstitial.
         setUpMapIfNeeded()
@@ -318,7 +318,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
         progressDialog?.apply {
             setCancelable(true)
             setOnCancelListener(pdOnCancelListener)
-            setIcon(ResourcesCompat.getDrawable(resources, R.mipmap.ic_lanucher, theme))
+            setIcon(ResourcesCompat.getDrawable(resources, R.mipmap.ic_launcher, theme))
             setTitle(getString(R.string.app_name))
             setMessage(getString(R.string.WaitForGPS))
             show()
@@ -483,7 +483,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
             setTitle(resources.getString(R.string.SAVE_TRIP))
             setMessage(resources.getString(R.string.SaveDialog))
             setCancelable(true)
-            setIcon(ResourcesCompat.getDrawable(resources, R.mipmap.ic_lanucher, this@MainScreen.theme))
+            setIcon(ResourcesCompat.getDrawable(resources, R.mipmap.ic_launcher, this@MainScreen.theme))
             setPositiveButton(resources.getString(R.string.YES)) { dialog: DialogInterface, _: Int ->
                 dialog.dismiss()
                 saveTrip()
@@ -594,7 +594,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
 
     private fun backPressedDialog() {
         AlertDialog.Builder(this).apply {
-            setIcon(ResourcesCompat.getDrawable(resources, R.mipmap.ic_lanucher, this@MainScreen.theme))
+            setIcon(ResourcesCompat.getDrawable(resources, R.mipmap.ic_launcher, this@MainScreen.theme))
             setTitle(resources.getString(R.string.app_name))
             setMessage(resources.getString(R.string.StopAndExit))
             setCancelable(false)
@@ -733,7 +733,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
             service: IBinder
         ) {
             // We've bound to LocalService, cast the IBinder and get LocalService instance
-            val binder = service as LocalBinder
+            val binder = service as GlidingAssistanceService.LocalBinder
             recordingService = binder.service
             serviceBounded = true
         }

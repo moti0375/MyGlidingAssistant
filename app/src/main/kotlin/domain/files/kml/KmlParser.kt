@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.domain.files.kml
+package com.dunihuliapps.myglidingassistnat.domain.files.kml
 
 import com.google.android.gms.maps.model.LatLng
 import org.jdom2.Document

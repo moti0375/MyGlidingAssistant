@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.presentation.map
+package com.dunihuliapps.myglidingassistnat.presentation.map
 
 interface MapReadyListener {
     fun onMapReady()

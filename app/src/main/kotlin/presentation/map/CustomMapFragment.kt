@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.presentation.map
+package com.dunihuliapps.myglidingassistnat.presentation.map
 import android.annotation.SuppressLint
 import android.graphics.Canvas
 import android.graphics.Color
@@ -9,8 +9,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.domain.map_helper.ImageMarker
+import com.dunihuliapps.myglidingassistant.R
+import com.dunihuliapps.myglidingassistnat.domain.map_helper.ImageMarker
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener

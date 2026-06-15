@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.presentation.screens.settings_screen
+package com.dunihuliapps.myglidingassistnat.presentation.screens.settings_screen
 
 import android.util.Log
 import androidx.lifecycle.LiveData

@@ -1,9 +1,9 @@
-package com.bartovapps.gpstriprec.domain.di
+package com.dunihuliapps.myglidingassistnat.domain.di
 import android.content.Context
 import android.content.res.Resources
 import android.location.Geocoder
-import com.bartovapps.gpstriprec.domain.timer.TimerManager
-import com.bartovapps.gpstriprec.domain.timer.TripTimer
+import com.dunihuliapps.myglidingassistnat.domain.timer.TimerManager
+import com.dunihuliapps.myglidingassistnat.domain.timer.TripTimer
 import dagger.Binds
 import dagger.Module
 import dagger.Provides

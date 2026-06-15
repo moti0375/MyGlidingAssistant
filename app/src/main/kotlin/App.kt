@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec
+package com.dunihuliapps.myglidingassistnat
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp
 

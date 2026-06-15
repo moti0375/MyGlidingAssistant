@@ -1,4 +1,4 @@
-package com.bartovapps.gpstriprec.presentation.screens.trip_details_screen
+package com.dunihuliapps.myglidingassistnat.presentation.screens.trip_details_screen
 import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
@@ -23,24 +23,24 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
-import com.bartovapps.gpstriprec.GpsTripRecGallery
-import com.bartovapps.gpstriprec.R
-import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
-import com.bartovapps.gpstriprec.data.enums.DistanceUnits
-import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter
-import com.bartovapps.gpstriprec.domain.formatters.TimeFormatter
-import com.bartovapps.gpstriprec.domain.formatters.UnitsFormatter
-import com.bartovapps.gpstriprec.domain.map_helper.ImageMarker
-import com.bartovapps.gpstriprec.presentation.map.CustomSupportMapFragment
-import com.bartovapps.gpstriprec.presentation.map.InfoWindowClickListener
-import com.bartovapps.gpstriprec.presentation.map.MapReadyListener
-import com.bartovapps.gpstriprec.presentation.units_formatters.FeetFormatter
-import com.bartovapps.gpstriprec.presentation.units_formatters.KmhFormatter
-import com.bartovapps.gpstriprec.presentation.units_formatters.MetricAltFormatter
-import com.bartovapps.gpstriprec.presentation.units_formatters.MetricFormatter
-import com.bartovapps.gpstriprec.presentation.units_formatters.MillageFormatter
-import com.bartovapps.gpstriprec.presentation.units_formatters.MphFormatter
-import com.bartovapps.gpstriprec.utils.Utils
+import com.dunihuliapps.myglidingassistant.R
+import com.dunihuliapps.myglidingassistnat.GpsTripRecGallery
+import com.dunihuliapps.myglidingassistnat.data.enums.AltitudeUnits
+import com.dunihuliapps.myglidingassistnat.data.enums.DistanceUnits
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.HmsFormatter
+import com.dunihuliapps.myglidingassistnat.domain.formatters.TimeFormatter
+import com.dunihuliapps.myglidingassistnat.domain.formatters.UnitsFormatter
+import com.dunihuliapps.myglidingassistnat.domain.map_helper.ImageMarker
+import com.dunihuliapps.myglidingassistnat.presentation.map.CustomSupportMapFragment
+import com.dunihuliapps.myglidingassistnat.presentation.map.InfoWindowClickListener
+import com.dunihuliapps.myglidingassistnat.presentation.map.MapReadyListener
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.FeetFormatter
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.KmhFormatter
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricAltFormatter
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricFormatter
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MillageFormatter
+import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MphFormatter
+import com.dunihuliapps.myglidingassistnat.utils.Utils
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.SnapshotReadyCallback
 import com.google.android.gms.maps.model.Marker
@@ -136,7 +136,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
             setIcon(
                 ResourcesCompat.getDrawable(
                     resources,
-                    R.mipmap.ic_lanucher,
+                    R.mipmap.ic_launcher,
                     this@TripDetailsActivity.theme
                 )
             )

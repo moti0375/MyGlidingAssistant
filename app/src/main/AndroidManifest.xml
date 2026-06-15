@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.bartovapps.gpstriprec"
     android:installLocation="preferExternal">
 
     <permission
-        android:name="com.bartovapps.gpstriprec.permission.MAPS_RECEIVE"
+        android:name="com.dunihuliapps.myglidingassistnat.permission.MAPS_RECEIVE"
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.bartovapps.gpstriprec.permission.MAPS_RECEIVE" />
@@ -23,12 +22,12 @@
 
 
     <application
-        android:name="App"
+        android:name="com.dunihuliapps.myglidingassistnat.App"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_lanucher"
+        android:icon="@mipmap/ic_launcher"
         android:theme="@style/Theme.App">
         <activity
-            android:name=".presentation.screens.splash_screen.SplashScreen"
+            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.splash_screen.SplashScreen"
             android:clearTaskOnLaunch="false"
             android:exported="true"
             android:screenOrientation="portrait">
@@ -86,7 +85,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.screens.main_screen.MainScreen"
+            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen"
             android:alwaysRetainTaskState="true"
             android:exported="true"
             android:configChanges="orientation|screenSize"
@@ -97,48 +96,48 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".GpsRecTripsList"
+            android:name="com.dunihuliapps.myglidingassistnat.GpsRecTripsList"
             android:label="@string/RecordedTrips"
             android:screenOrientation="sensorPortrait"
             android:exported="true"
             android:theme="@style/ListViewTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".presentation.screens.main_screen.MainScreen" />
+                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen" />
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.screens.trip_details_screen.TripDetailsActivity"
+            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.trip_details_screen.TripDetailsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".GpsRecTripsList" />
+                android:value="com.dunihuliapps.myglidingassistnat.GpsRecTripsList" />
         </activity>
         <activity
-            android:name=".GpsRecLicense"
+            android:name="com.dunihuliapps.myglidingassistnat.GpsRecLicense"
             android:exported="false"
-            android:parentActivityName=".presentation.screens.main_screen.MainScreen"
+            android:parentActivityName="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".presentation.screens.main_screen.MainScreen" />
+                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen" />
         </activity>
         <activity
-            android:name=".presentation.screens.settings_screen.SettingsActivity"
+            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.settings_screen.SettingsActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/AppSettings"
-            android:parentActivityName=".presentation.screens.main_screen.MainScreen">
+            android:parentActivityName="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".presentation.screens.main_screen.MainScreen" />
+                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen" />
         </activity>
 
-        <service android:name=".services.GlidingAssistanceService"
+        <service android:name="com.dunihuliapps.myglidingassistnat.services.GlidingAssistanceService"
             android:foregroundServiceType="location"
             android:exported="false"/>
 
@@ -147,13 +146,13 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".GpsTripRecGallery"
+            android:name="com.dunihuliapps.myglidingassistnat.GpsTripRecGallery"
             android:label="@string/title_activity_gps_trip_rec_gallery"
-            android:parentActivityName=".presentation.screens.trip_details_screen.TripDetailsActivity"
+            android:parentActivityName="com.dunihuliapps.myglidingassistnat.presentation.screens.trip_details_screen.TripDetailsActivity"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".presentation.screens.trip_details_screen.TripDetailsActivity" />
+                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.trip_details_screen.TripDetailsActivity" />
         </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.

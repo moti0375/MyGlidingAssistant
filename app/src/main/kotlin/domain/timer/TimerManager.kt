@@ -1,6 +1,6 @@
-package com.bartovapps.gpstriprec.domain.timer
+package com.dunihuliapps.myglidingassistnat.domain.timer
 import android.os.Handler
-import com.bartovapps.gpstriprec.domain.di.QTimerThread
+import com.dunihuliapps.myglidingassistnat.domain.di.QTimerThread
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
