@@ -88,19 +88,8 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.trip_details_activity)
-        toolbar = findViewById(R.id.app_bar)
-        try {
-            setSupportActionBar(toolbar)
-        } catch (t: Throwable) {
-            // WTF SAMSUNG!
-        }
-        supportActionBar?.apply {
-            setLogo(R.drawable.ic_launcher)
-            setDisplayUseLogoEnabled(true)
-            setDisplayShowTitleEnabled(true)
-            setDisplayHomeAsUpEnabled(true)
-            setHomeAsUpIndicator(R.drawable.ic_action_back)
-        }
+
+
         prefs = getSharedPreferences("GPS_TRIP_RECORDER", Context.MODE_PRIVATE)
         setUpMapIfNeeded()
         initDisplayComponents()
@@ -286,6 +275,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     }
 
     private fun setDisplayers() {
+        Log.i("TripDetailsActivity", "setDisplayers: units: ${this.units}")
         if (this.units == Units.Millage) {
             speedDisplayer = MphFormatter()
             moveSpeedDisplayer = MphFormatter()

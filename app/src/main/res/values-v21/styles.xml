@@ -36,6 +36,5 @@
     </style>
 
     <style name="detail_text_view" parent="detail_text_view.base">
-        <item name="android:elevation">4dp</item>
     </style>
 </resources>
