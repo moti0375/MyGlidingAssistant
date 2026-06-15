@@ -50,7 +50,6 @@ import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
 import com.bartovapps.gpstriprec.data.enums.DistanceUnits
 import com.bartovapps.gpstriprec.data.enums.data.enums.SpeedUnits
 import com.bartovapps.gpstriprec.databinding.GpsRecorderMainMaterialBinding
-import com.bartovapps.gpstriprec.domain.files.kml.KmlParserImpl
 import com.bartovapps.gpstriprec.presentation.units_formatters.FeetFormatter
 import com.bartovapps.gpstriprec.domain.formatters.UnitsFormatter
 import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter
@@ -62,7 +61,6 @@ import com.bartovapps.gpstriprec.presentation.screens.settings_screen.SettingsAc
 import com.bartovapps.gpstriprec.presentation.units_formatters.presentation.units_formatters.KnotsFormatter
 import com.bartovapps.gpstriprec.services.GpsTripRecService
 import com.bartovapps.gpstriprec.services.GpsTripRecService.LocalBinder
-import com.bartovapps.gpstriprec.utils.Utils
 import com.google.android.gms.common.GooglePlayServicesUtil
 import dagger.hilt.android.AndroidEntryPoint
 import data.model.Trip
