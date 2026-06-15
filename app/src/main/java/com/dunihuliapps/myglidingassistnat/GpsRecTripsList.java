@@ -90,7 +90,7 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.recorderd_trips);
+        setContentView(R.layout.layout_recorded_flights);
         toolbar = findViewById(R.id.app_bar);
 
         try {
@@ -146,28 +146,11 @@ public class GpsRecTripsList extends AppCompatActivity implements MultiChoiceMod
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.trips_list_menu, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         if (item.getItemId() == android.R.id.home) {
             NavUtils.navigateUpFromSameTask(this);
         }
-        if (item.getItemId() == R.id.action_backup_trips) {
-            Toast.makeText(this, "Export Trips selected", Toast.LENGTH_SHORT).show();
-            exportTrips();
-        }
-
-        if (item.getItemId() == R.id.action_import_trips) {
-            Toast.makeText(this, "Import Trips selected", Toast.LENGTH_SHORT).show();
-            importTrips();
-        }
-
         return true;
     }
 

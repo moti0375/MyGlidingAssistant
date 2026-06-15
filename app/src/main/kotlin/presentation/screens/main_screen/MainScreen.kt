@@ -56,6 +56,7 @@ import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.KmhForm
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricAltFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.map.CustomSupportMapFragment
 import com.dunihuliapps.myglidingassistnat.presentation.map.MapReadyListener
+import com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen
 import com.dunihuliapps.myglidingassistnat.presentation.screens.settings_screen.SettingsActivity
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.presentation.units_formatters.KnotsFormatter
 import com.dunihuliapps.myglidingassistnat.services.GlidingAssistanceService
@@ -119,7 +120,11 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
             insets
         }
 
+
         setSupportActionBar(binding.appBar)
+        supportActionBar?.apply {
+            title = null
+        }
 
         settings = PreferenceManager.getDefaultSharedPreferences(this)
         settings.registerOnSharedPreferenceChangeListener(this)
@@ -128,9 +133,15 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
         progressDialog = ProgressDialog(this)
         serviceIntent = Intent(this, GlidingAssistanceService::class.java)
 
-        // Create the interstitial.
         setUpMapIfNeeded()
         subscribeTimerChanges()
+        setupUiComponents()
+    }
+
+    private fun setupUiComponents() {
+        binding.fabStartStop.setOnClickListener {
+            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.StartStopButtonClicked)
+        }
     }
 
     private fun observeTripState() {
@@ -323,15 +334,15 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
             setMessage(getString(R.string.WaitForGPS))
             show()
         }
+        binding.imRecording.visibility = View.VISIBLE
 
-        imRecording?.visibility = View.VISIBLE
     }
 
     private fun stopRecording() {
         disableLocationListener(fixListener)
         disableGpsLocationListener(trackLocationListener)
         tripManagerViewModel.addTripEvent(mainScreenViewModelEvent = MainScreenViewModelEvent.StopTrip)
-        imRecording?.visibility = View.GONE
+        binding.imRecording.visibility = View.GONE
         binding.fabStartStop.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_action_new, this.theme))
         binding.fabCamera.visibility = View.INVISIBLE
         stopService()
@@ -429,7 +440,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_trips -> {
-                val tripListIntent = Intent(this, GpsRecTripsList::class.java)
+                val tripListIntent = Intent(this, FlightsListScreen::class.java)
                 startActivityForResult(
                     tripListIntent,
                     resources.getInteger(R.integer.GPS_TRIPS_LIST)

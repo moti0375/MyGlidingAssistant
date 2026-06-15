@@ -5,9 +5,8 @@
     <item
         android:id="@+id/action_delete_trip"
         android:orderInCategory="100"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:icon="@drawable/ic_action_delete"
-        android:iconTint="@color/black"
         android:title="Delete Trip" />
 
     <item
@@ -15,15 +14,22 @@
         android:orderInCategory="200"
         app:showAsAction="always"
         android:icon="@drawable/ic_action_edit"
-        android:iconTint="@color/black"
+        android:iconTint="@color/TtansBlack"
         android:title="Edit Trip Title" />
+
+    <item
+        android:id="@+id/action_merge_trips"
+        android:orderInCategory="300"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_merge"
+        android:visible="false"
+        android:title="Merge Trips" />
 
     <item
         android:id="@+id/action_upload_trip"
         android:orderInCategory="400"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:icon="@drawable/ic_action_upload"
-        android:iconTint="@color/black"
         android:visible="false"
         android:title="Upload Trip" />
 </menu>

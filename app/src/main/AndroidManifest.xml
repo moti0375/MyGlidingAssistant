@@ -119,7 +119,7 @@
                 android:value="com.dunihuliapps.myglidingassistnat.GpsRecTripsList" />
         </activity>
         <activity
-            android:name="com.dunihuliapps.myglidingassistnat.GpsRecLicense"
+            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen"
             android:exported="false"
             android:parentActivityName="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen"
             android:screenOrientation="portrait">

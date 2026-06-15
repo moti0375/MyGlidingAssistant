@@ -6,7 +6,6 @@
     android:background="@color/primaryColor"
     app:theme="@style/MyCustomToolBarTheme"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
-    android:elevation="@dimen/toolbarElevation"
     android:layout_marginTop="@dimen/appBarTopMargin"
     android:textDirection="ltr"
     android:layoutDirection="ltr">
