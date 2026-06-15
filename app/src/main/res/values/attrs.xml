@@ -4,5 +4,11 @@
         <attr name="indicator_text" format="string" />
         <attr name="start_icon" format="reference" />
         <attr name="end_icon" format="reference" />
+
+        <attr name="indicator_text_weight">
+            <enum name="normal" value="0" />
+            <enum name="bold" value="1" />
+        </attr>
+
     </declare-styleable>
 </resources>

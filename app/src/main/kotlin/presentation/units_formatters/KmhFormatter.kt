@@ -10,7 +10,7 @@ class KmhFormatter : BaseUnitFormatter() {
 
     override fun formatUnits(data: Double): SpannableString {
         // km\h = m\sec * 3.6
-        speedBuilder.replace(0, speedBuilder.length, String.format(Locale.getDefault(), "%.1f", (data * 3.6)))
+        speedBuilder.replace(0, speedBuilder.length, String.format(Locale.getDefault(), "%d", (data * 3.6).toInt()))
         return createSpannable(speedBuilder.toString())
     }
 }

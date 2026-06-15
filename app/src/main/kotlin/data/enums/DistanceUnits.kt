@@ -1,5 +1,5 @@
 package com.bartovapps.gpstriprec.data.enums
-enum class Units {
+enum class DistanceUnits {
     Metric,
     Millage
 }

@@ -1,90 +1,95 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="app_name">GPS маршрут регистратор</string>
-  <string name="action_settings">Установки</string>
-  <string name="SpeedHeader">СКОРОСТЬ</string>
-  <string name="BearingHeader">BEARING</string>
-  <string name="DistanceHeader">РАССТОЯНИЕ</string>
-  <string name="LatitudeHeader">ШИРОТА</string>
-  <string name="LongitudeHeader">ДОЛГОТА</string>
-  <string name="ClearMeas">CLEAR MEAS</string>
-  <string name="Close">ЗАКРЫТЬ</string>
-  <string name="NewTrip">НОВАЯ ПОЕЗДКА</string>
-  <string name="StopTrip">ОСТАНОВИТЬ ПОЕЗДКУ</string>
-  <string name="SAVE_TRIP">Сохранить маршрут</string>
-  <string name="SaveDialog">Сохранить маршрут?</string>
-  <string name="SavingTrip">Сохранение поездки.. ждите</string>
-  <string name="noMusicPlayer">Музыкальный плеер не может быть найден</string>
-  <string name="updateGPlayServices">Обновите Google Play сервис и попробуйте вновь...</string>
-  <string name="ServicesDisconnected">Не может подключиться к Google Play сервису...</string>
-  <string name="UnableInitMap">Не может инициализировать карту...</string>
-  <string name="StopAndExit">Остановит запись и выйти?</string>
-  <string name="TripLoaded">Маршрут загружен</string>
-  <string name="ContinueLoadedTrip">Продолжить загруженного маршрута?</string>
-  <string name="DELETE_TRIP">Удалить поездку?</string>
-  <string name="DeleteDialog">Удалить выбранные поездки?</string>
-  <string name="NoGPSHead">GPS не включен</string>
-  <string name="NoGPSBody">GPS не включен, включить?</string>
-  <string name="WaitForGPS">Подождите, GPS для определения вашего местоположения</string>
-  <string name="LocationFounded">Ваше местоположение обнаруженный! Вы можете начать ходьба, бег, или ездить на велосипеде! счастливого пути!</string>
-  <string name="Goodbye">Досвидания..</string>
-  <!-- Trip Manager -->
-  <string name="NotEnoughData">Недостаточно данных о поездке, поездка не будет сохранена..</string>
-  <string name="YES">Да</string>
-  <string name="NO">Нет</string>
-  <!-- Settings onItemSelection Strings -->
-  <string name="RecordedTrips">Сохранённые маршруты</string>
-  <string name="GoogleAggreement">Google лицензия</string>
-  <string name="AppSettings">Установки</string>
-  <string name="StartMusicPlayer">Музыкальный плеер</string>
-  <!-- Settings strings -->
-  <string name="UnitsCategory">Единицы</string>
-  <string name="UnitsPrefTitle">Скорость и расстояние</string>
-  <string name="UnitsPrefSummary">Единица которые будут показаны</string>
-  <string name="AltitudePrefTitle">Единицы высоты</string>
-  <string name="AltitudeUnitsPrefSummary">Единицы высоты которые будут показаны</string>
-  <string name="MapCategory">Опции карты</string>
-  <string name="LineColorTitle">Цвет линий на карте</string>
-  <string name="LineColorSummary">Карта ломаная цвет</string>
-  <string name="ZoomTitle">Карта Увеличить</string>
-  <string name="ZoomSummary">Карта точка зрения наезд</string>
-  <string name="LineWidthTitle">Карта ломаная ширина</string>
-  <string name="LineWidthSummary"></string>
-  <string name="SavingOptionsCategory">Маршрут опции записи</string>
-  <string name="AutoSaveSummary"></string>
-  <string name="AutoSaveTitle">Маршрут автосохранения вариантов</string>
-  <!-- Recorded Trip Tabs Activity -->
-  <string name="RecordedDetailedTitle">Детали маршрута</string>
-  <string name="When">Когда</string>
-  <string name="Duration">Продолжительность</string>
-  <string name="Distance">Расстояние</string>
-  <string name="AvSpeed">Средняя скорость</string>
-  <string name="MaxSpeed">Мах. скорость</string>
-  <string name="From">Пункт отправления</string>
-  <string name="To">Конечный пункт</string>
-  <string name="NoGoogleEarth">Не установлен Google Earth на вашем устройстве\nХотите установить сейчас?</string>
-  <string name="GooglePlayError">Google Play магазин не может быть найден или запущен, Установите Google Планета Земля и попробуйте снова!</string>
-  <!-- Recorded Trip Map Tab Activity -->
-  <string name="MapUnavailable">Сохраненные карта маршрута файл не может быть найден</string>
-  <string name="displaying_trip">Открытие карту маршрута, пожалуйста, подождите...</string>
-  <!-- Recorded Trip Details Tabs Activity -->
-  <string name="unavailable_data">Данные недоступны.. </string>
-  <!-- Recorded Trips List Activity -->
-  <string name="NoTripsHint">Нет сохраненных маршрутов...</string>
-  <string name="TripTitleDialogTitle">Изменить название маршрута</string>
-  <string name="EnterTripTitle">Введите название маршрута</string>
-  <string name="Done">Готово</string>
-  <string name="Cancel">Отменить</string>
-  <string name="Trip">Маршрут</string>
-  <string name="Trips">Маршруты</string>
-  <string name="NoTitleHint">Без названия...</string>
-  <string name="MergeTrips">Объединить эти маршруты?</string>
-  <string name="MergeingTrips">Консолидация маршруты, пожалуйста, подождите..</string>
-  <string name="ContinuousMergerTrips">Объединенные поездки должен быть непрерывным с не более, чем 300 метров</string>
-  <string name="Completed">Готово</string>
-  <string name="UploadTrip">Загрузить этот маршрут?</string>
-  <!-- License Activity -->
-  <string name="GooglePlayServicesUnavailable">Сервис Google Play не установлен на этом устройстве</string>
+    <string name="app_name">GPS маршрут регистратор</string>
+    <string name="action_settings">Установки</string>
+    <string name="SpeedHeader">СКОРОСТЬ</string>
+    <string name="BearingHeader">BEARING</string>
+    <string name="DistanceHeader">РАССТОЯНИЕ</string>
+    <string name="LatitudeHeader">ШИРОТА</string>
+    <string name="LongitudeHeader">ДОЛГОТА</string>
+    <string name="ClearMeas">CLEAR MEAS</string>
+    <string name="Close">ЗАКРЫТЬ</string>
+    <string name="NewTrip">НОВАЯ ПОЕЗДКА</string>
+    <string name="StopTrip">ОСТАНОВИТЬ ПОЕЗДКУ</string>
+    <string name="SAVE_TRIP">Сохранить маршрут</string>
+    <string name="SaveDialog">Сохранить маршрут?</string>
+    <string name="SavingTrip">Сохранение поездки.. ждите</string>
+    <string name="noMusicPlayer">Музыкальный плеер не может быть найден</string>
+    <string name="updateGPlayServices">Обновите Google Play сервис и попробуйте вновь...</string>
+    <string name="ServicesDisconnected">Не может подключиться к Google Play сервису...</string>
+    <string name="UnableInitMap">Не может инициализировать карту...</string>
+    <string name="StopAndExit">Остановит запись и выйти?</string>
+    <string name="TripLoaded">Маршрут загружен</string>
+    <string name="ContinueLoadedTrip">Продолжить загруженного маршрута?</string>
+    <string name="DELETE_TRIP">Удалить поездку?</string>
+    <string name="DeleteDialog">Удалить выбранные поездки?</string>
+    <string name="NoGPSHead">GPS не включен</string>
+    <string name="NoGPSBody">GPS не включен, включить?</string>
+    <string name="WaitForGPS">Подождите, GPS для определения вашего местоположения</string>
+    <string name="LocationFounded">Ваше местоположение обнаруженный! Вы можете начать ходьба, бег, или ездить на велосипеде! счастливого пути!</string>
+    <string name="Goodbye">Досвидания..</string>
+    <!-- Trip Manager -->
+    <string name="NotEnoughData">Недостаточно данных о поездке, поездка не будет сохранена..</string>
+    <string name="YES">Да</string>
+    <string name="NO">Нет</string>
+    <!-- Settings onItemSelection Strings -->
+    <string name="RecordedTrips">Сохранённые маршруты</string>
+    <string name="GoogleAggreement">Google лицензия</string>
+    <string name="AppSettings">Установки</string>
+    <string name="StartMusicPlayer">Музыкальный плеер</string>
+    <!-- Settings strings -->
+    <string name="unites_category">Единицы</string>
+
+    <string name="distance_units_pref_title">расстояние</string>
+    <string name="distance_units_pref_summary">Единицы измерения, в которых будет отображаться расстояние</string>
+
+    <string name="speed_units_pref_title">скорость</string>
+    <string name="speed_units_pref_summary">Единицы измерения, в которых будет отображаться скорость</string>
+
+    <string name="AltitudePrefTitle">высота</string>
+    <string name="AltitudeUnitsPrefSummary">Единицы высоты которые будут показаны</string>
+    <string name="MapCategory">Опции карты</string>
+    <string name="LineColorTitle">Цвет линий на карте</string>
+    <string name="LineColorSummary">Карта ломаная цвет</string>
+    <string name="ZoomTitle">Карта Увеличить</string>
+    <string name="ZoomSummary">Карта точка зрения наезд</string>
+    <string name="LineWidthTitle">Карта ломаная ширина</string>
+    <string name="LineWidthSummary"></string>
+    <string name="SavingOptionsCategory">Маршрут опции записи</string>
+    <string name="AutoSaveSummary"></string>
+    <string name="AutoSaveTitle">Маршрут автосохранения вариантов</string>
+    <!-- Recorded Trip Tabs Activity -->
+    <string name="RecordedDetailedTitle">Детали маршрута</string>
+    <string name="When">Когда</string>
+    <string name="Duration">Продолжительность</string>
+    <string name="Distance">Расстояние</string>
+    <string name="AvSpeed">Средняя скорость</string>
+    <string name="MaxSpeed">Мах. скорость</string>
+    <string name="From">Пункт отправления</string>
+    <string name="To">Конечный пункт</string>
+    <string name="NoGoogleEarth">Не установлен Google Earth на вашем устройстве\nХотите установить сейчас?</string>
+    <string name="GooglePlayError">Google Play магазин не может быть найден или запущен, Установите Google Планета Земля и попробуйте снова!</string>
+    <!-- Recorded Trip Map Tab Activity -->
+    <string name="MapUnavailable">Сохраненные карта маршрута файл не может быть найден</string>
+    <string name="displaying_trip">Открытие карту маршрута, пожалуйста, подождите...</string>
+    <!-- Recorded Trip Details Tabs Activity -->
+    <string name="unavailable_data">Данные недоступны.. </string>
+    <!-- Recorded Trips List Activity -->
+    <string name="NoTripsHint">Нет сохраненных маршрутов...</string>
+    <string name="TripTitleDialogTitle">Изменить название маршрута</string>
+    <string name="EnterTripTitle">Введите название маршрута</string>
+    <string name="Done">Готово</string>
+    <string name="Cancel">Отменить</string>
+    <string name="Trip">Маршрут</string>
+    <string name="Trips">Маршруты</string>
+    <string name="NoTitleHint">Без названия...</string>
+    <string name="MergeTrips">Объединить эти маршруты?</string>
+    <string name="MergeingTrips">Консолидация маршруты, пожалуйста, подождите..</string>
+    <string name="ContinuousMergerTrips">Объединенные поездки должен быть непрерывным с не более, чем 300 метров</string>
+    <string name="Completed">Готово</string>
+    <string name="UploadTrip">Загрузить этот маршрут?</string>
+    <!-- License Activity -->
+    <string name="GooglePlayServicesUnavailable">Сервис Google Play не установлен на этом устройстве</string>
     <string name="TripSaved">Маршрут успешно сохранены</string>
     <string name="AvMoveSpeed">Средняя скорость в движении</string>
     <string name="MaxAltitudeHeader">Макс высота над уровнем моря</string>
@@ -102,6 +107,6 @@
     <string name="share_map_image">Совместное использование карты</string>
     <string name="share_kml">Поделиться KML файл</string>
     <string name="error_access_attachment">Ошибка доступа к файловой</string>
-  <string name="unable_to_open_kml">Не удалось загрузить файл или файл карты не поддерживается!</string>
-  <string name="title_activity_gps_trip_rec_gallery">Маршрутный галерея</string>
+    <string name="unable_to_open_kml">Не удалось загрузить файл или файл карты не поддерживается!</string>
+    <string name="title_activity_gps_trip_rec_gallery">Маршрутный галерея</string>
 </resources>

@@ -1,6 +1,5 @@
 package com.bartovapps.gpstriprec.services;
 
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -17,7 +16,7 @@ import androidx.core.app.NotificationCompat;
 
 import com.bartovapps.gpstriprec.R;
 import com.bartovapps.gpstriprec.data.enums.AltitudeUnits;
-import com.bartovapps.gpstriprec.data.enums.Units;
+import com.bartovapps.gpstriprec.data.enums.DistanceUnits;
 import com.bartovapps.gpstriprec.presentation.screens.main_screen.MainScreen;
 
 /**
@@ -28,7 +27,7 @@ public class GpsTripRecService extends Service {
     NotificationManager notificationManager;
     NotificationCompat.Builder mBuilder;
     private SharedPreferences settings;
-    private Units units = Units.Metric;
+    private DistanceUnits distanceUnits = DistanceUnits.Metric;
     private AltitudeUnits altUnits = AltitudeUnits.Feet;
 
 
@@ -89,7 +88,7 @@ public class GpsTripRecService extends Service {
     }
 
     private void updateNotification(float distance) {
-        if (units == Units.Millage) {
+        if (distanceUnits == DistanceUnits.Millage) {
             mBuilder.setContentText(getString(R.string.Distance)+ ": " + String.format("%.1f Km", distance / 1609.34));
         } else {
             mBuilder.setContentText(getString(R.string.Distance)+ ": " + (distance < 1000 ? String.format("%.1f M", distance) : String.format("%.1f Km", distance / 1000)));
@@ -101,29 +100,22 @@ public class GpsTripRecService extends Service {
 
     private void updatePreferences() {
         int units = Integer.parseInt(settings.getString(getResources()
-                .getString(R.string.units), "1"));
+                .getString(R.string.distance_units_key), "1"));
         int altitudeUnits = Integer.parseInt(settings.getString(getResources()
-                .getString(R.string.altitudeUnitsKey), "1"));
+                .getString(R.string.altitude_units_key), "1"));
 
         // Log.i(LOG_TAG, "Selected units: " + units);
 
-        switch (units) {
-            case 1:
-                this.units = Units.Metric;
-                break;
-            case 2:
-                this.units = Units.Millage;
-                break;
+        if (units == 2) {
+            this.distanceUnits = DistanceUnits.Millage;
+        } else {
+            this.distanceUnits = DistanceUnits.Metric;
         }
 
-        switch (altitudeUnits) {
-            case 1:
-                this.altUnits = AltitudeUnits.Feet;
-                break;
-            case 2:
-                this.altUnits = AltitudeUnits.Metric;
-                break;
+        if(altitudeUnits == 2){
+            this.altUnits = AltitudeUnits.Metric;
+        } else {
+            this.altUnits = AltitudeUnits.Feet;
         }
-
     }
 }

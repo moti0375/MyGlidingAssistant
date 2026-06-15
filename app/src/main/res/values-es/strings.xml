@@ -48,11 +48,14 @@
     
     
     <!-- Settings strings -->
-    <string name="UnitsCategory">Unidades</string>
-    <string name="UnitsPrefTitle">Vvelocidad y la distancia</string>
-    <string name="UnitsPrefSummary">Las unidades que se mostrarán</string>
-    
-    <string name="AltitudePrefTitle">Unidades de altitud</string>
+    <string name="unites_category">Unidades</string>
+    <string name="distance_units_pref_title">Distancia</string>
+    <string name="distance_units_pref_summary">Las distancia unidades que se mostrarán</string>
+
+    <string name="speed_units_pref_title">Vvelocidad</string>
+    <string name="speed_units_pref_summary">Las vvelocidad unidades que se mostrarán</string>
+
+    <string name="AltitudePrefTitle">Altitud</string>
     <string name="AltitudeUnitsPrefSummary">Las altitud unidades que se mostrarán</string>
     
     <string name="MapCategory">Opciones de Mapa</string>

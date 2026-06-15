@@ -1,6 +1,7 @@
 package com.bartovapps.gpstriprec.views.text_indicator
 
 import android.content.Context
+import android.graphics.Typeface
 import android.text.SpannableString
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -25,6 +26,10 @@ class TextIndicator @JvmOverloads constructor(
             // Set Text
             val text = typedArray.getString(R.styleable.TextIndicator_indicator_text)
             binding.tvIndicatorText.text = text
+
+            // --- New: Set Text Weight ---
+            val weight = typedArray.getInt(R.styleable.TextIndicator_indicator_text_weight, 0)
+            setTextWeight(weight)
 
             // Set Start Icon
             val startRes = typedArray.getResourceId(R.styleable.TextIndicator_start_icon, -1)
@@ -54,6 +59,12 @@ class TextIndicator @JvmOverloads constructor(
         set(value) {
             binding.tvIndicatorText.text = value
         }
+
+    fun setTextWeight(weight: Int) {
+        val style = if (weight == 1) Typeface.BOLD else Typeface.NORMAL
+        binding.tvIndicatorText.setTypeface(null, style)
+    }
+
 
     fun setStartIcon(resId: Int) {
         binding.ivStartIcon.setImageResource(resId)

@@ -129,11 +129,10 @@
                 android:value=".presentation.screens.main_screen.MainScreen" />
         </activity>
         <activity
-            android:name=".GpsRecPrefs"
+            android:name=".presentation.screens.settings_screen.SettingsActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/AppSettings"
-            android:parentActivityName=".presentation.screens.main_screen.MainScreen"
-            android:theme="@style/SettingsTheme">
+            android:parentActivityName=".presentation.screens.main_screen.MainScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".presentation.screens.main_screen.MainScreen" />

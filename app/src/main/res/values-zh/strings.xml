@@ -48,10 +48,13 @@
     
     
     <!-- Settings strings -->
-    <string name="UnitsCategory">單位</string>
-    <string name="UnitsPrefTitle">速度和距離</string>
-    <string name="UnitsPrefSummary">將要顯示的單元</string>
-    
+    <string name="unites_category">單位</string>
+    <string name="distance_units_pref_title">距離</string>
+    <string name="distance_units_pref_summary">距離將顯示的單位</string>
+
+    <string name="speed_units_pref_title">速度</string>
+    <string name="speed_units_pref_summary">速度數據將顯示的單位</string>
+
     <string name="AltitudePrefTitle">高度單位</string>
     <string name="AltitudeUnitsPrefSummary">度將要顯示的單元</string>
     

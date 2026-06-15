@@ -38,9 +38,12 @@
     
     
     <!-- Settings strings -->
-    <string name="UnitsCategory">יחידות מדידה</string>
-    <string name="UnitsPrefTitle">מהירות ומרחק</string>
-    <string name="UnitsPrefSummary">היחידות בהן יוצגו נתוני מהירות ומרחק</string>
+    <string name="unites_category">יחידות מדידה</string>
+    <string name="distance_units_pref_title">מרחק</string>
+    <string name="distance_units_pref_summary">היחידות בהן יוצגו נתוני המרחק</string>
+
+    <string name="speed_units_pref_title">מהירות</string>
+    <string name="speed_units_pref_summary">היחידות בהן יוצגו נתוני המהירות</string>
     
     <string name="AltitudePrefTitle">גובה</string>
     <string name="AltitudeUnitsPrefSummary">היחידות בהן יוצגו נתוני הגובה</string>

@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-    <string-array name="units_enteries">
+    <string-array name="units_entries">
         <item name="Metric">מטר/קמ״ש</item>
         <item name="Milage">מייל/מיי״ש</item>
         </string-array>
-    <string-array name="altitude_units_enteries">
+    <string-array name="altitude_units_entries">
         <item name="Feet">רגל</item>
         <item name="Metric">מטרים</item>
     </string-array>
     
-    <string-array name="line_color_enteries">
+    <string-array name="line_color_entries">
         <item name="Red">אדום</item>
         <item name="Green">ירוק</item>
         <item name="Yellow">צהוב</item>
         <item name="Blue">כחול</item>
      </string-array>
      
-    <string-array name="line_width_enteries">
+    <string-array name="line_width_entries">
         <item name="Thin">דק</item>
         <item name="Thick">עבה</item>
         <item name="Thicker">עבה מאד</item>
      </string-array>
 
-    <string-array name="AutoSaveEnteries">
+    <string-array name="auto_save_entries">
         <item name="true">שמירה אוטומטית</item>
         <item name="false">שאל אותי האם לשמור המסלול</item>
     </string-array>
 
-    <string-array name="zoom_enteries">
+    <string-array name="zoom_entries">
         <item name="8">מדינה</item>
         <item name="12">עיר</item>
         <item name="15">שכונה</item>

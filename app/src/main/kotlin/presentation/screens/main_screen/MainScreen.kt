@@ -1,14 +1,13 @@
 package com.bartovapps.gpstriprec.presentation.screens.main_screen
 
+import android.Manifest
 import com.bartovapps.gpstriprec.presentation.units_formatters.MetricFormatter
 import com.bartovapps.gpstriprec.presentation.units_formatters.MillageFormatter
-import com.bartovapps.gpstriprec.presentation.units_formatters.MphFormatter
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.app.DialogFragment
 import android.app.ProgressDialog
-import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.DialogInterface
 import android.content.Intent
@@ -35,6 +34,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.FileProvider
@@ -42,12 +42,13 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import com.bartovapps.gpstriprec.GpsRecLicense
-import com.bartovapps.gpstriprec.GpsRecPrefs
 import com.bartovapps.gpstriprec.GpsRecTripsList
 import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
-import com.bartovapps.gpstriprec.data.enums.Units
+import com.bartovapps.gpstriprec.data.enums.DistanceUnits
+import com.bartovapps.gpstriprec.data.enums.data.enums.SpeedUnits
 import com.bartovapps.gpstriprec.presentation.units_formatters.FeetFormatter
 import com.bartovapps.gpstriprec.domain.formatters.UnitsFormatter
 import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter
@@ -55,6 +56,8 @@ import com.bartovapps.gpstriprec.presentation.units_formatters.KmhFormatter
 import com.bartovapps.gpstriprec.presentation.units_formatters.MetricAltFormatter
 import com.bartovapps.gpstriprec.presentation.map.CustomSupportMapFragment
 import com.bartovapps.gpstriprec.presentation.map.MapReadyListener
+import com.bartovapps.gpstriprec.presentation.screens.settings_screen.SettingsActivity
+import com.bartovapps.gpstriprec.presentation.units_formatters.presentation.units_formatters.KnotsFormatter
 import com.bartovapps.gpstriprec.services.GpsTripRecService
 import com.bartovapps.gpstriprec.services.GpsTripRecService.LocalBinder
 import com.bartovapps.gpstriprec.views.text_indicator.TextIndicator
@@ -91,7 +94,8 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
 
     private lateinit var lm: LocationManager
     private lateinit var settings: SharedPreferences
-    private var units = Units.Metric
+    private var distanceUnits = DistanceUnits.Metric
+    private var speedUnits = SpeedUnits.Metric
     private var altUnits = AltitudeUnits.Feet
 
     private var progressDialog: ProgressDialog? = null
@@ -126,7 +130,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         toolbar = findViewById(R.id.app_bar)
         setSupportActionBar(toolbar)
 
-        settings = this.getSharedPreferences("GPS_TRIP_RECORDER", MODE_PRIVATE)
+        settings = PreferenceManager.getDefaultSharedPreferences(this)
         settings.registerOnSharedPreferenceChangeListener(prefListener)
         handler = Handler(Looper.getMainLooper())
         lm = getSystemService(LOCATION_SERVICE) as LocationManager
@@ -237,28 +241,35 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     // Invoke displayInterstitial() when you are ready to display an
     // interstitial.
     private fun updatePreferences() {
-        val units = settings.getInt(resources.getString(R.string.units), 1)
-        val color = settings.getInt(resources.getString(R.string.LineColorPref), 1)
-        val zoom = settings.getFloat(
+        val distanceUnits = settings.getString(resources.getString(R.string.distance_units_key), "1")?.toInt()
+        val speedUnits = settings.getString(resources.getString(R.string.speed_units_key), "1")?.toInt()
+        val color = settings.getString(resources.getString(R.string.LineColorPref), "1")?.toInt()
+        val zoom = settings.getString(
             resources
-                .getString(R.string.ZoomPref), 15f
-        )
-        val width = settings.getFloat(resources.getString(R.string.LineWidthPref), 5f)
-        val altitudeUnits = settings.getInt(
+                .getString(R.string.ZoomPref), "15f"
+        )?.toFloat() ?: 15f
+        val width = settings.getString(resources.getString(R.string.LineWidthPref), "5f")?.toFloat() ?: 5f
+        val altitudeUnits = settings.getString(
             resources
-                .getString(R.string.altitudeUnitsKey), 1
-        )
+                .getString(R.string.altitude_units_key), "1"
+        )?.toInt()
 
-        if (units == 2) {
-            this.units = Units.Millage
+        if (distanceUnits == 2) {
+            this.distanceUnits = DistanceUnits.Millage
         } else {
-            this.units = Units.Metric
+            this.distanceUnits = DistanceUnits.Metric
         }
 
         if (altitudeUnits == 1) {
             this.altUnits = AltitudeUnits.Feet
         } else {
             this.altUnits = AltitudeUnits.Metric
+        }
+
+        if (speedUnits == 1) {
+            this.speedUnits = SpeedUnits.Metric
+        } else {
+            this.speedUnits = SpeedUnits.Knots
         }
 
         setFormatters()
@@ -278,12 +289,16 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     }
 
     private fun setFormatters() {
-        if (units == Units.Millage) {
-            speedFormatter = MphFormatter()
-            distanceFormatter = MillageFormatter()
+        distanceFormatter = if(distanceUnits == DistanceUnits.Millage) {
+            MillageFormatter()
         } else {
-            speedFormatter = KmhFormatter()
-            distanceFormatter = MetricFormatter()
+            MetricFormatter()
+        }
+
+        speedFormatter = if(speedUnits == SpeedUnits.Knots) {
+            KnotsFormatter()
+        } else {
+            KmhFormatter()
         }
 
         altitudeFormatter = if (altUnits == AltitudeUnits.Feet) {
@@ -350,6 +365,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
 
 
     private val fixListener = object : LocationListener {
+        @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
         override fun onLocationChanged(location: Location) {
             disableGpsLocationListener(this)
             progressDialog?.let {
@@ -390,6 +406,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         super.onDestroy()
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun enableGPSLocationListener(listener: LocationListener) {
         lm.requestLocationUpdates(
             LocationManager.GPS_PROVIDER, TIME_INTERVAL,
@@ -405,6 +422,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun enableLocationListener(
         listener: LocationListener
     ) {
@@ -439,8 +457,8 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
             }
 
             R.id.action_settigns -> {
-                val settings_intent = Intent(this, GpsRecPrefs::class.java)
-                startActivity(settings_intent)
+                val settingsIntent = Intent(this, SettingsActivity::class.java)
+                startActivity(settingsIntent)
             }
 
             R.id.action_license -> {
@@ -531,6 +549,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
     /* Called from ErrorDialogFragment when the dialog is dismissed. */
 
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     override fun onMapReady() {
         Log.i(TAG, "onMapReady: ")
         val topPadding = findViewById<View>(R.id.llGauges).measuredHeight
@@ -540,6 +559,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         moveMapToInitialPosition()
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun moveMapToInitialPosition() {
         var path: String? = null
 
@@ -572,6 +592,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener {
         }
     }
 
+    @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
     private fun moveToLastKnownLocation() {
         val networkProvider = LocationManager.NETWORK_PROVIDER
         val lastKnownLocation = lm.getLastKnownLocation(networkProvider)

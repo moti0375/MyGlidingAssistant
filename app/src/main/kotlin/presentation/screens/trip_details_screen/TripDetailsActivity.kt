@@ -3,7 +3,6 @@ import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.ContentValues
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
@@ -12,7 +11,6 @@ import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
@@ -24,10 +22,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.PreferenceManager
 import com.bartovapps.gpstriprec.GpsTripRecGallery
 import com.bartovapps.gpstriprec.R
 import com.bartovapps.gpstriprec.data.enums.AltitudeUnits
-import com.bartovapps.gpstriprec.data.enums.Units
+import com.bartovapps.gpstriprec.data.enums.DistanceUnits
 import com.bartovapps.gpstriprec.presentation.units_formatters.HmsFormatter
 import com.bartovapps.gpstriprec.domain.formatters.TimeFormatter
 import com.bartovapps.gpstriprec.domain.formatters.UnitsFormatter
@@ -80,7 +79,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     private lateinit var altitudeDisplayer: UnitsFormatter
     private val timeFormatter: TimeFormatter = HmsFormatter()
     private lateinit var mapFragment: CustomSupportMapFragment
-    private var units: Units = Units.Metric
+    private var distanceUnits: DistanceUnits = DistanceUnits.Metric
     private var altUnits: AltitudeUnits = AltitudeUnits.Feet
 
     private val detailsViewModel by viewModels<TripDetailsViewModel>()
@@ -90,7 +89,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         setContentView(R.layout.trip_details_activity)
 
 
-        prefs = getSharedPreferences("GPS_TRIP_RECORDER", Context.MODE_PRIVATE)
+        prefs = PreferenceManager.getDefaultSharedPreferences(this)
         setUpMapIfNeeded()
         initDisplayComponents()
         observeViewModelState()
@@ -195,13 +194,13 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     }
 
     private fun updatePreferences() {
-        val color = prefs.getInt(resources.getString(R.string.LineColorPref), 1)
-        this.lineWidth = prefs.getFloat(resources.getString(R.string.LineWidthPref), 5.0f)
-        val speedUnits = prefs.getInt(resources.getString(R.string.units), 1)
-        val altUnits = prefs.getInt(resources.getString(R.string.altitudeUnitsKey), 1)
-        when (speedUnits) {
-            1 -> this.units = Units.Metric
-            2 -> this.units = Units.Millage
+        val color = prefs.getString(resources.getString(R.string.LineColorPref), "1")?.toInt()
+        this.lineWidth = prefs.getString(resources.getString(R.string.LineWidthPref), "5.0f")?.toFloat() ?: 5f
+        val distanceUnits = prefs.getString(resources.getString(R.string.distance_units_key), "1")?.toInt()
+        val altUnits = prefs.getString(resources.getString(R.string.altitude_units_key), "1")?.toInt()
+        when (distanceUnits) {
+            1 -> this.distanceUnits = DistanceUnits.Metric
+            2 -> this.distanceUnits = DistanceUnits.Millage
         }
 
         when (altUnits) {
@@ -275,8 +274,8 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     }
 
     private fun setDisplayers() {
-        Log.i("TripDetailsActivity", "setDisplayers: units: ${this.units}")
-        if (this.units == Units.Millage) {
+        Log.i("TripDetailsActivity", "setDisplayers: units: ${this.distanceUnits}")
+        if (this.distanceUnits == DistanceUnits.Millage) {
             speedDisplayer = MphFormatter()
             moveSpeedDisplayer = MphFormatter()
             distanceDisplayer = MillageFormatter()

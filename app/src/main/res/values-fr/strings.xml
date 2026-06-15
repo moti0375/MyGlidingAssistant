@@ -40,11 +40,15 @@
     
     
     <!-- Settings strings -->
-    <string name="UnitsCategory">Unités de mesure</string>
-    <string name="UnitsPrefTitle">Vitesse et distance</string>
-    <string name="UnitsPrefSummary">Les unités dans lesquelles les données seront présentées</string>
-    
-    <string name="AltitudePrefTitle">Les unités d\'altitude</string>
+    <string name="unites_category">Unités de mesure</string>
+    <string name="distance_units_pref_title">Distance</string>
+    <string name="distance_units_pref_summary">Les distance unités dans lesquelles les données seront présentées</string>
+
+    <string name="speed_units_pref_title">Vitesse</string>
+    <string name="speed_units_pref_summary">Les vitesse unités dans lesquelles les données seront présentées</string>
+
+
+    <string name="AltitudePrefTitle">Altitude</string>
     <string name="AltitudeUnitsPrefSummary">Les d\'altitude unités dans lesquelles les données seront présentées</string>
     
     
