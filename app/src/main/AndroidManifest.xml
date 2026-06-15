@@ -138,7 +138,7 @@
                 android:value=".presentation.screens.main_screen.MainScreen" />
         </activity>
 
-        <service android:name=".services.GpsTripRecService"
+        <service android:name=".services.GlidingAssistanceService"
             android:foregroundServiceType="location"
             android:exported="false"/>
 
