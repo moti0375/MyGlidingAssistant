@@ -24,7 +24,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.dunihuliapps.myglidingassistant.R
-import com.dunihuliapps.myglidingassistnat.GpsTripRecGallery
 import com.dunihuliapps.myglidingassistnat.data.enums.AltitudeUnits
 import com.dunihuliapps.myglidingassistnat.data.enums.DistanceUnits
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.HmsFormatter
@@ -34,6 +33,7 @@ import com.dunihuliapps.myglidingassistnat.domain.map_helper.ImageMarker
 import com.dunihuliapps.myglidingassistnat.presentation.map.CustomSupportMapFragment
 import com.dunihuliapps.myglidingassistnat.presentation.map.InfoWindowClickListener
 import com.dunihuliapps.myglidingassistnat.presentation.map.MapReadyListener
+import com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.FeetFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.KmhFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricAltFormatter
@@ -124,8 +124,8 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     }
 
     private fun openGallery(tripDetailsState: TripDetailsState.OpenGallery) {
-        val galleryIntent = Intent(this@TripDetailsActivity, GpsTripRecGallery::class.java)
-        galleryIntent.setData(tripDetailsState.imageUri)
+        val galleryIntent = Intent(this@TripDetailsActivity, FlightsListScreen::class.java)
+        galleryIntent.data = tripDetailsState.imageUri
         galleryIntent.putExtra("TripId", tripDetailsState.tripId);
         startActivityForResult(galleryIntent, GALLERY_ACTIVITY_REQ);
     }

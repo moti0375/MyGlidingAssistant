@@ -8,10 +8,10 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.5.2'
+        classpath 'com.android.tools.build:gradle:8.6.0'
         classpath 'com.google.gms:google-services:4.4.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22"
-        classpath "org.jetbrains.kotlin:kotlin-serialization:1.9.22"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21"
+        classpath "org.jetbrains.kotlin:kotlin-serialization:2.0.21"
         classpath "com.google.dagger:hilt-android-gradle-plugin:2.51.1"
     }
 }
@@ -27,8 +27,8 @@ allprojects {
     project.ext {
         // Sdk and tools
         minSdkVersion = 24
-        targetSdkVersion = 34
-        compileSdkVersion = 34
+        targetSdkVersion = 36
+        compileSdkVersion = 36
 
         // App dependencies
         supportLibraryVersion = '28.0.0'

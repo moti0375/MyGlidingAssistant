@@ -19,7 +19,7 @@ import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.Main
 import java.util.Locale
 
 /**
- * Created by BartovMoti on 15/07/27.
+ * Created by BartovMoti on 15/07/26.
  */
 class GlidingAssistanceService : Service(), OnSharedPreferenceChangeListener {
     private lateinit var notificationManager: NotificationManager

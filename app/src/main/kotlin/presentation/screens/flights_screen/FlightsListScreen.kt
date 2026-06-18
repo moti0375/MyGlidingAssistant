@@ -2,15 +2,11 @@ package com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
-import android.os.AsyncTask
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.text.Editable
 import android.text.InputFilter
 import android.text.InputFilter.LengthFilter
@@ -23,15 +19,12 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup.MarginLayoutParams
-import android.view.WindowManager
 import android.widget.AbsListView.MultiChoiceModeListener
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NavUtils
 import androidx.core.view.ViewCompat
@@ -41,14 +34,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
 import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistant.databinding.LayoutRecordedFlightsBinding
-import com.dunihuliapps.myglidingassistnat.adapters.TripsRecyclerAdapter
 import com.dunihuliapps.myglidingassistnat.domain.db.TripsDataSource
 import com.dunihuliapps.myglidingassistnat.presentation.screens.trip_details_screen.TripDetailsActivity
-import com.dunihuliapps.myglidingassistnat.utils.Utils
 import dagger.hilt.android.AndroidEntryPoint
 import data.model.Trip
-import java.io.File
-import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -64,14 +53,9 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
     @Inject
     lateinit var datasource: TripsDataSource
 
-    private val trips = mutableListOf<Trip>()
-    private lateinit var tvTripsSummary: TextView
-    private val selectedTrips = mutableListOf<Trip>()
-    private lateinit var tripsRecyclerAdapter: TripsRecyclerAdapter
-
-
-    private var mergePd: ProgressDialog? = null
-
+    private val flights = mutableListOf<Trip>()
+    private val selectedFlights = mutableListOf<Trip>()
+    private lateinit var flightsListAdapter: FlightsListAdapter
 
     private lateinit var binding: LayoutRecordedFlightsBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -93,7 +77,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
             title = null
         }
 
-        tripsRecyclerAdapter = TripsRecyclerAdapter()
+        flightsListAdapter = FlightsListAdapter()
 
         binding.tripsRecyclerView.addOnItemTouchListener(
             RecyclerTouchListener(
@@ -106,7 +90,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
                         if (actionMode != null) {
                             recyclerToggleSelection(position)
                         } else {
-                            this@FlightsListScreen.startTabsActivity(trips!!.get(position))
+                            this@FlightsListScreen.startTabsActivity(flights!!.get(position))
                         }
                     }
 
@@ -118,7 +102,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
         binding.tripsRecyclerView.apply {
             setLayoutManager(LinearLayoutManager(this@FlightsListScreen))
             setCameraDistance(100f)
-            setAdapter(tripsRecyclerAdapter)
+            setAdapter(flightsListAdapter)
         }
 
         settings = getSharedPreferences("GPS_TRIP_RECORDER", MODE_PRIVATE)
@@ -145,16 +129,12 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
         super.onDestroy()
     }
 
-    var itemListener: OnItemClickListener = object : OnItemClickListener {
-        override fun onItemClick(
-            parent: AdapterView<*>?, view: View?, position: Int,
-            id: Long
-        ) {
+    var itemListener: OnItemClickListener =
+        OnItemClickListener { parent, view, position, id ->
             this@FlightsListScreen.position = position
-            selectedTrip = trips!!.get(position)
+            selectedTrip = flights[position]
             this@FlightsListScreen.startTabsActivity(selectedTrip!!)
         }
-    }
 
     fun startTabsActivity(selectedTrip: Trip) {
         val myIntent = Intent(this, TripDetailsActivity::class.java)
@@ -168,13 +148,13 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
 
         actionMode?.finish()
 
-        trips.let {
+        flights.let {
             it.clear()
             it.addAll(datasource.findAll())
         }
 
-        Log.i(LOG_TAG, "refreshDisplay: $trips")
-        val size = trips.size
+        Log.i(LOG_TAG, "refreshDisplay: $flights")
+        val size = flights.size
 
         //        Log.i(LOG_TAG, "Got " + size + " trips for database");
         if (size == 0) {
@@ -188,7 +168,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
         }
 
         //        tripsListAdapter = new TripsListAdapter(this, trips);
-        tripsRecyclerAdapter.updateTrips(trips)
+        flightsListAdapter.updateTrips(flights)
 
         //   tripListView.setAdapter(tripsListAdapter);
 
@@ -196,13 +176,6 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
 //            tripListView.setSelection(position);
 //        }
     }
-
-    override fun onResume() {
-        super.onResume()
-
-        //	refreshDisplay();
-    }
-
 
     fun deleteTripAlertDialog() {
         val alertDialogBuilder = AlertDialog.Builder(this)
@@ -222,7 +195,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
                 getResources().getString(R.string.YES),
                 object : DialogInterface.OnClickListener {
                     override fun onClick(dialog: DialogInterface, id: Int) {
-                        for (trip in selectedTrips!!) {
+                        for (trip in selectedFlights!!) {
                             datasource!!.removeSavedTrip(trip)
                             datasource!!.deleteMarkersForTrip(trip.id.toDouble())
                         }
@@ -231,12 +204,8 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
                     }
                 })
             .setNegativeButton(
-                getResources().getString(R.string.NO),
-                object : DialogInterface.OnClickListener {
-                    override fun onClick(dialog: DialogInterface, id: Int) {
-                        dialog.cancel()
-                    }
-                })
+                getResources().getString(R.string.NO)
+            ) { dialog, id -> dialog.cancel() }
 
         // create alert dialog
         val alertDialog = alertDialogBuilder.create()
@@ -260,7 +229,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
             LinearLayout.LayoutParams.MATCH_PARENT,
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
-        layout.setOrientation(LinearLayout.VERTICAL)
+        layout.orientation = LinearLayout.VERTICAL
         layout.setLayoutParams(parms)
 
         // Set an EditText view to get user input
@@ -277,11 +246,11 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
         )
 
         chars.setPadding(5, 0, 0, 2)
-        if (selectedTrips!!.get(0).tripName != null) {
-            chars.setText(selectedTrips!!.get(0).tripName!!.length.toString() + "/" + TRIP_NAME_MAX_LENGTH)
-            input.setText(selectedTrips!!.get(0).tripName)
+        if (selectedFlights[0].tripName != null) {
+            chars.text = selectedFlights[0].tripName!!.length.toString() + "/" + TRIP_NAME_MAX_LENGTH
+            input.setText(selectedFlights[0].tripName)
         } else {
-            chars.setText("0/" + TRIP_NAME_MAX_LENGTH)
+            chars.text = "0/$TRIP_NAME_MAX_LENGTH"
             input.setText("")
         }
         input.addTextChangedListener(object : TextWatcher {
@@ -325,7 +294,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
             val value = input.getText().toString()
             // Toast.makeText(context, value + " entered..",
             // Toast.LENGTH_LONG).show();
-            val status = datasource.updateTripTitle(selectedTrips[0], value)
+            val status = datasource.updateTripTitle(selectedFlights[0], value)
             if (status) {
                 // Toast.makeText(context, "Saved..",
                 // Toast.LENGTH_LONG).show();
@@ -352,8 +321,8 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
 
     override fun onCreateActionMode(mode: ActionMode, menu: Menu?): Boolean {
         mode.menuInflater.inflate(R.menu.trips_list_actionbar, menu)
-        tripsRecyclerAdapter.clearSelection()
-        selectedTrips.clear()
+        flightsListAdapter.clearSelection()
+        selectedFlights.clear()
         return true
     }
 
@@ -381,8 +350,8 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
 
     override fun onDestroyActionMode(mode: ActionMode?) {
         actionMode = null
-        selectedTrips.clear()
-        tripsRecyclerAdapter.clearSelection()
+        selectedFlights.clear()
+        flightsListAdapter.clearSelection()
     }
 
 
@@ -526,9 +495,9 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
     }
 
     private fun recyclerToggleSelection(idx: Int) {
-        tripsRecyclerAdapter!!.toggleSelection(idx)
+        flightsListAdapter.toggleSelection(idx)
         actionMode?.let { actMode ->
-            itemsCount = tripsRecyclerAdapter!!.getSelectedItemsCount()
+            itemsCount = flightsListAdapter.selectedItemsCount
 
             if (itemsCount == 0) {
                 actMode.finish()
@@ -537,11 +506,11 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
                 actMode.title = title
 
                 //selectedTrip = trips.get(idx);
-                selectedTrips?.apply {
+                selectedFlights?.apply {
                     clear()
-                    addAll(tripsRecyclerAdapter!!.getSelectedItems())
+                    addAll(flightsListAdapter.getSelectedItems())
                 }
-                Log.i(LOG_TAG, "Selected " + selectedTrips!!.size + " trips for action..")
+                Log.i(LOG_TAG, "Selected " + selectedFlights!!.size + " trips for action..")
 
                 if (itemsCount == 1) {
                     position = -1

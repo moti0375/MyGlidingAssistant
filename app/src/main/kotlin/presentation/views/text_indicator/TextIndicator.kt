@@ -1,4 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.views.text_indicator
+package com.dunihuliapps.myglidingassistnat.presentation.views.text_indicator
 
 import android.content.Context
 import android.graphics.Typeface
