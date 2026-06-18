@@ -96,27 +96,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.dunihuliapps.myglidingassistnat.GpsRecTripsList"
-            android:label="@string/RecordedTrips"
-            android:screenOrientation="sensorPortrait"
-            android:exported="true"
-            android:theme="@style/ListViewTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen" />
-
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.trip_details_screen.TripDetailsActivity"
+            android:name="presentation.screens.flight_details_screen.FlightDetailsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dunihuliapps.myglidingassistnat.GpsRecTripsList" />
+                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen" />
         </activity>
         <activity
             android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen"
@@ -144,16 +130,6 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-
-        <activity
-            android:name="com.dunihuliapps.myglidingassistnat.GpsTripRecGallery"
-            android:label="@string/title_activity_gps_trip_rec_gallery"
-            android:parentActivityName="com.dunihuliapps.myglidingassistnat.presentation.screens.trip_details_screen.TripDetailsActivity"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.trip_details_screen.TripDetailsActivity" />
-        </activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").

@@ -1,4 +1,5 @@
-package com.dunihuliapps.myglidingassistnat.presentation.screens.trip_details_screen
+package presentation.screens.flight_details_screen
+
 import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
@@ -19,7 +20,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
@@ -41,7 +41,6 @@ import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricF
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MillageFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MphFormatter
 import com.dunihuliapps.myglidingassistnat.utils.Utils
-import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.SnapshotReadyCallback
 import com.google.android.gms.maps.model.Marker
 import dagger.hilt.android.AndroidEntryPoint
@@ -50,15 +49,12 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 @AndroidEntryPoint
-class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
-    private var mMap: GoogleMap? = null
-
+class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     private lateinit var prefs: SharedPreferences
     private var lineColor = Color.RED
     private var lineWidth = 5f
     private var trip: Trip? = null
     private var progressDialog: ProgressDialog? = null
-    private var toolbar: Toolbar? = null
 
     private lateinit var tvWhen: TextView
     private lateinit var tvDuration: TextView
@@ -82,7 +78,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     private var distanceUnits: DistanceUnits = DistanceUnits.Metric
     private var altUnits: AltitudeUnits = AltitudeUnits.Feet
 
-    private val detailsViewModel by viewModels<TripDetailsViewModel>()
+    private val detailsViewModel by viewModels<FlightDetailsViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,28 +101,28 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         }
     }
 
-    private fun processDetailsLoading(tripDetailsState: TripDetailsState) {
-        when (tripDetailsState) {
-            is TripDetailsState.Initiated -> {}
-            is TripDetailsState.Loading -> showLoadingDialog()
-            is TripDetailsState.TripLoaded -> processLoadedTrip(tripDetailsState)
-            is TripDetailsState.FailedToLoadTrip -> processLoadFailed(tripDetailsState)
-            is TripDetailsState.OpenGallery -> openGallery(tripDetailsState)
-            is TripDetailsState.MapImageFileReady -> takeMapHqSnapshot(
-                tripDetailsState.file,
-                tripDetailsState.tripTitle
+    private fun processDetailsLoading(flightDetailsState: FlightDetailsState) {
+        when (flightDetailsState) {
+            is FlightDetailsState.Initiated -> {}
+            is FlightDetailsState.Loading -> showLoadingDialog()
+            is FlightDetailsState.FlightLoaded -> processLoadedTrip(flightDetailsState)
+            is FlightDetailsState.FailedToLoadFlight -> processLoadFailed(flightDetailsState)
+            is FlightDetailsState.OpenGallery -> openGallery(flightDetailsState)
+            is FlightDetailsState.MapImageFileReady -> takeMapHqSnapshot(
+                flightDetailsState.file,
+                flightDetailsState.tripTitle
             )
-            is TripDetailsState.TripKmlReady -> shareKml(
-                tripDetailsState.file,
-                tripDetailsState.tripTitle
+            is FlightDetailsState.FlightKmlReady -> shareKml(
+                flightDetailsState.file,
+                flightDetailsState.tripTitle
             )
         }
     }
 
-    private fun openGallery(tripDetailsState: TripDetailsState.OpenGallery) {
-        val galleryIntent = Intent(this@TripDetailsActivity, FlightsListScreen::class.java)
-        galleryIntent.data = tripDetailsState.imageUri
-        galleryIntent.putExtra("TripId", tripDetailsState.tripId);
+    private fun openGallery(flightDetailsState: FlightDetailsState.OpenGallery) {
+        val galleryIntent = Intent(this@FlightDetailsActivity, FlightsListScreen::class.java)
+        galleryIntent.data = flightDetailsState.imageUri
+        galleryIntent.putExtra("TripId", flightDetailsState.tripId);
         startActivityForResult(galleryIntent, GALLERY_ACTIVITY_REQ);
     }
 
@@ -137,7 +133,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
                 ResourcesCompat.getDrawable(
                     resources,
                     R.mipmap.ic_launcher,
-                    this@TripDetailsActivity.theme
+                    this@FlightDetailsActivity.theme
                 )
             )
             setTitle(getString(R.string.app_name))
@@ -146,7 +142,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         }
     }
 
-    private fun processLoadedTrip(state: TripDetailsState.TripLoaded) {
+    private fun processLoadedTrip(state: FlightDetailsState.FlightLoaded) {
         Log.i(LOG_TAG, "processLoadedTrip: ")
         updateDisplay(state.trip)
         mapFragment.apply {
@@ -157,7 +153,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         hideLoadingDialog()
     }
 
-    private fun processLoadFailed(tripDetailsState: TripDetailsState.FailedToLoadTrip) {
+    private fun processLoadFailed(flightDetailsState: FlightDetailsState.FailedToLoadFlight) {
 
     }
 
@@ -238,12 +234,12 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         override fun onMapReady() {
             Log.i(LOG_TAG, "onMapReady: ")
             mapFragment.apply {
-                lineWidth = this@TripDetailsActivity.lineWidth
-                setInfoWindowClickListener(this@TripDetailsActivity)
+                lineWidth = this@FlightDetailsActivity.lineWidth
+                setInfoWindowClickListener(this@FlightDetailsActivity)
             }
 
             val tripId = intent.getLongExtra("trip_id", 0)
-            detailsViewModel.addEvent(TripDetailsEvent.LoadTrip(tripId))
+            detailsViewModel.addEvent(FlightDetailsEvent.LoadFlight(tripId))
         }
     }
 
@@ -252,7 +248,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         Log.i(LOG_TAG, "Marker " + marker.id + " was clicked");
 
         imageMarker?.imageUri?.let {
-            detailsViewModel.addEvent(TripDetailsEvent.OnInfoWindowClicked(it))
+            detailsViewModel.addEvent(FlightDetailsEvent.OnInfoWindowClicked(it))
         }
 
     }
@@ -318,7 +314,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         if (googleEarthInstalled) {
             if (!Utils.isFileExists(trip!!.kml)) {
                 Toast.makeText(
-                    this@TripDetailsActivity,
+                    this@FlightDetailsActivity,
                     getString(R.string.MapUnavailable),
                     Toast.LENGTH_LONG
                 ).show()
@@ -365,7 +361,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
                 } catch (e: ActivityNotFoundException) {
                     e.printStackTrace()
                     Toast.makeText(
-                        this@TripDetailsActivity,
+                        this@FlightDetailsActivity,
                         getString(R.string.GooglePlayError),
                         Toast.LENGTH_LONG
                     ).show()
@@ -393,8 +389,8 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
             ) { dialog, _ ->
                 val selectedPosition = (dialog as AlertDialog).listView.checkedItemPosition
                 when (selectedPosition) {
-                    SHARE_IMAGE -> detailsViewModel.addEvent(TripDetailsEvent.ShareTripMapImage)
-                    SHARE_KML -> detailsViewModel.addEvent(TripDetailsEvent.ShareTripKml)
+                    SHARE_IMAGE -> detailsViewModel.addEvent(FlightDetailsEvent.ShareFlightMapImage)
+                    SHARE_KML -> detailsViewModel.addEvent(FlightDetailsEvent.ShareFlightKml)
                 }
                 dialog.cancel()
             }
@@ -406,7 +402,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
                 ResourcesCompat.getDrawable(
                     resources,
                     R.drawable.ic_launcher,
-                    this@TripDetailsActivity.theme
+                    this@FlightDetailsActivity.theme
                 )
             )
         }.show()
@@ -442,7 +438,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
             val projection = arrayOf(MediaStore.MediaColumns._ID, MediaStore.MediaColumns.TITLE)
             val selection = MediaStore.MediaColumns.RELATIVE_PATH + " = ?"
             val args = arrayOf(path)
-            this@TripDetailsActivity.contentResolver.query(
+            this@FlightDetailsActivity.contentResolver.query(
                 filesUri,
                 projection,
                 selection,
@@ -532,7 +528,7 @@ class TripDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         private const val GALLERY_ACTIVITY_REQ = 100
         private const val SHARE_IMAGE = 0
         private const val SHARE_KML = 1
-        private val LOG_TAG: String = TripDetailsActivity::class.java.simpleName
+        private val LOG_TAG: String = FlightDetailsActivity::class.java.simpleName
         private const val CAM_ZOOM = 15f
     }
 }

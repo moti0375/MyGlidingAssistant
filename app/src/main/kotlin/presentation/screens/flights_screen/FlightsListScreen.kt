@@ -20,8 +20,6 @@ import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.widget.AbsListView.MultiChoiceModeListener
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemClickListener
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -35,9 +33,9 @@ import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
 import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistant.databinding.LayoutRecordedFlightsBinding
 import com.dunihuliapps.myglidingassistnat.domain.db.TripsDataSource
-import com.dunihuliapps.myglidingassistnat.presentation.screens.trip_details_screen.TripDetailsActivity
 import dagger.hilt.android.AndroidEntryPoint
 import data.model.Trip
+import presentation.screens.flight_details_screen.FlightDetailsActivity
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -90,7 +88,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
                         if (actionMode != null) {
                             recyclerToggleSelection(position)
                         } else {
-                            this@FlightsListScreen.startTabsActivity(flights!!.get(position))
+                            this@FlightsListScreen.navigateToFlightDetailsScreen(flights[position])
                         }
                     }
 
@@ -129,15 +127,8 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
         super.onDestroy()
     }
 
-    var itemListener: OnItemClickListener =
-        OnItemClickListener { parent, view, position, id ->
-            this@FlightsListScreen.position = position
-            selectedTrip = flights[position]
-            this@FlightsListScreen.startTabsActivity(selectedTrip!!)
-        }
-
-    fun startTabsActivity(selectedTrip: Trip) {
-        val myIntent = Intent(this, TripDetailsActivity::class.java)
+    fun navigateToFlightDetailsScreen(selectedTrip: Trip) {
+        val myIntent = Intent(this, FlightDetailsActivity::class.java)
         myIntent.putExtra("trip_id", selectedTrip.id)
         startActivity(myIntent)
     }

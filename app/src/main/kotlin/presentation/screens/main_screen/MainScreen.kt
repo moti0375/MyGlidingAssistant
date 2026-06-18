@@ -45,7 +45,6 @@ import androidx.preference.PreferenceManager
 import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistant.databinding.GpsRecorderMainMaterialBinding
 import com.dunihuliapps.myglidingassistnat.GpsRecLicense
-import com.dunihuliapps.myglidingassistnat.GpsRecTripsList
 import com.dunihuliapps.myglidingassistnat.data.enums.AltitudeUnits
 import com.dunihuliapps.myglidingassistnat.data.enums.DistanceUnits
 import com.dunihuliapps.myglidingassistnat.data.enums.data.enums.SpeedUnits

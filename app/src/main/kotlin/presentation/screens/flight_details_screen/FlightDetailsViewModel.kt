@@ -1,4 +1,5 @@
-package com.dunihuliapps.myglidingassistnat.presentation.screens.trip_details_screen
+package presentation.screens.flight_details_screen
+
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -16,42 +17,42 @@ import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
-class TripDetailsViewModel @Inject constructor(
+class FlightDetailsViewModel @Inject constructor(
     private val tripsDataSource: TripsDataSource,
     private val kmlManager: KmlManager,
     private val pathProvider: PathProvider,
 ) : ViewModel() {
 
     private val tripDetailsMutableStateFlow =
-        MutableStateFlow<TripDetailsState>(TripDetailsState.Initiated)
+        MutableStateFlow<FlightDetailsState>(FlightDetailsState.Initiated)
     val tripDetailsStateFlow = tripDetailsMutableStateFlow.asStateFlow()
     private var trip: Trip? = null
     private var markerImages = mutableListOf<ImageMarker>()
 
 
-    fun addEvent(event: TripDetailsEvent){
+    fun addEvent(event: FlightDetailsEvent){
         mapEventToState(event)
     }
 
-    private fun mapEventToState(event: TripDetailsEvent) {
+    private fun mapEventToState(event: FlightDetailsEvent) {
         when (event) {
-            is TripDetailsEvent.LoadTrip -> loadTrip(event.tripId)
-            is TripDetailsEvent.OnInfoWindowClicked -> handleInfoWindowClicked(event.markerUri)
-            is TripDetailsEvent.ShareTripMapImage -> handleShareImage()
-            is TripDetailsEvent.ShareTripKml -> handleShareKml()
+            is FlightDetailsEvent.LoadFlight -> loadTrip(event.tripId)
+            is FlightDetailsEvent.OnInfoWindowClicked -> handleInfoWindowClicked(event.markerUri)
+            is FlightDetailsEvent.ShareFlightMapImage -> handleShareImage()
+            is FlightDetailsEvent.ShareFlightKml -> handleShareKml()
         }
     }
 
 
     private fun handleInfoWindowClicked(markerImageUri: Uri) {
         trip?.let {
-            publishState(TripDetailsState.OpenGallery(it.id, markerImageUri))
+            publishState(FlightDetailsState.OpenGallery(it.id, markerImageUri))
         }
     }
 
     private fun loadTrip(tripId: Long) {
         Log.i(TAG, "loadTrip: tripId = $tripId")
-        publishState(TripDetailsState.Loading)
+        publishState(FlightDetailsState.Loading)
         tripsDataSource.let {
             val t = it.findTripById(tripId)
             t?.let { trip ->
@@ -65,9 +66,9 @@ class TripDetailsViewModel @Inject constructor(
                     kmlManager.getLocationsFromKml(kmlPath)
                 } ?: emptyList()
                 Log.i(TAG, "Trip Loaded: $trip, markers: $markers, locations: $locations")
-                publishState(TripDetailsState.TripLoaded(trip, markers, locations))
+                publishState(FlightDetailsState.FlightLoaded(trip, markers, locations))
             } ?: run {
-                publishState(TripDetailsState.FailedToLoadTrip("Failed to load trip"))
+                publishState(FlightDetailsState.FailedToLoadFlight("Failed to load trip"))
             }
         }
     }
@@ -75,18 +76,18 @@ class TripDetailsViewModel @Inject constructor(
 
     private fun handleShareImage() {
         val filePath = File("${pathProvider.providesShareImagesDir()}/${trip?.date}_map.png")
-        publishState(TripDetailsState.MapImageFileReady(filePath.path, trip?.tripName))
+        publishState(FlightDetailsState.MapImageFileReady(filePath.path, trip?.tripName))
     }
 
     private fun handleShareKml(){
         trip?.kml?.let {
-            publishState(TripDetailsState.TripKmlReady(it, trip?.tripName))
+            publishState(FlightDetailsState.FlightKmlReady(it, trip?.tripName))
         }
     }
 
-    private fun publishState(tripDetailsState: TripDetailsState) {
+    private fun publishState(flightDetailsState: FlightDetailsState) {
         viewModelScope.launch {
-            tripDetailsMutableStateFlow.value = tripDetailsState
+            tripDetailsMutableStateFlow.value = flightDetailsState
         }
     }
 
