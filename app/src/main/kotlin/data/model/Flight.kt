@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 
 @Serializable
-data class Trip @JvmOverloads constructor(
+data class Flight @JvmOverloads constructor(
     val id: Long = 0,
     val date: String? = null,
     val distance: Float = 0f,

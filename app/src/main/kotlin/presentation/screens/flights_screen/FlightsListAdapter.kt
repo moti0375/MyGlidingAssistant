@@ -11,14 +11,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.compose.ui.graphics.TileMode
 import androidx.recyclerview.widget.RecyclerView
 import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistnat.domain.formatters.TimeFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.HmsFormatter
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Transformation
-import data.model.Trip
+import data.model.Flight
 import java.io.File
 import kotlin.math.min
 
@@ -27,7 +26,7 @@ import kotlin.math.min
  * Migrated to Kotlin on 18/6/2026
  */
 class FlightsListAdapter : RecyclerView.Adapter<FlightsListAdapter.FlightsListViewHolder>() {
-    private val data: MutableList<Trip> = ArrayList<Trip>()
+    private val data: MutableList<Flight> = ArrayList<Flight>()
     private val selectedItems: SparseBooleanArray = SparseBooleanArray()
     private val timeDisplayer: TimeFormatter = HmsFormatter()
 
@@ -81,8 +80,8 @@ class FlightsListAdapter : RecyclerView.Adapter<FlightsListAdapter.FlightsListVi
     val selectedItemsCount: Int
         get() = selectedItems.size()
 
-    fun getSelectedItems(): MutableList<Trip> {
-        val items: MutableList<Trip> = ArrayList()
+    fun getSelectedItems(): MutableList<Flight> {
+        val items: MutableList<Flight> = ArrayList()
         for (i in 0..<selectedItems.size()) {
             items.add(data[selectedItems.keyAt(i)])
         }
@@ -90,7 +89,7 @@ class FlightsListAdapter : RecyclerView.Adapter<FlightsListAdapter.FlightsListVi
     }
 
 
-    fun updateTrips(data: MutableList<Trip>) {
+    fun updateTrips(data: MutableList<Flight>) {
         this.data.apply {
             clear()
             addAll(data)

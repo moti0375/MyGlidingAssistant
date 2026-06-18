@@ -41,10 +41,9 @@ import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricF
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MillageFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MphFormatter
 import com.dunihuliapps.myglidingassistnat.utils.Utils
-import com.google.android.gms.maps.GoogleMap.SnapshotReadyCallback
 import com.google.android.gms.maps.model.Marker
 import dagger.hilt.android.AndroidEntryPoint
-import data.model.Trip
+import data.model.Flight
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -53,7 +52,7 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     private lateinit var prefs: SharedPreferences
     private var lineColor = Color.RED
     private var lineWidth = 5f
-    private var trip: Trip? = null
+    private var flight: Flight? = null
     private var progressDialog: ProgressDialog? = null
 
     private lateinit var speedDisplayer: UnitsFormatter
@@ -131,7 +130,7 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
 
     private fun processLoadedTrip(state: FlightDetailsState.FlightLoaded) {
         Log.i(LOG_TAG, "processLoadedTrip: ")
-        updateDisplay(state.trip)
+        updateDisplay(state.flight)
         mapFragment.apply {
             clearEverything()
             overlayRoute(state.locations)
@@ -255,24 +254,24 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         }
     }
 
-    private fun updateDisplay(trip: Trip) {
+    private fun updateDisplay(flight: Flight) {
 
         binding.tripRawDetails.apply {
-            tvWhen.text = trip.date
-            tvDurationDetails.text = timeFormatter.formatTime(trip.duration)
-            tvDistanceDetails.text = distanceDisplayer.formatUnits(trip.distance.toDouble())
-            tvAveSpeed.text = speedDisplayer.formatUnits(trip.averageSpeed)
-            tvMaxSpeed.text = speedDisplayer.formatUnits(trip.maxSpeed)
-            tvMaxAltitude.text = altitudeDisplayer.formatUnits(trip.maxAlt)
-            tvMoveTime.text = timeFormatter.formatTime(trip.moveTime)
-            tvStopTime.text = timeFormatter.formatTime(trip.stopTime)
-            tvTripDetailsHead.text = trip.tripName
-            tvFrom.text = trip.startAddress ?: getString(R.string.unavailable_data)
-            tvTo.text = trip.stopAddress ?: getString(R.string.unavailable_data)
-            if (trip.averageSpeed == 0.0) {
+            tvWhen.text = flight.date
+            tvDurationDetails.text = timeFormatter.formatTime(flight.duration)
+            tvDistanceDetails.text = distanceDisplayer.formatUnits(flight.distance.toDouble())
+            tvAveSpeed.text = speedDisplayer.formatUnits(flight.averageSpeed)
+            tvMaxSpeed.text = speedDisplayer.formatUnits(flight.maxSpeed)
+            tvMaxAltitude.text = altitudeDisplayer.formatUnits(flight.maxAlt)
+            tvMoveTime.text = timeFormatter.formatTime(flight.moveTime)
+            tvStopTime.text = timeFormatter.formatTime(flight.stopTime)
+            tvTripDetailsHead.text = flight.tripName
+            tvFrom.text = flight.startAddress ?: getString(R.string.unavailable_data)
+            tvTo.text = flight.stopAddress ?: getString(R.string.unavailable_data)
+            if (flight.averageSpeed == 0.0) {
                 tvAverageMoveSpeed.text = getString(R.string.unavailable_data)
             } else {
-                tvAverageMoveSpeed.text = moveSpeedDisplayer.formatUnits(trip.averageSpeed)
+                tvAverageMoveSpeed.text = moveSpeedDisplayer.formatUnits(flight.averageSpeed)
             }
 
         }

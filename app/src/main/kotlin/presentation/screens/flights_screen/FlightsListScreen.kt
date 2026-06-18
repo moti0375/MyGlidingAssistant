@@ -34,7 +34,7 @@ import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistant.databinding.LayoutRecordedFlightsBinding
 import com.dunihuliapps.myglidingassistnat.domain.db.TripsDataSource
 import dagger.hilt.android.AndroidEntryPoint
-import data.model.Trip
+import data.model.Flight
 import presentation.screens.flight_details_screen.FlightDetailsActivity
 import javax.inject.Inject
 
@@ -43,7 +43,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
     private var settings: SharedPreferences? = null
     private var listener: OnSharedPreferenceChangeListener? = null
     var position: Int = -1
-    private var selectedTrip: Trip? = null
+    private var selectedFlight: Flight? = null
     var actionMode: ActionMode? = null
     var itemsCount: Int = 0
 
@@ -51,8 +51,8 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
     @Inject
     lateinit var datasource: TripsDataSource
 
-    private val flights = mutableListOf<Trip>()
-    private val selectedFlights = mutableListOf<Trip>()
+    private val flights = mutableListOf<Flight>()
+    private val selectedFlights = mutableListOf<Flight>()
     private lateinit var flightsListAdapter: FlightsListAdapter
 
     private lateinit var binding: LayoutRecordedFlightsBinding
@@ -127,9 +127,9 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
         super.onDestroy()
     }
 
-    fun navigateToFlightDetailsScreen(selectedTrip: Trip) {
+    fun navigateToFlightDetailsScreen(selectedFlight: Flight) {
         val myIntent = Intent(this, FlightDetailsActivity::class.java)
-        myIntent.putExtra("trip_id", selectedTrip.id)
+        myIntent.putExtra("trip_id", selectedFlight.id)
         startActivity(myIntent)
     }
 

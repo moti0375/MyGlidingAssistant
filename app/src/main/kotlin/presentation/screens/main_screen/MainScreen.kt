@@ -60,7 +60,7 @@ import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.present
 
 import com.google.android.gms.common.GooglePlayServicesUtil
 import dagger.hilt.android.AndroidEntryPoint
-import data.model.Trip
+import data.model.Flight
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import presentation.screens.license_screen.GmsLicenseScreen
@@ -622,9 +622,9 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
         // Check which request we're responding to
         val hasExtras = data?.hasExtra("UploadedTrip") == true
         if (requestCode == TRIP_LIST_ACTIVITY && resultCode == RESULT_OK && hasExtras) {
-            val uploadedTrip = data?.getSerializableExtra("UploadedTrip") as Trip
+            val uploadedFlight = data?.getSerializableExtra("UploadedTrip") as Flight
             showUploadTripDialog()
-            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.UploadTrip(uploadedTrip))
+            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.UploadTrip(uploadedFlight))
         }
 
 

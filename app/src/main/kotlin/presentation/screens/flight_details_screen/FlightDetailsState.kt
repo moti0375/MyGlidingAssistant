@@ -3,13 +3,13 @@ package presentation.screens.flight_details_screen
 import android.net.Uri
 import com.dunihuliapps.myglidingassistnat.domain.map_helper.ImageMarker
 import com.google.android.gms.maps.model.LatLng
-import data.model.Trip
+import data.model.Flight
 
 sealed class FlightDetailsState {
     data object Initiated : FlightDetailsState()
     data object Loading : FlightDetailsState()
     class FlightLoaded(
-        val trip: Trip,
+        val flight: Flight,
         val markers: List<ImageMarker> = emptyList(),
         val locations: List<LatLng> = emptyList()
     ) : FlightDetailsState()

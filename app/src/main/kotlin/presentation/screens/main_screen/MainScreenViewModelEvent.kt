@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import android.location.Location
 import android.net.Uri
 import com.dunihuliapps.myglidingassistnat.data.enums.RecordingMode
-import data.model.Trip
+import data.model.Flight
 
 sealed class MainScreenViewModelEvent {
 
@@ -16,8 +16,8 @@ sealed class MainScreenViewModelEvent {
     class TripEnded(val bitmap: Bitmap?) : MainScreenViewModelEvent()
     class AccuracyChanged(val accuracy: Float) : MainScreenViewModelEvent()
     class SpeedFilterUpdated(val filter: Double) : MainScreenViewModelEvent()
-    class MergeTrips(val tripA: Trip, val tripB: Trip) : MainScreenViewModelEvent()
-    class UploadTrip(val trip: Trip) : MainScreenViewModelEvent()
+    class MergeTrips(val flightA: Flight, val flightB: Flight) : MainScreenViewModelEvent()
+    class UploadTrip(val flight: Flight) : MainScreenViewModelEvent()
     class PictureTaken(val capturedImageUri: Uri) : MainScreenViewModelEvent()
     class RecordingModeChanged(val recordingMode: RecordingMode) : MainScreenViewModelEvent()
 }

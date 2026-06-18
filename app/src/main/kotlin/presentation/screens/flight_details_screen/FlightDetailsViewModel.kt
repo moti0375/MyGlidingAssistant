@@ -9,7 +9,7 @@ import com.dunihuliapps.myglidingassistnat.domain.files.kml.KmlManager
 import com.dunihuliapps.myglidingassistnat.domain.files.path_provider.PathProvider
 import com.dunihuliapps.myglidingassistnat.domain.map_helper.ImageMarker
 import dagger.hilt.android.lifecycle.HiltViewModel
-import data.model.Trip
+import data.model.Flight
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -26,7 +26,7 @@ class FlightDetailsViewModel @Inject constructor(
     private val tripDetailsMutableStateFlow =
         MutableStateFlow<FlightDetailsState>(FlightDetailsState.Initiated)
     val tripDetailsStateFlow = tripDetailsMutableStateFlow.asStateFlow()
-    private var trip: Trip? = null
+    private var flight: Flight? = null
     private var markerImages = mutableListOf<ImageMarker>()
 
 
@@ -45,7 +45,7 @@ class FlightDetailsViewModel @Inject constructor(
 
 
     private fun handleInfoWindowClicked(markerImageUri: Uri) {
-        trip?.let {
+        flight?.let {
             publishState(FlightDetailsState.OpenGallery(it.id, markerImageUri))
         }
     }
@@ -56,7 +56,7 @@ class FlightDetailsViewModel @Inject constructor(
         tripsDataSource.let {
             val t = it.findTripById(tripId)
             t?.let { trip ->
-                this.trip = t
+                this.flight = t
                 val markers = it.findAllMarkersForTrip(tripId)
                 if(markers.isNotEmpty()){
                     markerImages.clear()
@@ -75,13 +75,13 @@ class FlightDetailsViewModel @Inject constructor(
 
 
     private fun handleShareImage() {
-        val filePath = File("${pathProvider.providesShareImagesDir()}/${trip?.date}_map.png")
-        publishState(FlightDetailsState.MapImageFileReady(filePath.path, trip?.tripName))
+        val filePath = File("${pathProvider.providesShareImagesDir()}/${flight?.date}_map.png")
+        publishState(FlightDetailsState.MapImageFileReady(filePath.path, flight?.tripName))
     }
 
     private fun handleShareKml(){
-        trip?.kml?.let {
-            publishState(FlightDetailsState.FlightKmlReady(it, trip?.tripName))
+        flight?.kml?.let {
+            publishState(FlightDetailsState.FlightKmlReady(it, flight?.tripName))
         }
     }
 

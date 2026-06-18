@@ -24,7 +24,7 @@ import com.dunihuliapps.myglidingassistnat.domain.timer.TripTimer
 import com.dunihuliapps.myglidingassistnat.utils.Utils
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
-import data.model.Trip
+import data.model.Flight
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -81,7 +81,7 @@ class TripManagerViewModel @Inject constructor(
     private val startAddress = "none"
     private val stopAddress = "none"
     private var moveState: MovementState? = null
-    private var uploadedTrip: Trip? = null
+    private var uploadedFlight: Flight? = null
     private var imageMarkers = mutableListOf<ImageMarker>()
     private var recordingState = RecordingState.Idle
     private var autoSave: Boolean = false
@@ -100,12 +100,12 @@ class TripManagerViewModel @Inject constructor(
         when (event) {
             is MainScreenViewModelEvent.AccuracyChanged -> updateAccuracy(event.accuracy)
             is MainScreenViewModelEvent.LocationFounded -> setCurrentLocation(event.location)
-            is MainScreenViewModelEvent.MergeTrips -> mergeTrips(event.tripA, event.tripB)
+            is MainScreenViewModelEvent.MergeTrips -> mergeTrips(event.flightA, event.flightB)
             is MainScreenViewModelEvent.OnNewLocation -> updateLocation(event.location)
             is MainScreenViewModelEvent.PictureTaken -> addImageMarker(event.capturedImageUri)
             is MainScreenViewModelEvent.SpeedFilterUpdated -> setSpeedFilter(event.filter)
             is MainScreenViewModelEvent.TripEnded -> saveTrip(event.bitmap)
-            is MainScreenViewModelEvent.UploadTrip -> uploadTrip(event.trip)
+            is MainScreenViewModelEvent.UploadTrip -> uploadTrip(event.flight)
             is MainScreenViewModelEvent.RecordingModeChanged -> updateRecordingMode(event.recordingMode)
             is MainScreenViewModelEvent.StartTrip -> startTrip()
             is MainScreenViewModelEvent.StopTrip -> stopTrip()
@@ -116,7 +116,7 @@ class TripManagerViewModel @Inject constructor(
     private fun handleStartStopClicked() {
 
         if (recordingState == RecordingState.Idle) {
-            if (uploadedTrip != null) {
+            if (uploadedFlight != null) {
                 if (recordingMode == RecordingMode.LOADED_FROM_INTENT) {
                     startTrip()
                 } else {
@@ -301,7 +301,7 @@ class TripManagerViewModel @Inject constructor(
             averageSpeed = (distance / (duration / 1000).toInt()).toDouble() // m/sec
             movementTime = duration - overallStopTime //mSec
             averageMoveSpeed = (distance / (movementTime / 1000).toInt()).toDouble() //m/sec
-            val trip = Trip(
+            val flight = Flight(
                 kml = mapFile,
                 date = date,
                 distance = distance,
@@ -316,7 +316,7 @@ class TripManagerViewModel @Inject constructor(
                 maxAlt = this.maxAltitude,
             )
 
-            val tripId = datasource.create(trip)
+            val tripId = datasource.create(flight)
 
             if (imageMarkers.isNotEmpty()) {
                 datasource.insertImageMarkers(imageMarkers, tripId.toDouble())
@@ -333,8 +333,8 @@ class TripManagerViewModel @Inject constructor(
         recordingState = RecordingState.Idle
     }
 
-    private fun uploadTrip(trip: Trip) {
-        val tripRoute = trip.kml?.let {
+    private fun uploadTrip(flight: Flight) {
+        val tripRoute = flight.kml?.let {
             kmlManager.getLocationsFromKml(it)
         } ?: emptyList()
 
@@ -348,7 +348,7 @@ class TripManagerViewModel @Inject constructor(
             }
         }
 
-        this.uploadedTrip = trip.also {
+        this.uploadedFlight = flight.also {
             this.distance = it.distance
             this.maxSpeed = it.maxSpeed
             this.duration = it.duration
@@ -359,7 +359,7 @@ class TripManagerViewModel @Inject constructor(
 
         imageMarkers.apply {
             clear()
-            addAll(datasource.findAllMarkersForTrip(trip.id))
+            addAll(datasource.findAllMarkersForTrip(flight.id))
         }
         publishTripState(
             TripState.TripLoaded(
@@ -430,8 +430,8 @@ class TripManagerViewModel @Inject constructor(
 
 
     fun mergeTrips(
-        tripA: Trip,
-        tripB: Trip,
+        flightA: Flight,
+        flightB: Flight,
     ): Int {
         val status = 1
         val latLngList = mutableListOf<LatLng>()
@@ -440,16 +440,16 @@ class TripManagerViewModel @Inject constructor(
         val tripBFirstLoc: LatLng
         val gap = FloatArray(3)
 
-        if (tripA.kml == null || tripB.kml == null) {
+        if (flightA.kml == null || flightB.kml == null) {
             return KML_NOT_FOUND
         }
 
-        if (!Utils.isFileExists(tripA.kml) || !Utils.isFileExists(tripB.kml)) {
+        if (!Utils.isFileExists(flightA.kml) || !Utils.isFileExists(flightB.kml)) {
             return KML_NOT_FOUND
         }
 
-        val tripALocations = kmlManager.getLocationsFromKml(tripA.kml)
-        val tripBLocations = kmlManager.getLocationsFromKml(tripB.kml)
+        val tripALocations = kmlManager.getLocationsFromKml(flightA.kml)
+        val tripBLocations = kmlManager.getLocationsFromKml(flightB.kml)
 
         latLngList.addAll(tripALocations)
         latLngList.addAll(tripBLocations)
@@ -467,15 +467,15 @@ class TripManagerViewModel @Inject constructor(
             return UNABLE_TO_MERGE
         }
         val mapFile = kmlManager.generateKmlFromLocationList(latLngList)
-        val tripsDuration = tripA.duration + tripB.duration
-        val tripsDistance = tripA.distance + tripB.distance
+        val tripsDuration = flightA.duration + flightB.duration
+        val tripsDistance = flightA.distance + flightB.distance
         val averageSpeed = (tripsDistance / (tripsDuration / 1000).toInt()).toDouble() // m/sec
         val sdf = SimpleDateFormat("dd-MM-yyyy 'at' HH:mm")
         val date = sdf.format(Date(System.currentTimeMillis()))
 
-        val maxSpeed = max(tripA.maxSpeed, tripB.maxSpeed)
-        val maxAlt = max(tripA.maxAlt, tripB.maxAlt)
-        val tripsStopTime = tripA.stopTime + tripB.stopTime
+        val maxSpeed = max(flightA.maxSpeed, flightB.maxSpeed)
+        val maxAlt = max(flightA.maxAlt, flightB.maxAlt)
+        val tripsStopTime = flightA.stopTime + flightB.stopTime
         val tripsMoveTime = tripsDuration - tripsStopTime
         val averageMoveSpeed = (tripsDistance / (tripsMoveTime / 1000)).toDouble() //m/Sec
 
@@ -483,7 +483,7 @@ class TripManagerViewModel @Inject constructor(
         val startAddress = startLocation?.let { getAddress(LatLng(it.latitude, it.longitude)) }
         val stopAddress = stopLocation.let { getAddress(LatLng(it.latitude, it.longitude)) }
 
-        val trip = Trip(
+        val flight = Flight(
             kml = mapFile,
             date = date,
             distance = tripsDistance,
@@ -500,9 +500,9 @@ class TripManagerViewModel @Inject constructor(
 
         val newTripMarkers = ArrayList<ImageMarker>()
         datasource.apply {
-            newTripMarkers.addAll(findAllMarkersForTrip(tripA.id))
-            newTripMarkers.addAll(findAllMarkersForTrip(tripB.id))
-            val insertId = create(trip)
+            newTripMarkers.addAll(findAllMarkersForTrip(flightA.id))
+            newTripMarkers.addAll(findAllMarkersForTrip(flightB.id))
+            val insertId = create(flight)
             insertImageMarkers(newTripMarkers, insertId.toDouble())
         }
         return MERGE_SUCCESS
