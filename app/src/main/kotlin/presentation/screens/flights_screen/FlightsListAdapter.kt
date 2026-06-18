@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.compose.ui.graphics.TileMode
 import androidx.recyclerview.widget.RecyclerView
 import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistnat.domain.formatters.TimeFormatter

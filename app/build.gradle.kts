@@ -1,4 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import java.util.Properties
 
 plugins {
@@ -57,7 +56,10 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs)
+    implementation(libs.androidx.preference.ktx)
+    implementation(libs.androidx.legacy.support)
+
+    implementation(libs.picasso)
 
 
     // Room
@@ -73,4 +75,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
+
+    implementation (files("libs/jdom-2.0.6.jar"))
+    implementation (files("libs/jdom-2.0.6-javadoc.jar"))
+
 }
