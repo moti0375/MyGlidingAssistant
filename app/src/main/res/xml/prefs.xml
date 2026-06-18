@@ -7,7 +7,6 @@
             android:key="@string/distance_units_key"
             android:summary="@string/distance_units_pref_summary"
             android:title="@string/distance_units_pref_title"
-            app:useSimpleSummaryProvider="true"
             android:entries="@array/distance_units_entries"
             android:entryValues="@array/distance_units_values"
             android:defaultValue="1"/>
@@ -16,7 +15,6 @@
             android:key="@string/speed_units_key"
             android:summary="@string/speed_units_pref_summary"
             android:title="@string/speed_units_pref_title"
-            app:useSimpleSummaryProvider="true"
             android:entries="@array/speed_units_entries"
             android:entryValues="@array/speed_units_values"
             android:defaultValue="1"/>

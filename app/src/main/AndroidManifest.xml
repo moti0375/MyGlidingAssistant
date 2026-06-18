@@ -97,7 +97,7 @@
         </activity>
         <activity
             android:name="presentation.screens.flight_details_screen.FlightDetailsActivity"
-            android:exported="false"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme">
             <meta-data
@@ -106,7 +106,7 @@
         </activity>
         <activity
             android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen"
-            android:exported="false"
+            android:exported="true"
             android:parentActivityName="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen"
             android:screenOrientation="portrait">
             <meta-data
@@ -117,6 +117,7 @@
             android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.settings_screen.SettingsActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/AppSettings"
+            android:exported="true"
             android:parentActivityName="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -125,7 +126,7 @@
 
         <activity android:name="presentation.screens.license_screen.GmsLicenseScreen"
             android:parentActivityName="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen"
-            android:exported="false"
+            android:exported="true"
             android:screenOrientation="portrait">
 
             <meta-data
@@ -135,7 +136,7 @@
         </activity>
         <service android:name="services.GlidingAssistanceService"
             android:foregroundServiceType="location"
-            android:exported="false"/>
+            android:exported="true"/>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -155,7 +156,7 @@
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"
-            android:exported="false"
+            android:exported="true"
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
