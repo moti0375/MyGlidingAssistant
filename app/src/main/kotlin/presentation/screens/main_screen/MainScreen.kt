@@ -44,7 +44,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistant.databinding.GpsRecorderMainMaterialBinding
-import com.dunihuliapps.myglidingassistnat.GpsRecLicense
 import com.dunihuliapps.myglidingassistnat.data.enums.AltitudeUnits
 import com.dunihuliapps.myglidingassistnat.data.enums.DistanceUnits
 import com.dunihuliapps.myglidingassistnat.data.enums.data.enums.SpeedUnits
@@ -58,13 +57,14 @@ import com.dunihuliapps.myglidingassistnat.presentation.map.MapReadyListener
 import com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen
 import com.dunihuliapps.myglidingassistnat.presentation.screens.settings_screen.SettingsActivity
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.presentation.units_formatters.KnotsFormatter
-import com.dunihuliapps.myglidingassistnat.services.GlidingAssistanceService
 
 import com.google.android.gms.common.GooglePlayServicesUtil
 import dagger.hilt.android.AndroidEntryPoint
 import data.model.Trip
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import presentation.screens.license_screen.GmsLicenseScreen
+import services.GlidingAssistanceService
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -452,8 +452,8 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
             }
 
             R.id.action_license -> {
-                val license_intent = Intent(this, GpsRecLicense::class.java)
-                startActivity(license_intent)
+                val intentIntent = Intent(this, GmsLicenseScreen::class.java)
+                startActivity(intentIntent)
             }
         }
         return true

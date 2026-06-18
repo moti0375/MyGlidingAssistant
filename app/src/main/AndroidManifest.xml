@@ -123,7 +123,17 @@
                 android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen" />
         </activity>
 
-        <service android:name="com.dunihuliapps.myglidingassistnat.services.GlidingAssistanceService"
+        <activity android:name="presentation.screens.license_screen.GmsLicenseScreen"
+            android:parentActivityName="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen"
+            android:exported="false"
+            android:screenOrientation="portrait">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen" />
+
+        </activity>
+        <service android:name="services.GlidingAssistanceService"
             android:foregroundServiceType="location"
             android:exported="false"/>
 

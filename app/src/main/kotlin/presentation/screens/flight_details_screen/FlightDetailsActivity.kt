@@ -24,6 +24,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import com.dunihuliapps.myglidingassistant.R
+import com.dunihuliapps.myglidingassistant.databinding.FlightDetailsActivityBinding
 import com.dunihuliapps.myglidingassistnat.data.enums.AltitudeUnits
 import com.dunihuliapps.myglidingassistnat.data.enums.DistanceUnits
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.HmsFormatter
@@ -56,19 +57,6 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     private var trip: Trip? = null
     private var progressDialog: ProgressDialog? = null
 
-    private lateinit var tvWhen: TextView
-    private lateinit var tvDuration: TextView
-    private lateinit var tvDistance: TextView
-    private lateinit var tvAvSpeed: TextView
-    private lateinit var tvMaxSpeed: TextView
-    private lateinit var tvFrom: TextView
-    private lateinit var tvTo: TextView
-    private lateinit var tvMaxAltitude: TextView
-    private lateinit var tvAverageMoveSpeed: TextView
-    private lateinit var tvMoveTime: TextView
-    private lateinit var tvStopTime: TextView
-    private lateinit var tvTripDetailsHead: TextView
-
     private lateinit var speedDisplayer: UnitsFormatter
     private lateinit var moveSpeedDisplayer: UnitsFormatter
     private lateinit var distanceDisplayer: UnitsFormatter
@@ -80,14 +68,15 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
 
     private val detailsViewModel by viewModels<FlightDetailsViewModel>()
 
+    private lateinit var binding: FlightDetailsActivityBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.trip_details_activity)
-
+        binding = FlightDetailsActivityBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
         setUpMapIfNeeded()
-        initDisplayComponents()
         observeViewModelState()
         updatePreferences()
         setDisplayers()
@@ -253,22 +242,6 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
 
     }
 
-
-    private fun initDisplayComponents() {
-        tvWhen = findViewById(R.id.tvWhen)
-        tvDuration = findViewById(R.id.tvDurationDetails)
-        tvAvSpeed = findViewById(R.id.tvAveSpeed)
-        tvMaxSpeed = findViewById(R.id.tvMaxSpeed)
-        tvDistance = findViewById(R.id.tvDistanceDetails)
-        tvFrom = findViewById(R.id.tvFrom)
-        tvTo = findViewById(R.id.tvTo)
-        tvMaxAltitude = findViewById(R.id.tvMaxAltitude)
-        tvAverageMoveSpeed = findViewById(R.id.tvAverageMoveSpeed)
-        tvMoveTime = findViewById(R.id.tvMoveTime)
-        tvStopTime = findViewById(R.id.tvStopTime)
-        tvTripDetailsHead = findViewById(R.id.tvTripDetailsHead)
-    }
-
     private fun setDisplayers() {
         Log.i("TripDetailsActivity", "setDisplayers: units: ${this.distanceUnits}")
         if (this.distanceUnits == DistanceUnits.Millage) {
@@ -289,21 +262,25 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     }
 
     private fun updateDisplay(trip: Trip) {
-        tvWhen.text = trip.date
-        tvDuration.text = timeFormatter.formatTime(trip.duration)
-        tvDistance.text = distanceDisplayer.formatUnits(trip.distance.toDouble())
-        tvAvSpeed.text = speedDisplayer.formatUnits(trip.averageSpeed)
-        tvMaxSpeed.text = speedDisplayer.formatUnits(trip.maxSpeed)
-        tvMaxAltitude.text = altitudeDisplayer.formatUnits(trip.maxAlt)
-        tvMoveTime.text = timeFormatter.formatTime(trip.moveTime)
-        tvStopTime.text = timeFormatter.formatTime(trip.stopTime)
-        tvTripDetailsHead.text = trip.tripName
-        tvFrom.text = trip.startAddress ?: getString(R.string.unavailable_data)
-        tvTo.text = trip.stopAddress ?: getString(R.string.unavailable_data)
-        if (trip.averageSpeed == 0.0) {
-            tvAverageMoveSpeed.text = getString(R.string.unavailable_data)
-        } else {
-            tvAverageMoveSpeed.text = moveSpeedDisplayer.formatUnits(trip.averageSpeed)
+
+        binding.tripRawDetails.apply {
+            tvWhen.text = trip.date
+            tvDurationDetails.text = timeFormatter.formatTime(trip.duration)
+            tvDistanceDetails.text = distanceDisplayer.formatUnits(trip.distance.toDouble())
+            tvAveSpeed.text = speedDisplayer.formatUnits(trip.averageSpeed)
+            tvMaxSpeed.text = speedDisplayer.formatUnits(trip.maxSpeed)
+            tvMaxAltitude.text = altitudeDisplayer.formatUnits(trip.maxAlt)
+            tvMoveTime.text = timeFormatter.formatTime(trip.moveTime)
+            tvStopTime.text = timeFormatter.formatTime(trip.stopTime)
+            tvTripDetailsHead.text = trip.tripName
+            tvFrom.text = trip.startAddress ?: getString(R.string.unavailable_data)
+            tvTo.text = trip.stopAddress ?: getString(R.string.unavailable_data)
+            if (trip.averageSpeed == 0.0) {
+                tvAverageMoveSpeed.text = getString(R.string.unavailable_data)
+            } else {
+                tvAverageMoveSpeed.text = moveSpeedDisplayer.formatUnits(trip.averageSpeed)
+            }
+
         }
     }
 

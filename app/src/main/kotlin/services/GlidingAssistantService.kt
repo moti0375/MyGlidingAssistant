@@ -1,5 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.services
-
+package services
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
