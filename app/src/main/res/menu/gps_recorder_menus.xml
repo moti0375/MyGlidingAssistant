@@ -1,14 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-
-   <item
-        android:id="@+id/action_musicPlayer"
-        android:orderInCategory="90"
-        android:icon="@drawable/ic_action_volume_on"
-        android:title="@string/StartMusicPlayer"
-        app:showAsAction="always"/>
-    
     <item
         android:id="@+id/action_license"
         android:orderInCategory="100"
@@ -21,12 +13,14 @@
         android:orderInCategory="110"
         android:icon="@drawable/ic_action_map"
         android:title="@string/RecordedTrips"
+        app:iconTint="@color/black"
         app:showAsAction="always"/>
     
     <item
         android:id="@+id/action_settigns"
         android:orderInCategory="120"
         android:icon="@drawable/ic_action_settings"
+        app:iconTint="@color/black"
         android:title="@string/AppSettings"
         app:showAsAction="always"/>
   

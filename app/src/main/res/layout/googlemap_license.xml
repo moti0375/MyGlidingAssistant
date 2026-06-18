@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/WhiteSmoke"
-            android:textColor="@color/Black"
+            android:textColor="@color/black"
             android:textStyle="bold"
             android:gravity="center" />
 

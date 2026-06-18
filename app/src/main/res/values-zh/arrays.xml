@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-    <string-array name="units_enteries">
+    <string-array name="units_entries">
         <item name="Metric">公里/小時</item>
         <item name="Milage">每小時英里</item>
         </string-array>
 
-    <string-array name="altitude_units_enteries">
+    <string-array name="altitude_units_entries">
         <item name="Feet">腳</item>
         <item name="Metric">仪表</item>
     </string-array>
 
-    <string-array name="line_color_enteries">
+    <string-array name="line_color_entries">
         <item name="Red">赤</item>
         <item name="Green">綠色</item>
         <item name="Yellow">黄色</item>
         <item name="Blue">藍</item>
      </string-array>
      
-    <string-array name="line_width_enteries">
+    <string-array name="line_width_entries">
         <item name="Thin">薄</item>
         <item name="Thick">厚</item>
         <item name="Thicker">厚實</item>
      </string-array>
 
-    <string-array name="AutoSaveEnteries">
+    <string-array name="auto_save_entries">
         <item name="true">自動保存我的旅行</item>
         <item name="false">問我是否要跟我的旅行</item>
     </string-array>
 
-    <string-array name="zoom_enteries">
+    <string-array name="zoom_entries">
         <item name="8">國家</item>
         <item name="12">城市</item>
         <item name="15">鄰里</item>

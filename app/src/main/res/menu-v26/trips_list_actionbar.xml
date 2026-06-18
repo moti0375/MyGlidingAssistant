@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_delete_trip"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_delete"
+        android:title="Delete Trip" />
+
+    <item
+        android:id="@+id/action_edit_trip"
+        android:orderInCategory="200"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_edit"
+        android:iconTint="@color/TtansBlack"
+        android:title="Edit Trip Title" />
+
+    <item
+        android:id="@+id/action_merge_trips"
+        android:orderInCategory="300"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_merge"
+        android:visible="false"
+        android:title="Merge Trips" />
+
+    <item
+        android:id="@+id/action_upload_trip"
+        android:orderInCategory="400"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_action_upload"
+        android:visible="false"
+        android:title="Upload Trip" />
+</menu>

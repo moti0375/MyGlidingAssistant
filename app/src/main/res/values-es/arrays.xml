@@ -1,36 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-    <string-array name="units_enteries">
+    <string-array name="units_entries">
         <item name="Metric">m/Km</item>
         <item name="Milage">Milla/Mph</item>
         </string-array>
 
-
-    <string-array name="altitude_units_enteries">
+    <string-array name="altitude_units_entries">
         <item name="Feet">Pies</item>
         <item name="Metric">Métrico</item>
     </string-array>
 
-    <string-array name="line_color_enteries">
+    <string-array name="line_color_entries">
         <item name="Red">Rojo</item>
         <item name="Green">Verde</item>
         <item name="Yellow">Amarillo</item>
         <item name="Blue">Azul</item>
      </string-array>
      
-    <string-array name="line_width_enteries">
+    <string-array name="line_width_entries">
         <item name="Thin">Delgada</item>
         <item name="Thick">De Sspesor</item>
         <item name="Thicker">Más Grueso</item>
      </string-array>
 
-    <string-array name="AutoSaveEnteries">
+    <string-array name="auto_save_entries">
         <item name="true">Lleve un registro de forma automática al final</item>
         <item name="false">Pídeme si desea guardar el viaje</item>
     </string-array>
 
-    <string-array name="zoom_enteries">
+    <string-array name="zoom_entries">
         <item name="8">Región</item>
         <item name="12">Ciudad</item>
         <item name="15">Vecindario</item>

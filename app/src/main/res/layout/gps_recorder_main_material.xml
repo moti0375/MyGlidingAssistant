@@ -1,34 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/Black">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main">
 
-    <include layout="@layout/status_bar" />
 
-    <include
-        android:id="@+id/app_bar"
-        layout="@layout/app_bar" />
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
 
     <FrameLayout
-        android:layout_below="@+id/app_bar"
+        android:layout_below="@id/app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/map_background">
 
-        <fragment
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            class="com.google.android.gms.maps.MapFragment" />
+            android:name="com.dunihuliapps.myglidingassistnat.presentation.map.CustomSupportMapFragment" />
     </FrameLayout>
 
     <LinearLayout
         android:id="@+id/llGauges"
-        android:layout_below="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/app_bar_layout"
         android:orientation="vertical"
         android:layout_marginTop="2dp"
         android:alpha="1">
@@ -40,63 +50,72 @@
             android:alpha="1">
 
             <LinearLayout
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="60dp"
                 android:layout_height="match_parent"
-                style="@style/material_textviews_style">
+                android:gravity="center"
+                style="@style/material_indicator_style"
+                android:layout_marginHorizontal="4dp">
 
                 <ImageView
+
                     android:id="@+id/imRecording"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:src="@drawable/ic_recording"
-                    android:visibility="gone"
+                    android:visibility="invisible"
                     android:elevation="1dp" />
             </LinearLayout>
 
-            <TextView
+
+            <com.dunihuliapps.myglidingassistnat.presentation.views.text_indicator.TextIndicator
                 android:id="@+id/tvTimer"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="8"
-                android:layout_gravity="center"
-                android:layout_centerHorizontal="true"
-                android:drawableRight="@drawable/ic_timer_white_24dp"
-                android:paddingRight="5dp"
-                style="@style/material_textviews_style"
-                android:text="00:00" />
-
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                app:indicator_text="00:00"
+                app:indicator_text_weight="bold"
+                app:end_icon="@drawable/ic_timer_white_24dp"
+                android:layout_marginEnd="4dp"
+                style="@style/material_indicator_style"/>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:alpha="1">
+            android:alpha="1"
+            android:padding="4dp">
 
-            <TextView
+            <com.dunihuliapps.myglidingassistnat.presentation.views.text_indicator.TextIndicator
                 android:id="@+id/tvSpeed"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                style="@style/material_textviews_style"
-                android:text="0.0"
-                android:drawableLeft="@drawable/ic_action_speedometer"/>
+                app:indicator_text="0.0"
+                app:indicator_text_weight="bold"
+                app:start_icon="@drawable/ic_action_speedometer"
+                style="@style/material_indicator_style"
+                android:layout_marginEnd="2dp"/>
 
-            <TextView
+
+            <com.dunihuliapps.myglidingassistnat.presentation.views.text_indicator.TextIndicator
                 android:id="@+id/tvDistance"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="match_parent"
-                style="@style/material_textviews_style"
-                android:text="0.0"
-                android:drawableRight="@drawable/ic_action_distance_meter"/>
-        </LinearLayout>
+                app:indicator_text="0.0"
+                app:indicator_text_weight="bold"
+                android:layout_marginStart="2dp"
+                app:end_icon="@drawable/ic_action_distance_meter"
+                style="@style/material_indicator_style"/>
+
+            </LinearLayout>
 
     </LinearLayout>
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:contentDescription="Start Stop Trip"
         android:id="@+id/fabCamera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -108,7 +127,7 @@
         android:visibility="invisible"/>
 
 
-    <android.support.design.widget.FloatingActionButton
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabStartStop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -116,20 +135,17 @@
         android:layout_above="@+id/tvAltitude"
         android:layout_alignParentRight="true"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@drawable/ic_action_new" />
+        android:src="@drawable/ic_action_new"
+        android:contentDescription="Start Stop Trip"/>
 
-    <TextView
+    <com.dunihuliapps.myglidingassistnat.presentation.views.text_indicator.TextIndicator
         android:id="@+id/tvAltitude"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        app:indicator_text="0"
+        app:indicator_text_weight="bold"
         android:layout_alignParentBottom="true"
-        android:paddingRight="5dp"
-        android:paddingLeft="10dp"
-        style="@style/material_textviews_style"
-        android:text="0.0"
-        android:drawableRight="@drawable/ic_terrain"/>
-
-
-
-
+        app:end_icon="@drawable/ic_terrain"
+        style="@style/material_indicator_style"/>
 </RelativeLayout>

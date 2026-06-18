@@ -40,11 +40,15 @@
     
     
     <!-- Settings strings -->
-    <string name="UnitsCategory">Unités de mesure</string>
-    <string name="UnitsPrefTitle">Vitesse et distance</string>
-    <string name="UnitsPrefSummary">Les unités dans lesquelles les données seront présentées</string>
-    
-    <string name="AltitudePrefTitle">Les unités d\'altitude</string>
+    <string name="unites_category">Unités de mesure</string>
+    <string name="distance_units_pref_title">Distance</string>
+    <string name="distance_units_pref_summary">Les distance unités dans lesquelles les données seront présentées</string>
+
+    <string name="speed_units_pref_title">Vitesse</string>
+    <string name="speed_units_pref_summary">Les vitesse unités dans lesquelles les données seront présentées</string>
+
+
+    <string name="AltitudePrefTitle">Altitude</string>
     <string name="AltitudeUnitsPrefSummary">Les d\'altitude unités dans lesquelles les données seront présentées</string>
     
     
@@ -79,7 +83,7 @@
 
     
      <!-- Recorded Trip Details Tabs Activity -->
-    <string name="UnavailableData">Information non disponible...</string>    
+    <string name="unavailable_data">Information non disponible...</string>
 
      <!-- Recorded Trips List Activity -->
     <string name="NoTripsHint">Il n\'y a pas de trajet enregistrés...</string>    

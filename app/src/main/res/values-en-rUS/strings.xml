@@ -48,11 +48,15 @@
     
     
     <!-- Settings strings -->
-    <string name="UnitsCategory">Units</string>
-    <string name="UnitsPrefTitle">Speed and distance</string>
-    <string name="UnitsPrefSummary">Units which will be displayed</string>
-    
-    <string name="AltitudePrefTitle">Altitude Units</string>
+    <string name="unites_category">Units</string>
+    <string name="distance_units_pref_title">Distance</string>
+    <string name="distance_units_pref_summary">Units which will be displayed</string>
+
+    <string name="speed_units_pref_title">Speed</string>
+    <string name="speed_units_pref_summary">Units which speed will be displayed</string>
+
+
+    <string name="AltitudePrefTitle">Altitude</string>
     <string name="AltitudeUnitsPrefSummary">Altitude Units which will be displayed</string>
     
     <string name="MapCategory">Map Options</string>
@@ -90,7 +94,7 @@
 
 
     <!-- Recorded Trip Details Tabs Activity -->
-    <string name="UnavailableData">This data is unavailable.. </string>    
+    <string name="unavailable_data">This data is unavailable.. </string>
 
      <!-- Recorded Trips List Activity -->
     <string name="NoTripsHint">There are no recorded trips yet...</string>    

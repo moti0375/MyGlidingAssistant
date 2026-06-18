@@ -1,21 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="@string/UnitsCategory" >
+    <PreferenceCategory android:title="@string/unites_category" >
      <ListPreference
-            android:key="@string/units"
-            android:summary="@string/UnitsPrefSummary"
-            android:title="@string/UnitsPrefTitle" 
-            android:entries="@array/units_enteries"
-            android:entryValues="@array/units_ualues"
+            android:key="@string/distance_units_key"
+            android:summary="@string/distance_units_pref_summary"
+            android:title="@string/distance_units_pref_title"
+            app:useSimpleSummaryProvider="true"
+            android:entries="@array/distance_units_entries"
+            android:entryValues="@array/distance_units_values"
             android:defaultValue="1"/>
-     
+
+        <ListPreference
+            android:key="@string/speed_units_key"
+            android:summary="@string/speed_units_pref_summary"
+            android:title="@string/speed_units_pref_title"
+            app:useSimpleSummaryProvider="true"
+            android:entries="@array/speed_units_entries"
+            android:entryValues="@array/speed_units_values"
+            android:defaultValue="1"/>
+
          <ListPreference
-            android:key="@string/altitudeUnitsKey"
+            android:key="@string/altitude_units_key"
             android:summary="@string/AltitudeUnitsPrefSummary"
             android:title="@string/AltitudePrefTitle" 
-            android:entries="@array/altitude_units_enteries"
-            android:entryValues="@array/altitude_units_ualues"
+            android:entries="@array/altitude_units_entries"
+            android:entryValues="@array/altitude_units_values"
             android:defaultValue="1"/>
          
     </PreferenceCategory>
@@ -24,21 +35,21 @@
             android:key="@string/LineColorPref"
             android:summary="@string/LineColorSummary"
             android:title="@string/LineColorTitle" 
-            android:entries="@array/line_color_enteries"
+            android:entries="@array/line_color_entries"
             android:entryValues="@array/line_color_values"
             android:defaultValue="1"/>
        <ListPreference
             android:key="@string/LineWidthPref"
             android:summary="@string/LineWidthSummary"
             android:title="@string/LineWidthTitle" 
-            android:entries="@array/line_width_enteries"
-            android:entryValues="@array/line_width_val"
+            android:entries="@array/line_width_entries"
+            android:entryValues="@array/line_width_values"
             android:defaultValue="5"/>       
        <ListPreference
             android:key="@string/ZoomPref"
             android:summary="@string/ZoomSummary"
             android:title="@string/ZoomTitle" 
-            android:entries="@array/zoom_enteries"
+            android:entries="@array/zoom_entries"
             android:entryValues="@array/zoom_values"
             android:defaultValue="15"/>
        
@@ -49,8 +60,8 @@
             android:key="@string/AutoSavePrefKey"
             android:summary="@string/AutoSaveSummary"
             android:title="@string/AutoSaveTitle"
-            android:entries="@array/AutoSaveEnteries"
-            android:entryValues="@array/AutoSaveValues"
+            android:entries="@array/auto_save_entries"
+            android:entryValues="@array/auto_save_values"
             android:defaultValue="0"/>
 
     </PreferenceCategory>

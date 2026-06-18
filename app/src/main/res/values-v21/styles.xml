@@ -10,7 +10,7 @@
         <item name="android:statusBarColor">@color/primaryColorDark</item>
     </style>
 
-    <style name="material_textviews_style" parent="material_textviews_style.Base">
+    <style name="material_indicator_style" parent="indicator.base">
         <item name="android:elevation">4dp</item>
         <item name="android:alpha">0.8</item>
     </style>
@@ -36,6 +36,5 @@
     </style>
 
     <style name="detail_text_view" parent="detail_text_view.base">
-        <item name="android:elevation">4dp</item>
     </style>
 </resources>

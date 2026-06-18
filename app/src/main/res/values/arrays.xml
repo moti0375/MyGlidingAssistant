@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="units_ualues" translatable="false">
+    <string-array name="distance_units_values" translatable="false">
         <item name="Metric">1</item>
-        <item name="Milage">2</item>
+        <item name="Millage">2</item>
     </string-array>
-    <string-array name="units_enteries">
-        <item name="Metric">m/Kmh</item>
-        <item name="Milage">Miles/Mph</item>
+
+    <string-array name="distance_units_entries">
+        <item name="Metric">Metric</item>
+        <item name="Millage">Miles</item>
     </string-array>
-    <string-array name="altitude_units_ualues" translatable="false">
+
+    <string-array name="speed_units_entries">
+        <item name="Metric">Metric</item>
+        <item name="Knots">Knots</item>
+    </string-array>
+
+    <string-array name="speed_units_values" translatable="false">
+        <item name="Metric">1</item>
+        <item name="Knots">2</item>
+    </string-array>
+
+    <string-array name="altitude_units_values" translatable="false">
         <item name="Feet">1</item>
         <item name="Metric">2</item>
     </string-array>
-    <string-array name="altitude_units_enteries">
+    <string-array name="altitude_units_entries">
         <item name="Feet">Feet</item>
         <item name="Metric">Metric</item>
     </string-array>
@@ -23,7 +35,7 @@
         <item name="Yellow">3</item>
         <item name="Blue">4</item>
     </string-array>
-    <string-array name="line_color_enteries">
+    <string-array name="line_color_entries">
         <item name="Red">Red</item>
         <item name="Green">Green</item>
         <item name="Yellow">Yellow</item>
@@ -36,30 +48,32 @@
         <item name="20">20</item>
     </string-array>
 
-    <string-array name="zoom_enteries">
+    <string-array name="zoom_entries">
         <item name="8">State</item>
         <item name="12">City</item>
         <item name="15">Block</item>
         <item name="20">Street</item>
     </string-array>
 
-    <string-array name="line_width_val" translatable="false">
+    <string-array name="line_width_values" translatable="false">
         <item name="thin">5</item>
         <item name="thick">10</item>
         <item name="thicker">15</item>
     </string-array>
-    <string-array name="line_width_enteries">
+    <string-array name="line_width_entries">
         <item name="Thin">Thin</item>
         <item name="Thick">Thick</item>
         <item name="Thicker">Thicker</item>
     </string-array>
-    <string-array name="AutoSaveValues" translatable="false">
-        <item name="true">0</item>
-        <item name="false">1</item>
-    </string-array>
-    <string-array name="AutoSaveEnteries">
+
+    <string-array name="auto_save_entries">
         <item name="true">Automatic save trip when done</item>
         <item name="false">Ask me to save trip</item>
+    </string-array>
+
+    <string-array name="auto_save_values" translatable="false">
+        <item name="true">0</item>
+        <item name="false">1</item>
     </string-array>
 
 </resources>

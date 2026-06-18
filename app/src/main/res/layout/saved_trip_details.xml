@@ -35,7 +35,6 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/When"
-                android:elevation="4dp"
                 style="@style/detail_left_text_view" />
 
             <TextView
@@ -43,7 +42,6 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:elevation="4dp"
                 style="@style/detail_right_text_view" />
 
         </LinearLayout>

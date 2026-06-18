@@ -39,13 +39,17 @@
         <item name="android:homeAsUpIndicator">@drawable/ic_action_back</item>
     </style>
 
+
+    <style name="indicator.base" parent="AppTheme.Base">
+        <item name="android:background">@drawable/indicator_background</item>
+        <item name="android:alpha">0.7</item>
+    </style>
+
     <style name="material_textviews_style.Base" parent="AppTheme.Base">
-        <item name="android:background">@drawable/material_textview</item>
-        <item name="android:textColor">@color/WhiteSmoke</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:textSize">35sp</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_margin">3dp</item>
-        <item name="android:alpha">0.8</item>
     </style>
 
     <style name="material_textviews_style" parent="material_textviews_style.Base">
@@ -63,7 +67,7 @@
     </style>
 
     <style name="detail_text_view.base" parent="AppTheme.Base">
-        <item name="android:textColor">@color/Black</item>
+        <item name="android:textColor">@color/black</item>
         <item name="android:textAppearance">?android:attr/textAppearanceLarge</item>
         <item name="android:background">@drawable/details_textview</item>
         <item name="android:layout_margin">1dp</item>
@@ -103,4 +107,22 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.GpsTripRecorder" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Background of Toolbar -->
+        <item name="colorPrimary">@color/white</item>
+        <item name="colorOnPrimary">@color/black</item>
+
+        <!-- 1. This attribute controls the color of action icons (Map, Settings, etc.) -->
+        <item name="colorControlNormal">@color/black</item>
+
+        <!-- 2. This ensures the "3-dots" and text are tinted correctly -->
+        <item name="actionBarTheme">@style/ThemeOverlay.App.Toolbar</item>
+    </style>
+
+<!-- Custom Overlay -->
+    <style name="ThemeOverlay.App.Toolbar" parent="ThemeOverlay.MaterialComponents.ActionBar">
+        <!-- This forces all icons and text in the toolbar to follow this color -->
+        <item name="colorControlNormal">@color/black</item>
+        <item name="android:textColorPrimary">@color/black</item>
+    </style>
 </resources>
