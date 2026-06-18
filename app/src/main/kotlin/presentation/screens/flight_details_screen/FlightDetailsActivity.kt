@@ -16,7 +16,6 @@ import android.provider.MediaStore
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -74,7 +73,6 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         super.onCreate(savedInstanceState)
         binding = FlightDetailsActivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         prefs = PreferenceManager.getDefaultSharedPreferences(this)
         setUpMapIfNeeded()
         observeViewModelState()
@@ -160,10 +158,6 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == android.R.id.home) {
             finish()
-        }
-
-        if (item.itemId == R.id.action_googleErath) {
-            startGoogleEarth()
         }
 
         if (item.itemId == R.id.action_share) {
@@ -284,39 +278,6 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         }
     }
 
-    private fun startGoogleEarth() {
-        val googleEarthInstalled = Utils.isPackageInstalled(
-            GOOGLE_EARTH_PACKAGE, this
-        )
-        if (googleEarthInstalled) {
-            if (!Utils.isFileExists(trip!!.kml)) {
-                Toast.makeText(
-                    this@FlightDetailsActivity,
-                    getString(R.string.MapUnavailable),
-                    Toast.LENGTH_LONG
-                ).show()
-                return
-            }
-
-            val file = File(trip!!.kml)
-            val earthURI = Uri.fromFile(file)
-
-            val earthIntent = Intent(Intent.ACTION_VIEW, earthURI)
-
-            //            Intent intent = new Intent(Intent.ACTION_VIEW);
-//            intent.setDataAndType(Uri.fromFile(file), GOOGLE_EARTH_KML_ARG);
-//            intent.putExtra("com.google.earth.EXTRA.tour_feature_id", "my_track");
-            try {
-                startActivity(earthIntent)
-            } catch (e: ActivityNotFoundException) {
-                e.printStackTrace()
-                googleEarthInstallDialog()
-            }
-        } else {
-            googleEarthInstallDialog()
-        }
-    }
-
     private fun googleEarthInstallDialog() {
         AlertDialog.Builder(this).apply {
             setMessage(resources.getString(R.string.NoGoogleEarth))
@@ -387,20 +348,22 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
 
 
     private fun takeMapHqSnapshot(imageFileName: String, tripTitle: String?) {
-        val callback = SnapshotReadyCallback { snapshot: Bitmap? ->
-            shareImage(snapshot, imageFileName, tripTitle)
+        mapFragment.takeMapSnapshot{ snapshot ->
+            snapshot?.let {
+                shareImage(snapshot, imageFileName, tripTitle)
+            }
         }
-        mapFragment.takeMapSnapshot(callback)
-
     }
 
 
-    private fun shareImage(b: Bitmap?, imageFileName: String, tripTitle: String?) {
+    private fun shareImage(b: Bitmap, imageFileName: String, tripTitle: String?) {
         val icon = BitmapFactory.decodeResource(this.resources, R.drawable.ic_launcher)
         val image = Utils.overlay(b, icon, getString(R.string.app_name))
 
-        val share = Intent(Intent.ACTION_SEND)
-        share.setType("image/png")
+        val share = Intent(Intent.ACTION_SEND).apply{
+            type = "image/png"
+        }
+
         val path = File(imageFileName).path
 
         val values = ContentValues().apply {
@@ -434,8 +397,8 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         try {
             uri?.let {
                 contentResolver.openOutputStream(it)?.use { os ->
-                    image.compress(Bitmap.CompressFormat.PNG, 100, os)
-                    image.recycle()
+                    image?.compress(Bitmap.CompressFormat.PNG, 100, os)
+                    image?.recycle()
                 }
             }
             share.putExtra(Intent.EXTRA_STREAM, uri)
