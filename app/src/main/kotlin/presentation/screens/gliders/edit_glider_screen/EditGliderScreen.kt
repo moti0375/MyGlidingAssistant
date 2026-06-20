@@ -49,16 +49,31 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.type
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
+import coil.compose.AsyncImage
 import com.dunihuliapps.myglidingassistant.R
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit) {
+    val context = LocalContext.current
 
     val state by viewModel.state.collectAsState()
+
+    val tempUri = remember {
+        val directory = File(context.externalCacheDir, "camera_photos").apply { mkdirs() }
+        val file = File(directory, "temp_glider_${System.currentTimeMillis()}.jpg")
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.provider",
+            file
+        )
+    }
 
     // Activity Result Launcher for CameraActivity
     val galleryLauncher = rememberLauncherForActivityResult(
@@ -68,15 +83,14 @@ fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit) {
     } }
 
     val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview()
-    ) { bitmap: Bitmap? ->
-        // Note: For production, you'd save this bitmap to a file and get the URI
-        // For now, we update the state if a photo was taken
-        if (bitmap != null) { /* Handle saving bitmap to file if needed */
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            // The image is now saved at tempUri
+            viewModel.mapEventToState(EditGliderEvent.OnImageTaken(tempUri))
         }
     }
 
-    val context = LocalContext.current
     var showImagePickerOptions by remember { mutableStateOf(false) }
 
     // Launcher for Gallery
@@ -98,7 +112,7 @@ fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit) {
             },
             dismissButton = {
                 TextButton(onClick = {
-                    cameraLauncher.launch()
+                    cameraLauncher.launch(tempUri)
                     showImagePickerOptions = false
                 }) {
                     Icon(Icons.Default.AddAPhoto, contentDescription = null)
@@ -130,18 +144,23 @@ fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit) {
                     color = MaterialTheme.colorScheme.surfaceVariant,
                     tonalElevation = 2.dp
                 ) {
-                    // Use a placeholder if gliderImage is null
-                    if (state.image == null) {
+                    val imageUri = state.image
+                    imageUri?.let{
+                        AsyncImage(
+                            model = imageUri,
+                            contentDescription = "Taken Glider Image",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } ?: run {
                         Image(
                             painter = painterResource(id = R.drawable.ic_glider_icon),
                             contentDescription = null,
                             modifier = Modifier.padding(32.dp)
                         )
-                    } else {
-                        // If you have Coil/Glide for Compose, use it here.
-                        // Otherwise, standard Image with a local file path:
-                        Text("Image Loaded") // Placeholder for actual Image loading logic
                     }
+                    // Use a placeholder if gliderImage is null
+
                 }
 
                 // Camera Badge

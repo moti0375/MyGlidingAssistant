@@ -21,7 +21,6 @@ class EditGliderViewModel @Inject constructor(
     private val repository: GlidersRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(EditGliderScreenState(
         type = savedStateHandle.get<String>("type"),
         callsign = savedStateHandle.get<String>("callsign"),
@@ -37,7 +36,9 @@ class EditGliderViewModel @Inject constructor(
             is EditGliderEvent.OnCallsignChange -> _state.value = _state.value.copy(callsign = event.callsign)
             is EditGliderEvent.OnSeatsChange -> _state.value = _state.value.copy(seats = event.seats)
             is EditGliderEvent.OnRatioChange -> _state.value = _state.value.copy(ratio = event.ratio)
-            is EditGliderEvent.OnImageTaken -> _state.value = _state.value.copy(image = event.imageUri.toString())
+            is EditGliderEvent.OnImageTaken ->  {
+                _state.value =  _state.value.copy(image = event.imageUri.toString())
+            }
             is EditGliderEvent.Save -> save()
         }
     }
