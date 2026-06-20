@@ -164,16 +164,16 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
 
     fun refreshDisplay(flights: List<Flight>) {
 //        Log.i(LOG_TAG, "refreshDisplay was called");
+
         actionMode?.finish()
-        Log.i(LOG_TAG, "refreshDisplay: $flights")
+
 
         if (flights.isEmpty()) {
-            binding.tripsRecyclerView.visibility = View.GONE
-            binding.noFlightsLayout.root.visibility = View.VISIBLE
+
         } else {
-            binding.tripsRecyclerView.visibility = View.VISIBLE
-            binding.noFlightsLayout.root.visibility = View.GONE
+
         }
+        Log.i(LOG_TAG, "refreshDisplay: $flights")
 
         flightsListAdapter.updateTrips(flights)
 
@@ -431,7 +431,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
                 // clickListener.onClick(child, rv.getChildPosition(child));
                 position = rv.getChildAdapterPosition(child)
                 val flight = flightsListAdapter.getItemAtPosition(rv.getChildAdapterPosition(child))
-                clickListener?.onClick(flight)
+                clickListener?.onClick(flight )
             }
             return false
         }
