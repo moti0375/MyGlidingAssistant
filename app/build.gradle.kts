@@ -74,8 +74,12 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material.icons.core)
+// In dependencies block
+    // In dependencies block
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
+// For loading the selected image from a URI:
+    implementation("io.coil-kt:coil-compose:2.6.0")
 
-    // Debugging Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
