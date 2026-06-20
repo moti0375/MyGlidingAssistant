@@ -80,6 +80,7 @@ dependencies {
 // For loading the selected image from a URI:
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation(libs.androidx.ui)
+    implementation(libs.androidx.compose.foundation.layout)
 
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

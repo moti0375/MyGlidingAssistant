@@ -1,5 +1,6 @@
 package com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.edit_glider_screen
 
+import android.util.Log
 import androidx.activity.result.launch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -19,8 +20,13 @@ import javax.inject.Inject
 @HiltViewModel
 class EditGliderViewModel @Inject constructor(
     private val repository: GlidersRepository,
-    savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
+    init {
+        Log.i("EditGliderViewModel", "init: glider id: ${savedStateHandle.get<Long>("id")}" )
+    }
+
     private val _state = MutableStateFlow(EditGliderScreenState(
         type = savedStateHandle.get<String>("type"),
         callsign = savedStateHandle.get<String>("callsign"),
@@ -45,8 +51,11 @@ class EditGliderViewModel @Inject constructor(
 
     fun save() {
         viewModelScope.launch {
-            repository.insertGlider(
-                Glider(type = _state.value.type ?: "", callsign = _state.value.callsign ?: "", seats = _state.value.seats, ratio = _state.value.ratio))
+            savedStateHandle.get<Long>("id")?.let { gliderId ->
+                repository.update(gliderId, type = _state.value.type ?: "", callsign = _state.value.callsign ?: "", seats = _state.value.seats, ratio = _state.value.ratio, gliderImage = _state.value.image)
+            } ?: run {
+                repository.insertGlider( type =_state.value.type ?: "", callsign = _state.value.callsign ?: "", seats = _state.value.seats, ratio = _state.value.ratio, gliderImage = _state.value.image)
+            }
         }
     }
 

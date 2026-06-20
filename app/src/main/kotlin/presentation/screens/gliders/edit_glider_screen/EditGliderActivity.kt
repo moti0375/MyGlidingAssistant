@@ -27,6 +27,7 @@ class EditGliderActivity : ComponentActivity() {
         fun newIntent(context: Context, glider: Glider?) : Intent {
             val intent = Intent(context, EditGliderActivity::class.java).apply {
                 glider?.let {
+                    putExtra("id", it.id)
                     putExtra("type", it.type)
                     putExtra("callsign", it.callsign)
                     putExtra("seats", it.seats)

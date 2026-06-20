@@ -13,8 +13,8 @@ class GlidersActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            GlidersScreen(viewModel) {
-                startActivity(EditGliderActivity.newIntent(this@GlidersActivity, null))
+            GlidersScreen(viewModel) { glider ->
+                startActivity(EditGliderActivity.newIntent(this@GlidersActivity, glider))
             }
         }
     }
