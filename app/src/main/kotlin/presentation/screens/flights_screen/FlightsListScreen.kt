@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -23,36 +22,32 @@ import android.widget.AbsListView.MultiChoiceModeListener
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NavUtils
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
 import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistant.databinding.LayoutRecordedFlightsBinding
-import com.dunihuliapps.myglidingassistnat.domain.db.TripsDataSource
 import dagger.hilt.android.AndroidEntryPoint
 import data.model.Flight
+import kotlinx.coroutines.launch
 import presentation.screens.flight_details_screen.FlightDetailsActivity
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
+
+    private val viewModel by viewModels<FlightsListViewModel>()
+
     private var settings: SharedPreferences? = null
-    private var listener: OnSharedPreferenceChangeListener? = null
     var position: Int = -1
-    private var selectedFlight: Flight? = null
     var actionMode: ActionMode? = null
     var itemsCount: Int = 0
 
-
-    @Inject
-    lateinit var datasource: TripsDataSource
-
-    private val flights = mutableListOf<Flight>()
-    private val selectedFlights = mutableListOf<Flight>()
     private lateinit var flightsListAdapter: FlightsListAdapter
 
     private lateinit var binding: LayoutRecordedFlightsBinding
@@ -61,7 +56,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
         binding = LayoutRecordedFlightsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.appBar) { view, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             // Use padding instead of margins to handle the status bar area
             view.setPadding(0, systemBars.top, 0, 0)
@@ -83,12 +78,12 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
                 binding.tripsRecyclerView,
                 this@FlightsListScreen,
                 object : ClickListener {
-                    override fun onClick(v: View?, position: Int) {
+                    override fun onClick(flight: Flight) {
                         //   Toast.makeText(GpsRecTripsList.this, "RecyclerView item " + position + " clicked..", Toast.LENGTH_SHORT).show();
                         if (actionMode != null) {
                             recyclerToggleSelection(position)
                         } else {
-                            this@FlightsListScreen.navigateToFlightDetailsScreen(flights[position])
+                            this@FlightsListScreen.navigateToFlightDetailsScreen(flight)
                         }
                     }
 
@@ -99,16 +94,49 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
         )
         binding.tripsRecyclerView.apply {
             setLayoutManager(LinearLayoutManager(this@FlightsListScreen))
-            setCameraDistance(100f)
+            cameraDistance = 100f
             setAdapter(flightsListAdapter)
         }
 
         settings = getSharedPreferences("GPS_TRIP_RECORDER", MODE_PRIVATE)
-        listener =
-            OnSharedPreferenceChangeListener { sharedPreferences: SharedPreferences?, key: String? -> this@FlightsListScreen.refreshDisplay() }
-        settings!!.registerOnSharedPreferenceChangeListener(listener)
+        listenToState()
+    }
 
-        refreshDisplay()
+    private fun listenToState() {
+        observeScreenStateFlow()
+        observeUpdateFlightFlow()
+    }
+
+    private fun observeScreenStateFlow() {
+        lifecycleScope.launch {
+            viewModel.state.collect {
+                when (it) {
+                    is FlightsListState.Initiated -> {
+                        viewModel.mapEventToState(FlightsListEvent.GetAllFlights)
+                    }
+
+                    is FlightsListState.Loading -> {
+
+                    }
+
+                    is FlightsListState.FlightsLoaded -> {
+                        refreshDisplay(it.flights)
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    private fun observeUpdateFlightFlow() {
+        lifecycleScope.launch {
+            viewModel.editSelectedFlight.collect { selectedFlight ->
+                selectedFlight?.let {
+                    userInputDialog(selectedFlight)
+                }
+            }
+        }
     }
 
 
@@ -134,38 +162,21 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
     }
 
 
-    fun refreshDisplay() {
+    fun refreshDisplay(flights: List<Flight>) {
 //        Log.i(LOG_TAG, "refreshDisplay was called");
 
         actionMode?.finish()
 
-        flights.let {
-            it.clear()
-            it.addAll(datasource.findAll())
-        }
 
-        Log.i(LOG_TAG, "refreshDisplay: $flights")
-        val size = flights.size
+        if (flights.isEmpty()) {
 
-        //        Log.i(LOG_TAG, "Got " + size + " trips for database");
-        if (size == 0) {
-            binding.tvTripsListSummary.text = getResources().getString(
-                R.string.NoTripsHint
-            )
         } else {
-            binding.tvTripsListSummary.text = if (size > 1) (size.toString() + " "
-                    + getResources().getString(R.string.Trips)) else (size.toString() + " "
-                    + getResources().getString(R.string.Trip))
-        }
 
-        //        tripsListAdapter = new TripsListAdapter(this, trips);
+        }
+        Log.i(LOG_TAG, "refreshDisplay: $flights")
+
         flightsListAdapter.updateTrips(flights)
 
-        //   tripListView.setAdapter(tripsListAdapter);
-
-//        if (position != -1) {
-//            tripListView.setSelection(position);
-//        }
     }
 
     fun deleteTripAlertDialog() {
@@ -183,17 +194,11 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
             .setMessage(getResources().getString(R.string.DeleteDialog))
             .setCancelable(false)
             .setPositiveButton(
-                getResources().getString(R.string.YES),
-                object : DialogInterface.OnClickListener {
-                    override fun onClick(dialog: DialogInterface, id: Int) {
-                        for (trip in selectedFlights!!) {
-                            datasource!!.removeSavedTrip(trip)
-                            datasource!!.deleteMarkersForTrip(trip.id.toDouble())
-                        }
-                        refreshDisplay()
-                        dialog.cancel()
-                    }
-                })
+                getResources().getString(R.string.YES)
+            ) { dialog, _ ->
+                viewModel.mapEventToState(FlightsListEvent.DeleteSelectedFlights)
+                dialog.cancel()
+            }
             .setNegativeButton(
                 getResources().getString(R.string.NO)
             ) { dialog, id -> dialog.cancel() }
@@ -210,7 +215,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
     }
 
 
-    fun userInputDialog() {
+    fun userInputDialog(flight: Flight) {
         val alert = AlertDialog.Builder(this)
         alert.setIcon(getResources().getDrawable(R.mipmap.ic_launcher))
         alert.setTitle(getResources().getString(R.string.TripTitleDialogTitle))
@@ -221,26 +226,23 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
             LinearLayout.LayoutParams.WRAP_CONTENT
         )
         layout.orientation = LinearLayout.VERTICAL
-        layout.setLayoutParams(parms)
+        layout.layoutParams = parms
 
         // Set an EditText view to get user input
         val input = EditText(this)
         val chars = TextView(this)
 
-        input.setMaxLines(1)
-        input.setFilters(
-            arrayOf<InputFilter>(
-                LengthFilter(
-                    TRIP_NAME_MAX_LENGTH
-                )
+        input.maxLines = 1
+        input.filters = arrayOf<InputFilter>(
+            LengthFilter(
+                TRIP_NAME_MAX_LENGTH
             )
         )
 
         chars.setPadding(5, 0, 0, 2)
-        if (selectedFlights[0].tripName != null) {
-            chars.text = selectedFlights[0].tripName!!.length.toString() + "/" + TRIP_NAME_MAX_LENGTH
-            input.setText(selectedFlights[0].tripName)
-        } else {
+        flight.name?.let {
+            input.setText("${it.length} / $TRIP_NAME_MAX_LENGTH")
+        } ?: run {
             chars.text = "0/$TRIP_NAME_MAX_LENGTH"
             input.setText("")
         }
@@ -276,21 +278,14 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
             )
         )
         layout.addView(chars, tv1Params)
-
         alert.setView(layout)
-
         alert.setPositiveButton(
             getResources().getString(R.string.Done)
         ) { dialog, whichButton ->
-            val value = input.getText().toString()
+            val value = input.text.toString()
             // Toast.makeText(context, value + " entered..",
             // Toast.LENGTH_LONG).show();
-            val status = datasource.updateTripTitle(selectedFlights[0], value)
-            if (status) {
-                // Toast.makeText(context, "Saved..",
-                // Toast.LENGTH_LONG).show();
-                refreshDisplay()
-            }
+            viewModel.mapEventToState(FlightsListEvent.UpdateFlightName(flight, value))
         }
 
         alert.setNegativeButton(
@@ -313,7 +308,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
     override fun onCreateActionMode(mode: ActionMode, menu: Menu?): Boolean {
         mode.menuInflater.inflate(R.menu.trips_list_actionbar, menu)
         flightsListAdapter.clearSelection()
-        selectedFlights.clear()
+        viewModel.mapEventToState(FlightsListEvent.ClearSelectedFlight)
         return true
     }
 
@@ -327,7 +322,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
     override fun onActionItemClicked(mode: ActionMode?, item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_delete_trip -> deleteTripAlertDialog()
-            R.id.action_edit_trip -> userInputDialog()
+            R.id.action_edit_trip -> viewModel.mapEventToState(FlightsListEvent.EditFlightClicked)
             R.id.action_upload_trip -> {
                 position = -1
                 uploadFlightDialog()
@@ -341,7 +336,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
 
     override fun onDestroyActionMode(mode: ActionMode?) {
         actionMode = null
-        selectedFlights.clear()
+        viewModel.mapEventToState(FlightsListEvent.ClearSelectedFlight)
         flightsListAdapter.clearSelection()
     }
 
@@ -349,42 +344,6 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
     //    };
 
 
-    //    private class MergeTripsLongOperation extends AsyncTask<String, Void, String> {
-    //
-    //        @Override
-    //        protected String doInBackground(String... params) {
-    //
-    //            int MergeStatus = com.bartovapps.gpstriprec.presentation.screens.main_screen.TripManager.mergeTrips(selectedTrips.get(1), selectedTrips.get(0), GpsRecTripsList.this, datasource);
-    //            String result = new String();
-    //            switch (MergeStatus) {
-    //                case MERGE_SUCCESS:
-    //                    result = getResources().getString(R.string.Completed);
-    //                    break;
-    //                case UNABLE_TO_MERGE:
-    //                    result = getResources().getString(R.string.ContinuousMergerTrips);
-    //                    break;
-    //                case KML_NOT_FOUND:
-    //                    result = "Trips details cannot be found!, Merge Failed!";
-    //            }
-    //            return result;
-    //        }
-    //
-    //        @Override
-    //        protected void onPostExecute(String result) {
-    //            Toast.makeText(GpsRecTripsList.this, result, Toast.LENGTH_SHORT).show();
-    //            mergePd.dismiss();
-    //            actionMode.finish();
-    //            refreshDisplay();
-    //        }
-    //
-    //        @Override
-    //        protected void onPreExecute() {
-    //        }
-    //
-    //        @Override
-    //        protected void onProgressUpdate(Void... values) {
-    //        }
-    //    }
     fun uploadFlightDialog() {
         val alertDialogBuilder = AlertDialog.Builder(this)
 
@@ -401,7 +360,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
             .setCancelable(true).setPositiveButton(
                 getResources().getString(R.string.YES),
                 DialogInterface.OnClickListener { dialog: DialogInterface?, id: Int ->
-                    dialog!!.dismiss()
+                    dialog?.dismiss()
                     //								Toast.makeText(GpsRecTripsList.this, "Uploading this trip...", Toast.LENGTH_LONG).show();
                     val intent = this@FlightsListScreen.intent
                     //intent.putExtra("UploadedTrip", selectedTrips.get(0));
@@ -411,8 +370,8 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
             .setNegativeButton(
                 getResources().getString(R.string.NO),
                 DialogInterface.OnClickListener { dialog: DialogInterface?, id: Int ->
-                    dialog!!.dismiss()
-                    actionMode!!.finish()
+                    dialog?.dismiss()
+                    actionMode?.finish()
                 })
 
         // create alert dialog
@@ -424,14 +383,13 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
     }
 
 
-
     internal inner class RecyclerTouchListener(
         context: Activity,
         recyclerView: RecyclerView,
         actionModeCallback: ActionMode.Callback?,
         clickListener: ClickListener?
     ) : OnItemTouchListener {
-        private val LOG_TAG: String = RecyclerTouchListener::class.java.getSimpleName()
+        private val LOG_TAG: String = RecyclerTouchListener::class.java.simpleName
         var gestureDetector: GestureDetector
         var clickListener: ClickListener?
 
@@ -448,16 +406,16 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
 
 
                 override fun onLongPress(e: MotionEvent) {
-                    Log.i(LOG_TAG, "onLongPress was invoked..: " + e)
-                    val childView = recyclerView.findChildViewUnder(e.getX(), e.getY())
+                    Log.i(LOG_TAG, "onLongPress was invoked..: $e")
+                    val childView = recyclerView.findChildViewUnder(e.x, e.y)
                     if (actionMode != null) {
                         return
                     } else {
                         actionMode = context.startActionMode(actionModeCallback)
-                        Log.i(LOG_TAG, "actionMode = " + actionMode)
+                        Log.i(LOG_TAG, "actionMode = $actionMode")
                         //                        int idx = recyclerView.getChildPosition(childView);   //this method was deprecated and caused app to crash! replaced with the one below..
                         val idx = recyclerView.getChildLayoutPosition(childView!!)
-                        Log.i(LOG_TAG, "indx = " + idx)
+                        Log.i(LOG_TAG, "indx = $idx")
                         recyclerToggleSelection(idx)
                     }
 
@@ -468,11 +426,12 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
 
 
         override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-//            Log.i(LOG_TAG, "onInterceptTouchEvent was called: " + gestureDetector.onTouchEvent(e));
-            val child = rv.findChildViewUnder(e.getX(), e.getY())
-            if (child != null && clickListener != null && gestureDetector.onTouchEvent(e) == true) {
+            val child = rv.findChildViewUnder(e.x, e.y)
+            if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
                 // clickListener.onClick(child, rv.getChildPosition(child));
-                clickListener!!.onClick(child, rv.getChildAdapterPosition(child))
+                position = rv.getChildAdapterPosition(child)
+                val flight = flightsListAdapter.getItemAtPosition(rv.getChildAdapterPosition(child))
+                clickListener?.onClick(flight )
             }
             return false
         }
@@ -497,30 +456,22 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
                 actMode.title = title
 
                 //selectedTrip = trips.get(idx);
-                selectedFlights?.apply {
-                    clear()
-                    addAll(flightsListAdapter.getSelectedItems())
-                }
-                Log.i(LOG_TAG, "Selected " + selectedFlights!!.size + " trips for action..")
+                val selectedFlights = flightsListAdapter.getSelectedItems()
 
-                if (itemsCount == 1) {
+                if (itemsCount > 1) {
+                    actMode.apply {
+                        menu.findItem(R.id.action_edit_trip).isVisible = false
+                        menu.findItem(R.id.action_upload_trip).isVisible = false
+                    }
+                } else {
                     position = -1
                     actMode.apply {
                         menu.findItem(R.id.action_edit_trip).isVisible = true
                         menu.findItem(R.id.action_upload_trip).isVisible = true
                     }
-                } else {
-                    actMode.apply {
-                        menu.findItem(R.id.action_edit_trip).isVisible = false
-                        menu.findItem(R.id.action_upload_trip).isVisible = false
-                    }
                 }
 
-                if (itemsCount == 2) {
-                    actMode.menu.findItem(R.id.action_merge_trips).isVisible = true
-                } else {
-                    actMode.menu.findItem(R.id.action_merge_trips).isVisible = false
-                }
+                viewModel.mapEventToState(FlightsListEvent.UpdateSelectedFlights(selectedFlights))
 
                 this@FlightsListScreen.invalidateOptionsMenu()
             }
@@ -530,7 +481,7 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
     }
 
     interface ClickListener {
-        fun onClick(v: View?, position: Int)
+        fun onClick(flight: Flight)
 
         fun onLongClick(v: View?, position: Int)
     }

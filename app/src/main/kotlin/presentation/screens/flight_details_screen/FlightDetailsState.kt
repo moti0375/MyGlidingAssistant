@@ -10,7 +10,6 @@ sealed class FlightDetailsState {
     data object Loading : FlightDetailsState()
     class FlightLoaded(
         val flight: Flight,
-        val markers: List<ImageMarker> = emptyList(),
         val locations: List<LatLng> = emptyList()
     ) : FlightDetailsState()
     class MapImageFileReady(val file: String, val tripTitle: String?) : FlightDetailsState()

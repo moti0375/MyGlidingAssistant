@@ -1,22 +1,19 @@
 package data.model
 
-import kotlinx.serialization.Serializable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
 
-@Serializable
+@Entity(tableName = "flights")
 data class Flight @JvmOverloads constructor(
-    val id: Long = 0,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val date: String? = null,
-    val distance: Float = 0f,
+    val takeOffTime: Long? = null,
+    val landingTime: Long? = null,
+    val overallDistance: Float,
+    val maxDistance: Float,
     val kml: String? = null,
-    val duration: Long = 0,
-    val moveTime: Long = 0,
-    val stopTime: Long = 0,
-    val averageSpeed: Double = 0.0,
-    val moveAverageSpeed: Double = 0.0,
-    val startAddress: String? = null,
-    val stopAddress: String? = null,
-    val maxSpeed: Double = 0.0,
-    val maxAlt: Double = 0.0,
-    val tripName: String? = null,
+    val duration: Long,
+    val maxAlt: Double,
+    val name: String? = null,
     val imageFileName: String? = null)
