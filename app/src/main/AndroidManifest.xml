@@ -134,6 +134,18 @@
                 android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen" />
 
         </activity>
+
+        <activity
+            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.gliders_screen.GlidersActivity"
+            android:exported="true"
+            android:screenOrientation="portrait">
+
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen" />
+
+        </activity>
+
         <service android:name="services.GlidingAssistanceService"
             android:foregroundServiceType="location"
             android:exported="true"/>

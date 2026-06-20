@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.compose)
     kotlin("kapt") // Keep kapt for Hilt for now
 }
 
@@ -60,6 +61,23 @@ dependencies {
     implementation(libs.androidx.legacy.support)
 
     implementation(libs.picasso)
+
+    // Core Compose libraries
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
+
+    // Integration with Activity & ViewModels
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.compose.material.icons.core)
+
+    // Debugging Tooling
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 
 
     // Room

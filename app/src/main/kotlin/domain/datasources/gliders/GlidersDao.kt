@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface GlidersDao {
     @Query("SELECT * FROM gliders ORDER BY id DESC")
-    fun getAllFlights(): Flow<List<Glider>>
+    fun getAllGliders(): Flow<List<Glider>>
 
     @Query("SELECT * FROM gliders WHERE id = :gliderId LIMIT 1")
     suspend fun findById(gliderId: Long): Glider?

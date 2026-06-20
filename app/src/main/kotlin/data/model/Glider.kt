@@ -7,7 +7,6 @@ import androidx.room.PrimaryKey
 data class Glider(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val type: String,
-    val model: String,
     val callsign: String,
     val seats: Int,
     val ratio: Int,

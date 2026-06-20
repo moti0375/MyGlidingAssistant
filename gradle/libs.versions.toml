@@ -14,6 +14,8 @@ playServicesLocation = "21.3.0"
 preference = "1.2.1"
 legacy-support = "1.0.0"
 picasso = "2.5.2"
+compose = "2024.10.00"
+material3 = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -23,6 +25,19 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-preference-ktx = { group = "androidx.preference", name = "preference", version.ref = "preference" }
 androidx-legacy-support = { group = "androidx.legacy", name = "legacy-support-v4", version.ref = "legacy-support" }
 picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picasso" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version = "1.9.3" }
+androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version = "2.8.7" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0" }
+androidx-compose-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core", version = "1.7.0" }
+
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
+androidx-compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
+
 
 # Room
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
@@ -39,6 +54,7 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 # Maps
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -46,4 +62,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }

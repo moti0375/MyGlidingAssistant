@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 interface GlidersRepository{
-    suspend fun getAllGliders(): Flow<List<Glider>>
+    fun getAllGliders(): Flow<List<Glider>>
     suspend fun findById(gliderId: Long): Glider?
     suspend fun insertGlider(glider: Glider): Long
     suspend fun deleteGlider(glider: Glider) : Int
@@ -16,7 +16,7 @@ interface GlidersRepository{
 
 class GlidersRepositoryImpl @Inject constructor(private val glidersLocalDatasource: GlidersLocalDatasource) : GlidersRepository{
 
-    override suspend fun getAllGliders(): Flow<List<Glider>> {
+    override fun getAllGliders(): Flow<List<Glider>> {
         return glidersLocalDatasource.getAllGliders()
     }
 
