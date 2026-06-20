@@ -29,4 +29,8 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideFlightDao(database: AppDatabase) = database.flightDao()
+
+    @Provides
+    @Singleton
+    fun provideGliderDao(database: AppDatabase) = database.gliderDao()
 }

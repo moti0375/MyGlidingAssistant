@@ -5,12 +5,14 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.dunihuliapps.myglidingassistnat.domain.datasources.flights.FlightDao
+import com.dunihuliapps.myglidingassistnat.domain.datasources.gliders.GlidersDao
 import data.model.Flight
 
 @Database(entities = [Flight::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun flightDao(): FlightDao
 
+    abstract fun gliderDao(): GlidersDao
 
     companion object {
         // Define migration from version 1 to 2
