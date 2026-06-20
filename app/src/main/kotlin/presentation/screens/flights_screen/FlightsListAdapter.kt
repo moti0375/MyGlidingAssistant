@@ -17,7 +17,7 @@ import com.dunihuliapps.myglidingassistnat.domain.formatters.TimeFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.HmsFormatter
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Transformation
-import data.model.Trip
+import data.model.Flight
 import java.io.File
 import kotlin.math.min
 
@@ -26,7 +26,7 @@ import kotlin.math.min
  * Migrated to Kotlin on 18/6/2026
  */
 class FlightsListAdapter : RecyclerView.Adapter<FlightsListAdapter.FlightsListViewHolder>() {
-    private val data: MutableList<Trip> = ArrayList<Trip>()
+    private val data = mutableListOf<Flight>()
     private val selectedItems: SparseBooleanArray = SparseBooleanArray()
     private val timeDisplayer: TimeFormatter = HmsFormatter()
 
@@ -38,18 +38,19 @@ class FlightsListAdapter : RecyclerView.Adapter<FlightsListAdapter.FlightsListVi
 
     override fun onBindViewHolder(holder: FlightsListViewHolder, position: Int) {
         Log.i(LOG_TAG, "onBindViewHolder was called")
-        val trip = data.get(position)
-        val tripTitle = trip.tripName
-        if (tripTitle == null || tripTitle.isEmpty()) {
-            holder.tvTitle.setText("")
+        val flight = data[position]
+        val flightName = flight.name
+        if(flightName.isNullOrEmpty()) {
+            holder.tvTitle.text = ""
+
         } else {
-            holder.tvTitle.setText(tripTitle)
+            holder.tvTitle.text = flightName
         }
-        holder.tvDate.setText(trip.date)
-        holder.tvDuration.setText(timeDisplayer.formatTime(trip.duration))
-        holder.itemView.setActivated(selectedItems.get(position, false))
-        Picasso.with(holder.itemView.getContext())
-            .load(File(trip.imageFileName)).transform(CircleTransform())
+        holder.tvDate.text = flight.date
+        holder.tvDuration.text = timeDisplayer.formatTime(flight.duration)
+        holder.itemView.isActivated = selectedItems.get(position, false)
+        Picasso.with(holder.itemView.context)
+            .load(File(flight.imageFileName)).transform(CircleTransform())
             .error(R.drawable.ic_google_map_hdpi_active).transform(CircleTransform())
             .placeholder(R.drawable.ic_google_map_hdpi_active).transform(CircleTransform())
             .fit()
@@ -77,11 +78,15 @@ class FlightsListAdapter : RecyclerView.Adapter<FlightsListAdapter.FlightsListVi
         notifyDataSetChanged()
     }
 
+    fun getItemAtPosition(position: Int): Flight {
+        return data[position]
+    }
+
     val selectedItemsCount: Int
         get() = selectedItems.size()
 
-    fun getSelectedItems(): MutableList<Trip> {
-        val items: MutableList<Trip> = ArrayList()
+    fun getSelectedItems(): List<Flight> {
+        val items: MutableList<Flight> = ArrayList()
         for (i in 0..<selectedItems.size()) {
             items.add(data[selectedItems.keyAt(i)])
         }
@@ -89,7 +94,7 @@ class FlightsListAdapter : RecyclerView.Adapter<FlightsListAdapter.FlightsListVi
     }
 
 
-    fun updateTrips(data: MutableList<Trip>) {
+    fun updateTrips(data: List<Flight>) {
         this.data.apply {
             clear()
             addAll(data)

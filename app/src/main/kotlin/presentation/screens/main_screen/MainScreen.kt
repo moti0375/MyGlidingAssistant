@@ -60,7 +60,7 @@ import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.present
 
 import com.google.android.gms.common.GooglePlayServicesUtil
 import dagger.hilt.android.AndroidEntryPoint
-import data.model.Trip
+import data.model.Flight
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import presentation.screens.license_screen.GmsLicenseScreen
@@ -146,7 +146,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
     private fun observeTripState() {
         job?.cancel()
         job = lifecycleScope.launch {
-            tripManagerViewModel.tripStateFlow.collect {
+            tripManagerViewModel.flightStateFlow.collect {
                 Log.i(TAG, "onTripStateChanged: $it")
                 processTripState(it)
             }
@@ -154,23 +154,23 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
     }
 
     @RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
-    private fun processTripState(state: TripState) {
+    private fun processTripState(state: FlightState) {
         when (state) {
-            is TripState.Initiated -> mapFrag.clearEverything()
-            is TripState.NewImageMarker -> mapFrag.addImageMarker(state.imageMarker)
-            is TripState.TripUpdated -> processTripUpdate(state)
-            is TripState.OnGoing -> mapFrag.mapCameraCloseup()
-            is TripState.TripLoaded -> processTripLoaded(state.tripUploadedResult)
-            is TripState.Stopped -> mapFrag.mapCameraLongShot()
-            is TripState.TripSaved -> {
+            is FlightState.Initiated -> mapFrag.clearEverything()
+            is FlightState.NewImageMarker -> mapFrag.addImageMarker(state.imageMarker)
+            is FlightState.FlightUpdated -> processTripUpdate(state)
+            is FlightState.OnGoing -> mapFrag.mapCameraCloseup()
+            is FlightState.FlightLoaded -> processTripLoaded(state.tripUploadedResult)
+            is FlightState.Stopped -> mapFrag.mapCameraLongShot()
+            is FlightState.FlightSaved -> {
                 processTripSaved(state)
             }
 
-            is TripState.StartLocation -> mapFrag.goToLocation(state.location)
-            is TripState.StartRecording -> startRecording()
-            is TripState.StopAndSave -> saveTrip()
-            is TripState.ShowSaveDialog -> saveTripAlertDialog()
-            is TripState.ShowRecordingInBackground -> processRecordingInBackground()
+            is FlightState.StartLocation -> mapFrag.goToLocation(state.location)
+            is FlightState.StartRecording -> startRecording()
+            is FlightState.StopAndSave -> saveTrip()
+            is FlightState.ShowSaveDialog -> saveTripAlertDialog()
+            is FlightState.ShowRecordingInBackground -> processRecordingInBackground()
         }
     }
 
@@ -186,9 +186,6 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
                     it.overlayRoute(loadedResult.route)
                     it.zoom = loadedResult.zoom
                     it.lineColor = loadedResult.color
-                    loadedResult.markers.forEach { marker ->
-                        it.addImageMarker(marker)
-                    }
                 }
                 Toast.makeText(this@MainScreen, getString(R.string.TripLoaded), Toast.LENGTH_LONG).show()
             }
@@ -206,7 +203,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
         }
     }
 
-    private fun processTripSaved(state: TripState.TripSaved) {
+    private fun processTripSaved(state: FlightState.FlightSaved) {
         when (state.saveStatus) {
             is SaveStatus.Success -> {
                 mapFrag.fitCameraToRoute(state.saveStatus.locations)
@@ -225,7 +222,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
         progressDialog?.dismiss()
     }
 
-    private fun processTripUpdate(state: TripState.TripUpdated) {
+    private fun processTripUpdate(state: FlightState.FlightUpdated) {
         mapFrag.moveToLocationAndDrawLine(state.location)
         updateDisplay(state)
     }
@@ -340,7 +337,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
     private fun stopRecording() {
         disableLocationListener(fixListener)
         disableGpsLocationListener(trackLocationListener)
-        tripManagerViewModel.addTripEvent(mainScreenViewModelEvent = MainScreenViewModelEvent.StopTrip)
+        tripManagerViewModel.addTripEvent(mainScreenViewModelEvent = MainScreenViewModelEvent.FinishFlight)
         binding.imRecording.visibility = View.GONE
         binding.fabStartStop.setImageDrawable(ResourcesCompat.getDrawable(resources, R.drawable.ic_action_new, this.theme))
         binding.fabCamera.visibility = View.INVISIBLE
@@ -464,7 +461,7 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
             tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.OnNewLocation(location))
         }
 
-    private fun updateDisplay(tripUpdate: TripState.TripUpdated) {
+    private fun updateDisplay(tripUpdate: FlightState.FlightUpdated) {
         binding.apply {
             tvSpeed.text = speedFormatter.formatUnits(tripUpdate.location.speed.toDouble())
             tvDistance.text = distanceFormatter.formatUnits(tripUpdate.distance.toDouble())
@@ -622,29 +619,9 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
         // Check which request we're responding to
         val hasExtras = data?.hasExtra("UploadedTrip") == true
         if (requestCode == TRIP_LIST_ACTIVITY && resultCode == RESULT_OK && hasExtras) {
-            val uploadedTrip = data?.getSerializableExtra("UploadedTrip") as Trip
+            val uploadedFlight = data.getSerializableExtra("UploadedTrip") as Flight
             showUploadTripDialog()
-            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.UploadTrip(uploadedTrip))
-        }
-
-
-        if (requestCode == CAMERA_INTENT_ACTIVITY && resultCode == RESULT_OK) {
-            val capturedImageUri = Uri.fromFile(mImageMarkerFileLocation)
-
-            try {
-                tripManagerViewModel.addTripEvent(
-                    MainScreenViewModelEvent.PictureTaken(
-                        capturedImageUri
-                    )
-                )
-            } catch (e: Exception) {
-                e.printStackTrace()
-                Toast.makeText(
-                    this,
-                    "There was an error, please try again...",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.UploadTrip(uploadedFlight))
         }
     }
 

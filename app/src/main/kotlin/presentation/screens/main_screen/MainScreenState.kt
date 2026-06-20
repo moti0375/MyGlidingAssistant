@@ -4,19 +4,19 @@ import android.location.Location
 import com.dunihuliapps.myglidingassistnat.domain.map_helper.ImageMarker
 import com.google.android.gms.maps.model.LatLng
 
-sealed class TripState {
-    data object Initiated : TripState()
-    class TripUpdated(val location: Location, val distance: Float) : TripState()
-    class StartLocation(val location: Location) : TripState()
-    class NewImageMarker(val imageMarker: ImageMarker) : TripState()
-    class TripLoaded(val tripUploadedResult: TripUploadedResult) : TripState()
-    class TripSaved(val saveStatus: SaveStatus) : TripState()
-    data object Stopped : TripState()
-    data object OnGoing : TripState()
-    data object StartRecording : TripState()
-    data object StopAndSave : TripState()
-    data object ShowSaveDialog : TripState()
-    data object ShowRecordingInBackground : TripState()
+sealed class FlightState {
+    data object Initiated : FlightState()
+    class FlightUpdated(val location: Location, val distance: Float) : FlightState()
+    class StartLocation(val location: Location) : FlightState()
+    class NewImageMarker(val imageMarker: ImageMarker) : FlightState()
+    class FlightLoaded(val tripUploadedResult: TripUploadedResult) : FlightState()
+    class FlightSaved(val saveStatus: SaveStatus) : FlightState()
+    data object Stopped : FlightState()
+    data object OnGoing : FlightState()
+    data object StartRecording : FlightState()
+    data object StopAndSave : FlightState()
+    data object ShowSaveDialog : FlightState()
+    data object ShowRecordingInBackground : FlightState()
 }
 
 sealed class SaveStatus(){
@@ -25,7 +25,7 @@ sealed class SaveStatus(){
 }
 
 sealed class TripUploadedResult{
-    class Success(val route: List<LatLng>, val zoom: Float, val color: Int, val markers: List<ImageMarker>) : TripUploadedResult()
+    class Success(val route: List<LatLng>, val zoom: Float, val color: Int) : TripUploadedResult()
     class Failed(val failures: TripLoadFailures) : TripUploadedResult()
 }
 

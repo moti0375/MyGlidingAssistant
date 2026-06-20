@@ -2,7 +2,6 @@ package presentation.screens.flight_details_screen
 
 import android.app.AlertDialog
 import android.app.ProgressDialog
-import android.content.ActivityNotFoundException
 import android.content.ContentValues
 import android.content.DialogInterface
 import android.content.Intent
@@ -41,10 +40,9 @@ import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricF
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MillageFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MphFormatter
 import com.dunihuliapps.myglidingassistnat.utils.Utils
-import com.google.android.gms.maps.GoogleMap.SnapshotReadyCallback
 import com.google.android.gms.maps.model.Marker
 import dagger.hilt.android.AndroidEntryPoint
-import data.model.Trip
+import data.model.Flight
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -53,7 +51,7 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     private lateinit var prefs: SharedPreferences
     private var lineColor = Color.RED
     private var lineWidth = 5f
-    private var trip: Trip? = null
+    private var flight: Flight? = null
     private var progressDialog: ProgressDialog? = null
 
     private lateinit var speedDisplayer: UnitsFormatter
@@ -64,7 +62,6 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
     private lateinit var mapFragment: CustomSupportMapFragment
     private var distanceUnits: DistanceUnits = DistanceUnits.Metric
     private var altUnits: AltitudeUnits = AltitudeUnits.Feet
-
     private val detailsViewModel by viewModels<FlightDetailsViewModel>()
 
     private lateinit var binding: FlightDetailsActivityBinding
@@ -131,23 +128,16 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
 
     private fun processLoadedTrip(state: FlightDetailsState.FlightLoaded) {
         Log.i(LOG_TAG, "processLoadedTrip: ")
-        updateDisplay(state.trip)
+        updateDisplay(state.flight)
         mapFragment.apply {
             clearEverything()
             overlayRoute(state.locations)
-            addImageMarkers(state.markers)
         }
         hideLoadingDialog()
     }
 
     private fun processLoadFailed(flightDetailsState: FlightDetailsState.FailedToLoadFlight) {
 
-    }
-
-    private fun addImageMarkers(markers: List<ImageMarker>?) {
-        markers?.forEach {
-            mapFragment.addImageMarker(it)
-        }
     }
 
     private fun hideLoadingDialog() {
@@ -255,60 +245,14 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
         }
     }
 
-    private fun updateDisplay(trip: Trip) {
-
+    private fun updateDisplay(flight: Flight) {
         binding.tripRawDetails.apply {
-            tvWhen.text = trip.date
-            tvDurationDetails.text = timeFormatter.formatTime(trip.duration)
-            tvDistanceDetails.text = distanceDisplayer.formatUnits(trip.distance.toDouble())
-            tvAveSpeed.text = speedDisplayer.formatUnits(trip.averageSpeed)
-            tvMaxSpeed.text = speedDisplayer.formatUnits(trip.maxSpeed)
-            tvMaxAltitude.text = altitudeDisplayer.formatUnits(trip.maxAlt)
-            tvMoveTime.text = timeFormatter.formatTime(trip.moveTime)
-            tvStopTime.text = timeFormatter.formatTime(trip.stopTime)
-            tvTripDetailsHead.text = trip.tripName
-            tvFrom.text = trip.startAddress ?: getString(R.string.unavailable_data)
-            tvTo.text = trip.stopAddress ?: getString(R.string.unavailable_data)
-            if (trip.averageSpeed == 0.0) {
-                tvAverageMoveSpeed.text = getString(R.string.unavailable_data)
-            } else {
-                tvAverageMoveSpeed.text = moveSpeedDisplayer.formatUnits(trip.averageSpeed)
-            }
-
+            tvWhen.text = flight.date
+            tvDurationDetails.text = timeFormatter.formatTime(flight.duration)
+            tvDistanceDetails.text = distanceDisplayer.formatUnits(flight.overallDistance.toDouble())
+            tvMaxAltitude.text = altitudeDisplayer.formatUnits(flight.maxAlt)
+            tvTripDetailsHead.text = flight.name
         }
-    }
-
-    private fun googleEarthInstallDialog() {
-        AlertDialog.Builder(this).apply {
-            setMessage(resources.getString(R.string.NoGoogleEarth))
-            setTitle(resources.getString(R.string.app_name))
-            setIcon(resources.getDrawable(R.drawable.ic_launcher))
-            setCancelable(false)
-            setPositiveButton(
-                resources.getString(R.string.YES)
-            ) { dialog: DialogInterface, id: Int ->
-                dialog.cancel()
-                //Toast.makeText(context, "Google Earth is not installed on this device\nGoogle Erath is required for this action", Toast.LENGTH_LONG).show();
-                val marketIntent = Intent(
-                    Intent.ACTION_VIEW,
-                    Uri.parse(GOOGLE_EARTH_STORE_URI)
-                )
-                marketIntent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY or Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET)
-                try {
-                    startActivity(marketIntent)
-                } catch (e: ActivityNotFoundException) {
-                    e.printStackTrace()
-                    Toast.makeText(
-                        this@FlightDetailsActivity,
-                        getString(R.string.GooglePlayError),
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
-            setNegativeButton(
-                resources.getString(R.string.NO)
-            ) { dialog: DialogInterface, id: Int -> dialog.cancel() }
-        }.create().show()
     }
 
 
@@ -328,7 +272,6 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
                 val selectedPosition = (dialog as AlertDialog).listView.checkedItemPosition
                 when (selectedPosition) {
                     SHARE_IMAGE -> detailsViewModel.addEvent(FlightDetailsEvent.ShareFlightMapImage)
-                    SHARE_KML -> detailsViewModel.addEvent(FlightDetailsEvent.ShareFlightKml)
                 }
                 dialog.cancel()
             }
@@ -467,7 +410,6 @@ class FlightDetailsActivity : AppCompatActivity(), InfoWindowClickListener {
 
         private const val GALLERY_ACTIVITY_REQ = 100
         private const val SHARE_IMAGE = 0
-        private const val SHARE_KML = 1
         private val LOG_TAG: String = FlightDetailsActivity::class.java.simpleName
         private const val CAM_ZOOM = 15f
     }
