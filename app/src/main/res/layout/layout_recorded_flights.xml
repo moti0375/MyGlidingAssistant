@@ -23,6 +23,10 @@
 
     <!--</ListView>-->
 
+    <include layout="@layout/layout_no_flights"
+        android:id="@+id/no_flights_layout"
+        android:visibility="visible"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tripsRecyclerView"
         android:layout_width="0dp"

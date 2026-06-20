@@ -164,20 +164,19 @@ class FlightsListScreen : AppCompatActivity(), MultiChoiceModeListener {
 
     fun refreshDisplay(flights: List<Flight>) {
 //        Log.i(LOG_TAG, "refreshDisplay was called");
-
         actionMode?.finish()
-
-
-        if (flights.isEmpty()) {
-
-        } else {
-
-        }
         Log.i(LOG_TAG, "refreshDisplay: $flights")
 
+        if (flights.isEmpty()) {
+            binding.tripsRecyclerView.visibility = View.GONE
+            binding.noFlightsLayout.root.visibility = View.VISIBLE
+        } else {
+            binding.tripsRecyclerView.visibility = View.VISIBLE
+            binding.noFlightsLayout.root.visibility = View.GONE
+        }
         flightsListAdapter.updateTrips(flights)
-
     }
+
 
     fun deleteTripAlertDialog() {
         val alertDialogBuilder = AlertDialog.Builder(this)

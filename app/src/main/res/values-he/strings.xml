@@ -90,13 +90,12 @@
     <string name="Trips">מסלולים</string>    
     <string name="NoTitleHint">מסלול ללא שם...</string>    
 	<string name="DeleteDialog">למחוק מסלולים נבחרים?</string>    
-    <string name="MergeTrips">לאחד מסלולים אלו?</string>    
-    <string name="MergeingTrips">מאחד מסלולים, נא להמתין...</string>    
-    <string name="ContinuousMergerTrips">יש לבחור מסלולים רצופים בעד 300 מטר</string>    
+    <string name="ContinuousMergerTrips">יש לבחור מסלולים רצופים בעד 300 מטר</string>
     <string name="Completed">בוצע</string>    
-    <string name="UploadTrip">להעלות מסלול זה?</string>    
-    
-       <!-- License Activity -->
+    <string name="UploadTrip">להעלות מסלול זה?</string>
+    <string name="NoFlights">השמים מחכים</string>
+
+    <!-- License Activity -->
     <string name="GooglePlayServicesUnavailable">שירותי Google Play אינם מותקנים במכשיר זה</string>
     <string name="GooglePlayError">לא היה ניתן לפתוח את חנות Google Play. התקן אפליקצית Google Earth ונסה שנית!</string>
     <string name="MaxAltitudeHeader">גובה מקסימלי</string>

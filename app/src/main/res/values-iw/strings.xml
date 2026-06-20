@@ -98,8 +98,9 @@
     <string name="MergeingTrips">מאחד מסלולים, נא להמתין...</string>    
     <string name="ContinuousMergerTrips">יש לבחור מסלולים רצופים בעד 300 מטר</string>    
     <string name="Completed">בוצע</string>    
-    <string name="UploadTrip">להעלות מסלול זה?</string>    
-    
+    <string name="UploadTrip">להעלות מסלול זה?</string>
+    <string name="NoFlights">השמים מחכים</string>
+
     <!-- License Activity -->
     <string name="GooglePlayServicesUnavailable">שירותי Google Play אינם מותקנים במכשיר זה</string>
     <string name="GooglePlayError">לא היה ניתן לפתוח את חנות Google Play. התקן אפליקצית Google Earth ונסה שנית!</string>
