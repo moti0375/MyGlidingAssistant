@@ -16,7 +16,7 @@ interface GlidersDao {
     fun getAllFlights(): Flow<List<Glider>>
 
     @Query("SELECT * FROM gliders WHERE id = :gliderId LIMIT 1")
-    suspend fun findById(gliderId: Long): Flight?
+    suspend fun findById(gliderId: Long): Glider?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(glider: Glider): Long
