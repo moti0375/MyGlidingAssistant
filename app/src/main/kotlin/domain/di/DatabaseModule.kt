@@ -20,8 +20,10 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "app_database"
-        ).build()
+            "app_database.db"
+        )
+        //.addMigrations(AppDatabase.MIGRATION_1_2) // Add this line for migration
+            .build()
     }
 
     @Provides

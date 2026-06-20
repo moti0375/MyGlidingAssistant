@@ -244,7 +244,7 @@ class TripManagerViewModel @Inject constructor(
                     duration = duration,
                     maxDistance = maxDistance,
                     maxAlt = maxAltitude,
-                    imageFileName = mapImageFile
+                    imageFileName = mapImageFile,
                 )
 
                 val tripId = flightsRepository.insertFlight(flight)
