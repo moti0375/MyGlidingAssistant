@@ -22,11 +22,15 @@ object DatabaseModule {
             AppDatabase::class.java,
             "app_database.db"
         )
-        //.addMigrations(AppDatabase.MIGRATION_1_2) // Add this line for migration
-            .build()
+        .addMigrations(AppDatabase.MIGRATION_2_3) // Add this line for migration
+        .build()
     }
 
     @Provides
     @Singleton
     fun provideFlightDao(database: AppDatabase) = database.flightDao()
+
+    @Provides
+    @Singleton
+    fun provideGliderDao(database: AppDatabase) = database.glidersDao()
 }

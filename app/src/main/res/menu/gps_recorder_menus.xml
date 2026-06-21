@@ -23,6 +23,13 @@
         app:iconTint="@color/black"
         android:title="@string/AppSettings"
         app:showAsAction="always"/>
-  
- 
+
+
+    <item
+        android:id="@+id/action_gliders"
+        android:icon="@drawable/ic_glider_icon"
+        android:title="Gliders"
+        app:showAsAction="always" />
+
+
 </menu>

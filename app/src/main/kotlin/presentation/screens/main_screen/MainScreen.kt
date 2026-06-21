@@ -55,6 +55,7 @@ import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricA
 import com.dunihuliapps.myglidingassistnat.presentation.map.CustomSupportMapFragment
 import com.dunihuliapps.myglidingassistnat.presentation.map.MapReadyListener
 import com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen
+import com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.gliders_screen.GlidersActivity
 import com.dunihuliapps.myglidingassistnat.presentation.screens.settings_screen.SettingsActivity
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.presentation.units_formatters.KnotsFormatter
 
@@ -450,6 +451,11 @@ class MainScreen : AppCompatActivity(), MapReadyListener, OnSharedPreferenceChan
 
             R.id.action_license -> {
                 val intentIntent = Intent(this, GmsLicenseScreen::class.java)
+                startActivity(intentIntent)
+            }
+
+            R.id.action_gliders -> {
+                val intentIntent = Intent(this, GlidersActivity::class.java)
                 startActivity(intentIntent)
             }
         }
