@@ -106,7 +106,7 @@ fun FlightsListContent(
                     tint = MaterialTheme.colorScheme.error
                 )
             },
-            title = { Text(stringResource(R.string.app_name)) },
+            title = { Text("Delete Flight") },
             text = { Text(stringResource(R.string.DeleteDialog)) },
             confirmButton = {
                 TextButton(onClick = {
