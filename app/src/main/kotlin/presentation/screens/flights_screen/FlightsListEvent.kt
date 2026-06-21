@@ -13,4 +13,7 @@ sealed class FlightsListEvent {
     object EditFlightClicked : FlightsListEvent()
 
     data class UpdateFlightName(val flight: Flight, val name: String) : FlightsListEvent()
+    data class ToggleFlightSelection(val flightId: Long) : FlightsListEvent()
+    object DismissEditFlight : FlightsListEvent()
+    data class UpdateFlightDetails(val flight: Flight) : FlightsListEvent()
 }
