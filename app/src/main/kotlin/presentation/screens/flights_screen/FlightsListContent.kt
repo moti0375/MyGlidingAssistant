@@ -427,7 +427,9 @@ private fun EditFlightDetailsDialog(
     var secondPilot by remember(flight.id) { mutableStateOf(flight.secondPilot ?: "") }
     var gliderDropdownExpanded by remember { mutableStateOf(false) }
 
-    val selectedGliderLabel = gliders.find { it.callsign == selectedGliderCallsign }
+    val selectedGlider = gliders.find { it.callsign == selectedGliderCallsign }
+    val isTwoSeater = selectedGlider?.seats == 2
+    val selectedGliderLabel = selectedGlider
         ?.let { "${it.callsign} (${it.type})" }
         ?: selectedGliderCallsign
         ?: ""
@@ -489,6 +491,7 @@ private fun EditFlightDetailsDialog(
                             text = { Text("None") },
                             onClick = {
                                 selectedGliderCallsign = null
+                                secondPilot = ""
                                 gliderDropdownExpanded = false
                             }
                         )
@@ -497,6 +500,7 @@ private fun EditFlightDetailsDialog(
                                 text = { Text("${glider.callsign} (${glider.type})") },
                                 onClick = {
                                     selectedGliderCallsign = glider.callsign
+                                    if (glider.seats != 2) secondPilot = ""
                                     gliderDropdownExpanded = false
                                 }
                             )
@@ -513,14 +517,16 @@ private fun EditFlightDetailsDialog(
                     label = { Text("First pilot") }
                 )
 
-                // Second pilot
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = secondPilot,
-                    onValueChange = { secondPilot = it },
-                    singleLine = true,
-                    label = { Text("Second pilot") }
-                )
+                // Second pilot — only for 2-seat gliders
+                if (isTwoSeater) {
+                    OutlinedTextField(
+                        modifier = Modifier.fillMaxWidth(),
+                        value = secondPilot,
+                        onValueChange = { secondPilot = it },
+                        singleLine = true,
+                        label = { Text("Second pilot") }
+                    )
+                }
             }
         },
         confirmButton = {
@@ -530,7 +536,7 @@ private fun EditFlightDetailsDialog(
                         name = name.takeIf { it.isNotBlank() },
                         glider = selectedGliderCallsign,
                         firstPilot = firstPilot.takeIf { it.isNotBlank() },
-                        secondPilot = secondPilot.takeIf { it.isNotBlank() }
+                        secondPilot = if (isTwoSeater) secondPilot.takeIf { it.isNotBlank() } else null
                     )
                 )
             }) { Text(stringResource(R.string.Done)) }
