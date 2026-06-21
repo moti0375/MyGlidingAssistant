@@ -35,6 +35,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -97,10 +100,10 @@ fun FlightsListContent(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
             icon = {
-                Image(
-                    painter = painterResource(R.mipmap.ic_launcher),
+                Icon(
+                    imageVector = Icons.Default.Delete,
                     contentDescription = null,
-                    modifier = Modifier.size(48.dp)
+                    tint = MaterialTheme.colorScheme.error
                 )
             },
             title = { Text(stringResource(R.string.app_name)) },
@@ -123,10 +126,9 @@ fun FlightsListContent(
         AlertDialog(
             onDismissRequest = { showUploadDialog = false },
             icon = {
-                Image(
-                    painter = painterResource(R.mipmap.ic_launcher),
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp)
+                Icon(
+                    imageVector = Icons.Default.FileUpload,
+                    contentDescription = null
                 )
             },
             title = { Text(stringResource(R.string.app_name)) },
@@ -209,24 +211,51 @@ fun FlightsListContent(
         } else {
             LazyColumn(modifier = Modifier.padding(paddingValues)) {
                 items(flights, key = { it.id }) { flight ->
-                    FlightItem(
-                        flight = flight,
-                        isSelected = flight.id in selectedFlightIds,
-                        onClick = {
-                            if (inSelectionMode) {
+                    val dismissState = rememberSwipeToDismissBoxState()
+                    LaunchedEffect(dismissState.currentValue) {
+                        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+                            viewModel.mapEventToState(FlightsListEvent.DeleteFlight(flight))
+                        }
+                    }
+                    SwipeToDismissBox(
+                        state = dismissState,
+                        enableDismissFromStartToEnd = false,
+                        gesturesEnabled = !inSelectionMode,
+                        backgroundContent = {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(MaterialTheme.colorScheme.errorContainer)
+                                    .padding(end = 16.dp),
+                                contentAlignment = Alignment.CenterEnd
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Delete",
+                                    tint = MaterialTheme.colorScheme.onErrorContainer
+                                )
+                            }
+                        }
+                    ) {
+                        FlightItem(
+                            flight = flight,
+                            isSelected = flight.id in selectedFlightIds,
+                            onClick = {
+                                if (inSelectionMode) {
+                                    viewModel.mapEventToState(
+                                        FlightsListEvent.ToggleFlightSelection(flight.id)
+                                    )
+                                } else {
+                                    onFlightClick(flight)
+                                }
+                            },
+                            onLongClick = {
                                 viewModel.mapEventToState(
                                     FlightsListEvent.ToggleFlightSelection(flight.id)
                                 )
-                            } else {
-                                onFlightClick(flight)
                             }
-                        },
-                        onLongClick = {
-                            viewModel.mapEventToState(
-                                FlightsListEvent.ToggleFlightSelection(flight.id)
-                            )
-                        }
-                    )
+                        )
+                    }
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp),
                         thickness = 0.5.dp
