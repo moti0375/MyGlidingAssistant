@@ -30,6 +30,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMarkerClickListener, OnInfoWindowClickListener {
 
     lateinit var map: GoogleMap
+    val isMapReady: Boolean get() = this::map.isInitialized
     var lineWidth = 5f
     var zoom = 5f
     var lineColor = Color.RED
