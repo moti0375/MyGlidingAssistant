@@ -43,6 +43,7 @@ import com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.gliders_
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.FlightState
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreenViewModelEvent
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.SaveStatus
+import com.dunihuliapps.myglidingassistnat.data.model.Glider
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.TripLoadFailures
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.TripManagerViewModel
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.TripUploadedResult
@@ -72,8 +73,10 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
     var altitudeText by mutableStateOf(AnnotatedString("0"))
     var isRecording by mutableStateOf(false)
     var showSaveDialog by mutableStateOf(false)
+    var showNewFlightDialog by mutableStateOf(false)
     var isLoading by mutableStateOf(false)
     var loadingMessage by mutableStateOf("")
+    var gliders by mutableStateOf<List<Glider>>(emptyList())
 
     private var cameraZoom = 15f
     private var lineWidth = 5f
@@ -118,11 +121,24 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
                     altitudeText = altitudeText,
                     isRecording = isRecording,
                     showSaveDialog = showSaveDialog,
+                    showNewFlightDialog = showNewFlightDialog,
+                    gliders = gliders,
                     isLoading = isLoading,
                     loadingMessage = loadingMessage,
                     onStartStopClick = {
-                        tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.StartStopButtonClicked)
+                        if (isRecording) {
+                            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.StartStopButtonClicked)
+                        } else {
+                            showNewFlightDialog = true
+                        }
                     },
+                    onTakeOffConfirmed = { glider, firstPilot, secondPilot ->
+                        showNewFlightDialog = false
+                        tripManagerViewModel.addTripEvent(
+                            MainScreenViewModelEvent.StartFlight(glider, firstPilot, secondPilot)
+                        )
+                    },
+                    onNewFlightDismiss = { showNewFlightDialog = false },
                     onFlightsClick = {
                         @Suppress("DEPRECATION")
                         startActivityForResult(
@@ -160,6 +176,7 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
         }
 
         subscribeTimerChanges()
+        subscribeGliders()
     }
 
     private fun onFragmentReady(fragment: CustomSupportMapFragment) {
@@ -265,6 +282,12 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
             tripManagerViewModel.timerStateFlow.collect {
                 timerText = AnnotatedString(timeFormatter.formatTime(it))
             }
+        }
+    }
+
+    private fun subscribeGliders() {
+        lifecycleScope.launch {
+            tripManagerViewModel.gliders.collect { gliders = it }
         }
     }
 
@@ -452,6 +475,8 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
         private const val TIME_INTERVAL: Long = 2000
     }
 }
+
+const val MAIN_MAP_FRAGMENT_TAG = "main_map_fragment"
 
 private fun SpannableString.toAnnotatedString(): AnnotatedString = buildAnnotatedString {
     append(this@toAnnotatedString.toString())

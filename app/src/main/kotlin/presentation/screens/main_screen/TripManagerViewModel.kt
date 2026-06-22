@@ -12,7 +12,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dunihuliapps.myglidingassistnat.data.enums.RecordingMode
 import com.dunihuliapps.myglidingassistnat.data.enums.RecordingState
+import com.dunihuliapps.myglidingassistnat.data.model.Glider
 import com.dunihuliapps.myglidingassistnat.data.repositories.flights.FlightsRepository
+import com.dunihuliapps.myglidingassistnat.data.repositories.gliders.GlidersRepository
 import com.dunihuliapps.myglidingassistnat.domain.files.kml.KmlManager
 import com.dunihuliapps.myglidingassistnat.domain.files.path_provider.PathProvider
 import com.dunihuliapps.myglidingassistnat.domain.timer.TripTimer
@@ -22,8 +24,10 @@ import data.model.Flight
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.sql.Date
 import java.text.SimpleDateFormat
@@ -33,6 +37,7 @@ import javax.inject.Inject
 class TripManagerViewModel @Inject constructor(
     private val pathProvider: PathProvider,
     private val flightsRepository: FlightsRepository,
+    private val glidersRepository: GlidersRepository,
     private val timer: TripTimer,
     private val kmlManager: KmlManager,
     private val sharedPreferences: SharedPreferences
@@ -41,10 +46,16 @@ class TripManagerViewModel @Inject constructor(
     val flightStateFlow: StateFlow<FlightState> = tripMutableStateFlow.asStateFlow()
     val timerStateFlow = timer.timerStateFlow
 
+    val gliders: StateFlow<List<Glider>> = glidersRepository.getAllGliders()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     private var startLocation: Location? = null
     private var recordingMode = RecordingMode.NEW_TRIP
     private var takeOffTime: Long = 0
     private var landingTime: Long = 0
+    private var currentFlightGlider: String? = null
+    private var currentFlightFirstPilot: String? = null
+    private var currentFlightSecondPilot: String? = null
     /**
      * The current location
      */
@@ -88,6 +99,7 @@ class TripManagerViewModel @Inject constructor(
             is MainScreenViewModelEvent.TakeOff -> takeOff()
             is MainScreenViewModelEvent.FinishFlight -> finishFlight()
             is MainScreenViewModelEvent.StartStopButtonClicked -> handleStartStopClicked()
+            is MainScreenViewModelEvent.StartFlight -> startFlight(event.glider, event.firstPilot, event.secondPilot)
         }
     }
 
@@ -113,6 +125,15 @@ class TripManagerViewModel @Inject constructor(
                 publishFlightState(FlightState.ShowSaveDialog)
             }
         }
+    }
+
+    private fun startFlight(glider: String?, firstPilot: String?, secondPilot: String?) {
+        currentFlightGlider = glider
+        currentFlightFirstPilot = firstPilot
+        currentFlightSecondPilot = secondPilot
+        resetRoute(true)
+        recordingMode = RecordingMode.NEW_TRIP
+        takeOff()
     }
 
     private fun takeOff() {
@@ -245,6 +266,9 @@ class TripManagerViewModel @Inject constructor(
                     maxDistance = maxDistance,
                     maxAlt = maxAltitude,
                     imageFileName = mapImageFile,
+                    glider = currentFlightGlider,
+                    firstPilot = currentFlightFirstPilot,
+                    secondPilot = currentFlightSecondPilot,
                 )
 
                 val tripId = flightsRepository.insertFlight(flight)

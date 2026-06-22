@@ -85,7 +85,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen"
+            android:name="presentation.screens.main_screen.MainScreen"
             android:alwaysRetainTaskState="true"
             android:exported="true"
             android:configChanges="orientation|screenSize"
@@ -107,31 +107,31 @@
         <activity
             android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen"
             android:exported="true"
-            android:parentActivityName="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen"
+            android:parentActivityName="presentation.screens.main_screen.MainScreen"
             android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen" />
+                android:value="presentation.screens.main_screen.MainScreen" />
         </activity>
         <activity
             android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.settings_screen.SettingsActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/AppSettings"
             android:exported="true"
-            android:parentActivityName="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen">
+            android:parentActivityName="presentation.screens.main_screen.MainScreen">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen" />
+                android:value="presentation.screens.main_screen.MainScreen" />
         </activity>
 
         <activity android:name="presentation.screens.license_screen.GmsLicenseScreen"
-            android:parentActivityName="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen"
+            android:parentActivityName="presentation.screens.main_screen.MainScreen"
             android:exported="true"
             android:screenOrientation="portrait">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen" />
+                android:value="presentation.screens.main_screen.MainScreen" />
 
         </activity>
 
@@ -142,7 +142,7 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen" />
+                android:value="presentation.screens.main_screen.MainScreen" />
 
         </activity>
 

@@ -17,4 +17,5 @@ sealed class MainScreenViewModelEvent {
     class SpeedFilterUpdated(val filter: Double) : MainScreenViewModelEvent()
     class UploadTrip(val flight: Flight) : MainScreenViewModelEvent()
     class RecordingModeChanged(val recordingMode: RecordingMode) : MainScreenViewModelEvent()
+    class StartFlight(val glider: String?, val firstPilot: String?, val secondPilot: String?) : MainScreenViewModelEvent()
 }
