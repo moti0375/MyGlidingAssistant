@@ -18,10 +18,10 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.dunihuliapps.myglidingassistant.R
-import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen
 import com.dunihuliapps.myglidingassistnat.utils.Utils
 import com.squareup.picasso.Picasso
 import dagger.hilt.android.AndroidEntryPoint
+import presentation.screens.main_screen.MainScreen
 import java.io.BufferedInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
