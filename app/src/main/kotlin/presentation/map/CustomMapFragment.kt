@@ -1,5 +1,7 @@
-package com.dunihuliapps.myglidingassistnat.presentation.map
+package presentation.map
+
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.location.Location
@@ -11,6 +13,9 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistnat.domain.map_helper.ImageMarker
+import com.dunihuliapps.myglidingassistnat.presentation.map.CustomInfoWindowAdapter
+import com.dunihuliapps.myglidingassistnat.presentation.map.InfoWindowClickListener
+import com.dunihuliapps.myglidingassistnat.presentation.map.MapReadyListener
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener
@@ -151,7 +156,12 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
         val update = CameraUpdateFactory.zoomBy(this.zoom)
         this.map.apply {
             moveCamera(update)
-            setInfoWindowAdapter(CustomInfoWindowAdapter(LayoutInflater.from(context), markersIdsMap))
+            setInfoWindowAdapter(
+                CustomInfoWindowAdapter(
+                    LayoutInflater.from(context),
+                    markersIdsMap
+                )
+            )
         }
     }
 
@@ -252,10 +262,10 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
         val sizePx = (sizeDp * density).toInt()
 
         val vectorDrawable = ContextCompat.getDrawable(requireContext(), vectorResId) ?: return null
-        val bitmap = android.graphics.Bitmap.createBitmap(
+        val bitmap = Bitmap.createBitmap(
             sizePx,
             sizePx,
-            android.graphics.Bitmap.Config.ARGB_8888
+            Bitmap.Config.ARGB_8888
         )
 
         Log.i("CustomMapFragment", "bitmapDescriptorFromVector: width: ${bitmap.width}, height: ${bitmap.height} ")

@@ -52,7 +52,6 @@ import com.dunihuliapps.myglidingassistnat.domain.formatters.UnitsFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.HmsFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.KmhFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricAltFormatter
-import com.dunihuliapps.myglidingassistnat.presentation.map.CustomSupportMapFragment
 import com.dunihuliapps.myglidingassistnat.presentation.map.MapReadyListener
 import com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen
 import com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.gliders_screen.GlidersActivity
@@ -64,6 +63,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import data.model.Flight
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import presentation.map.CustomSupportMapFragment
 import presentation.screens.license_screen.GmsLicenseScreen
 import services.GlidingAssistanceService
 import java.io.File
