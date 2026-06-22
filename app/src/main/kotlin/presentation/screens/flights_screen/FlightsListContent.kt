@@ -1,5 +1,7 @@
 package com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen
 
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -59,6 +61,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -378,9 +385,7 @@ private fun FlightItem(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(2.dp)
                     ) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_glider_icon),
-                            contentDescription = null,
+                        GliderIcon(
                             modifier = Modifier.size(12.dp),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -466,9 +471,7 @@ private fun EditFlightDetailsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = {
-            Icon(
-                painter = painterResource(R.drawable.ic_glider_icon),
-                contentDescription = null,
+            GliderIcon(
                 modifier = Modifier.size(32.dp),
                 tint = MaterialTheme.colorScheme.primary
             )
@@ -576,4 +579,23 @@ private fun EditFlightDetailsDialog(
             }
         }
     )
+}
+
+@Composable
+private fun GliderIcon(modifier: Modifier = Modifier, tint: Color) {
+    val context = LocalContext.current
+    val tintArgb = tint.toArgb()
+    val drawable = remember(tintArgb) {
+        AppCompatResources.getDrawable(context, R.drawable.ic_glider_icon)?.mutate()?.also {
+            it.setTint(tintArgb)
+        }
+    }
+    Canvas(modifier = modifier) {
+        drawable?.let { d ->
+            d.setBounds(0, 0, size.width.toInt(), size.height.toInt())
+            drawIntoCanvas { canvas ->
+                d.draw(canvas.nativeCanvas)
+            }
+        }
+    }
 }
