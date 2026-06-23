@@ -1,5 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen
-
+package presentation.screens.main_screen
 import android.graphics.Bitmap
 import android.location.Location
 import com.dunihuliapps.myglidingassistnat.data.enums.RecordingMode

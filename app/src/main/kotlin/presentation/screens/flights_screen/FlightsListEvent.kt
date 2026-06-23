@@ -1,5 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen
-
+package presentation.screens.flights_screen
 import data.model.Flight
 
 sealed class FlightsListEvent {

@@ -1,7 +1,6 @@
 package presentation.screens.flight_details_screen
 
 import android.net.Uri
-import com.dunihuliapps.myglidingassistnat.domain.map_helper.ImageMarker
 import com.google.android.gms.maps.model.LatLng
 import data.model.Flight
 

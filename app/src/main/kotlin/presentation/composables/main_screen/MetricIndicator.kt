@@ -1,6 +1,7 @@
 package presentation.composables.main_screen
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,7 @@ fun MetricIndicator(
     modifier: Modifier = Modifier,
     startIcon: ImageVector? = null,
     endIcon: ImageVector? = null,
+    onClick: (() -> Unit)? = null,
 ) {
     // Use a fallback placeholder for the absent icon side so the text stays centred
     val startPlaceholder = startIcon ?: endIcon ?: Icons.Default.Timer
@@ -36,6 +38,7 @@ fun MetricIndicator(
     Row(
         modifier = modifier
             .background(Color.Black.copy(alpha = 0.55f), RoundedCornerShape(4.dp))
+            .then(if (onClick != null) Modifier.clickable(onClick = onClick) else Modifier)
             .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)

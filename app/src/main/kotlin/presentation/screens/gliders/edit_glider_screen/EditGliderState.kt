@@ -1,5 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.edit_glider_screen
-
+package presentation.screens.gliders.edit_glider_screen
 data class EditGliderScreenState(
     val type: String?,
     val callsign: String?,

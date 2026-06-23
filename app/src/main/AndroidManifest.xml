@@ -114,7 +114,7 @@
                 android:value="presentation.screens.main_screen.MainScreen" />
         </activity>
         <activity
-            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.settings_screen.SettingsActivity"
+            android:name="presentation.screens.settings_screen.SettingsActivity"
             android:icon="@drawable/ic_launcher"
             android:label="@string/AppSettings"
             android:exported="true"

@@ -26,6 +26,8 @@ fun GaugesPanel(
     distanceText: AnnotatedString,
     isRecording: Boolean,
     modifier: Modifier = Modifier,
+    onSpeedClick: (() -> Unit)? = null,
+    onDistanceClick: (() -> Unit)? = null,
 ) {
     Column(modifier = modifier) {
         // Row 1: recording indicator and timer share the same height
@@ -57,12 +59,14 @@ fun GaugesPanel(
             MetricIndicator(
                 value = speedText,
                 startIcon = Icons.Default.Speed,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onClick = onSpeedClick
             )
             MetricIndicator(
                 value = distanceText,
                 endIcon = Icons.Default.Straighten,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onClick = onDistanceClick
             )
         }
     }

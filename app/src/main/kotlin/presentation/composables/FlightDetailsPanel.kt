@@ -22,8 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.dunihuliapps.myglidingassistnat.presentation.composables.FlightDetailRow
-import com.dunihuliapps.myglidingassistnat.presentation.composables.GliderIcon
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.HmsFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricFormatter
 import data.model.Flight

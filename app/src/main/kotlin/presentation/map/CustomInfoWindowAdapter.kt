@@ -1,5 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.presentation.map
-
+package presentation.map
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory

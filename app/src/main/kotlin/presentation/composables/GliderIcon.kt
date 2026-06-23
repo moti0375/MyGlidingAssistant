@@ -1,5 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.presentation.composables
-
+package presentation.composables
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable

@@ -1,5 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.edit_glider_screen
-
+package presentation.screens.gliders.edit_glider_screen
 sealed class EditGliderEvent {
     data class OnTypeChange(val type: String) : EditGliderEvent()
     data class OnCallsignChange(val callsign: String) : EditGliderEvent()
