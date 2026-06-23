@@ -44,6 +44,7 @@ import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.Flig
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreenViewModelEvent
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.SaveStatus
 import com.dunihuliapps.myglidingassistnat.data.model.Glider
+import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.FlightDraft
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.TripLoadFailures
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.TripManagerViewModel
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.TripUploadedResult
@@ -77,6 +78,7 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
     var isLoading by mutableStateOf(false)
     var loadingMessage by mutableStateOf("")
     var gliders by mutableStateOf<List<Glider>>(emptyList())
+    var flightDraft by mutableStateOf(FlightDraft())
 
     private var cameraZoom = 15f
     private var lineWidth = 5f
@@ -123,6 +125,9 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
                     showSaveDialog = showSaveDialog,
                     showNewFlightDialog = showNewFlightDialog,
                     gliders = gliders,
+                    initialFlightGlider = flightDraft.glider,
+                    initialFlightFirstPilot = flightDraft.firstPilot,
+                    initialFlightSecondPilot = flightDraft.secondPilot,
                     isLoading = isLoading,
                     loadingMessage = loadingMessage,
                     onStartStopClick = {
@@ -138,7 +143,10 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
                             MainScreenViewModelEvent.StartFlight(glider, firstPilot, secondPilot)
                         )
                     },
-                    onNewFlightDismiss = { showNewFlightDialog = false },
+                    onNewFlightDismiss = { glider, firstPilot, secondPilot ->
+                        showNewFlightDialog = false
+                        tripManagerViewModel.updateFlightDraft(glider, firstPilot, secondPilot)
+                    },
                     onFlightsClick = {
                         @Suppress("DEPRECATION")
                         startActivityForResult(
@@ -177,6 +185,7 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
         subscribeTimerChanges()
         subscribeGliders()
+        subscribeFlightDraft()
     }
 
     private fun onFragmentReady(fragment: CustomSupportMapFragment) {
@@ -288,6 +297,12 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
     private fun subscribeGliders() {
         lifecycleScope.launch {
             tripManagerViewModel.gliders.collect { gliders = it }
+        }
+    }
+
+    private fun subscribeFlightDraft() {
+        lifecycleScope.launch {
+            tripManagerViewModel.flightDraft.collect { flightDraft = it }
         }
     }
 

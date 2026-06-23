@@ -63,11 +63,14 @@ fun MainScreenContent(
     showSaveDialog: Boolean,
     showNewFlightDialog: Boolean,
     gliders: List<Glider>,
+    initialFlightGlider: String?,
+    initialFlightFirstPilot: String,
+    initialFlightSecondPilot: String,
     isLoading: Boolean,
     loadingMessage: String,
     onStartStopClick: () -> Unit,
     onTakeOffConfirmed: (glider: String?, firstPilot: String?, secondPilot: String?) -> Unit,
-    onNewFlightDismiss: () -> Unit,
+    onNewFlightDismiss: (glider: String?, firstPilot: String, secondPilot: String) -> Unit,
     onFlightsClick: () -> Unit,
     onSettingsClick: () -> Unit,
     onGlidersClick: () -> Unit,
@@ -115,6 +118,9 @@ fun MainScreenContent(
     if (showNewFlightDialog) {
         NewFlightDialog(
             gliders = gliders,
+            initialGlider = initialFlightGlider,
+            initialFirstPilot = initialFlightFirstPilot,
+            initialSecondPilot = initialFlightSecondPilot,
             onConfirm = onTakeOffConfirmed,
             onDismiss = onNewFlightDismiss,
         )
@@ -199,12 +205,15 @@ fun MainScreenContent(
 @Composable
 private fun NewFlightDialog(
     gliders: List<Glider>,
+    initialGlider: String?,
+    initialFirstPilot: String,
+    initialSecondPilot: String,
     onConfirm: (glider: String?, firstPilot: String?, secondPilot: String?) -> Unit,
-    onDismiss: () -> Unit,
+    onDismiss: (glider: String?, firstPilot: String, secondPilot: String) -> Unit,
 ) {
-    var selectedGliderCallsign by remember { mutableStateOf<String?>(null) }
-    var firstPilot by remember { mutableStateOf("") }
-    var secondPilot by remember { mutableStateOf("") }
+    var selectedGliderCallsign by remember { mutableStateOf(initialGlider) }
+    var firstPilot by remember { mutableStateOf(initialFirstPilot) }
+    var secondPilot by remember { mutableStateOf(initialSecondPilot) }
     var gliderDropdownExpanded by remember { mutableStateOf(false) }
 
     val selectedGlider = gliders.find { it.callsign == selectedGliderCallsign }
@@ -215,7 +224,7 @@ private fun NewFlightDialog(
         ?: ""
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = { onDismiss(selectedGliderCallsign, firstPilot, secondPilot) },
         icon = {
             GliderToolbarIcon()
         },
@@ -295,7 +304,7 @@ private fun NewFlightDialog(
             }) { Text("Take Off") }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = { onDismiss(selectedGliderCallsign, firstPilot, secondPilot) }) {
                 Text(stringResource(R.string.Cancel))
             }
         }

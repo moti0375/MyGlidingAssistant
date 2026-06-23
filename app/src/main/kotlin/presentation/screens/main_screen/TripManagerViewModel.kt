@@ -49,6 +49,9 @@ class TripManagerViewModel @Inject constructor(
     val gliders: StateFlow<List<Glider>> = glidersRepository.getAllGliders()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    private val _flightDraft = MutableStateFlow(FlightDraft())
+    val flightDraft: StateFlow<FlightDraft> = _flightDraft.asStateFlow()
+
     private var startLocation: Location? = null
     private var recordingMode = RecordingMode.NEW_TRIP
     private var takeOffTime: Long = 0
@@ -127,10 +130,15 @@ class TripManagerViewModel @Inject constructor(
         }
     }
 
+    fun updateFlightDraft(glider: String?, firstPilot: String, secondPilot: String) {
+        _flightDraft.value = FlightDraft(glider, firstPilot, secondPilot)
+    }
+
     private fun startFlight(glider: String?, firstPilot: String?, secondPilot: String?) {
         currentFlightGlider = glider
         currentFlightFirstPilot = firstPilot
         currentFlightSecondPilot = secondPilot
+        _flightDraft.value = FlightDraft(glider, firstPilot ?: "", secondPilot ?: "")
         resetRoute(true)
         recordingMode = RecordingMode.NEW_TRIP
         takeOff()
@@ -371,6 +379,10 @@ class TripManagerViewModel @Inject constructor(
         const val SPEED_FILTER: Float = 0.832f // 0.833 < 3km/h
         private const val CONTINUE_TRIPS_GAP = 300
     }
-
-
 }
+
+data class FlightDraft(
+    val glider: String? = null,
+    val firstPilot: String = "",
+    val secondPilot: String = "",
+)
