@@ -1,5 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen
-
+package presentation.screens.main_screen
 import android.annotation.SuppressLint
 import android.content.SharedPreferences
 import android.graphics.Bitmap

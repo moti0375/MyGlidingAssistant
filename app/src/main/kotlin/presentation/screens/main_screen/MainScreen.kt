@@ -37,9 +37,6 @@ import com.dunihuliapps.myglidingassistnat.data.enums.AltitudeUnits
 import com.dunihuliapps.myglidingassistnat.data.enums.DistanceUnits
 import com.dunihuliapps.myglidingassistnat.data.enums.data.enums.SpeedUnits
 import com.dunihuliapps.myglidingassistnat.domain.formatters.UnitsFormatter
-import com.dunihuliapps.myglidingassistnat.presentation.map.MapReadyListener
-import com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen
-import com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.gliders_screen.GlidersActivity
 import com.dunihuliapps.myglidingassistnat.data.model.Glider
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.FeetFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.HmsFormatter
@@ -53,6 +50,9 @@ import data.model.Flight
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import presentation.map.CustomSupportMapFragment
+import presentation.map.MapReadyListener
+import presentation.screens.flights_screen.FlightsListScreen
+import presentation.screens.gliders.gliders_screen.GlidersActivity
 import presentation.screens.license_screen.GmsLicenseScreen
 import presentation.screens.settings_screen.SettingsActivity
 import services.GlidingAssistanceService

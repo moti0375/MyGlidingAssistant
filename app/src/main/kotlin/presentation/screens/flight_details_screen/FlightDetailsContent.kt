@@ -26,10 +26,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.dunihuliapps.myglidingassistnat.presentation.map.MapReadyListener
 import presentation.composables.FlightDetailsPanel
 import presentation.composables.MapContainer
 import presentation.map.CustomSupportMapFragment
+import presentation.map.MapReadyListener
 
 
 @OptIn(ExperimentalMaterial3Api::class)

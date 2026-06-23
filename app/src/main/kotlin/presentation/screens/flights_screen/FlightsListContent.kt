@@ -1,5 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen
-
+package presentation.screens.flights_screen
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -101,7 +100,7 @@ fun FlightsListContent(
     }
 
     val inSelectionMode = selectedFlightIds.isNotEmpty()
-    val flights = (state as? FlightsListState.FlightsLoaded)?.flights ?: emptyList()
+    val flights: List<Flight> = (state as? FlightsListState.FlightsLoaded)?.flights ?: emptyList()
 
     if (showDeleteDialog) {
         AlertDialog(

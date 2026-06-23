@@ -1,5 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen
-
+package presentation.screens.flights_screen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dunihuliapps.myglidingassistnat.data.model.Glider
@@ -9,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import data.model.Flight
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -30,7 +30,7 @@ class FlightsListViewModel @Inject constructor(
     private val _selectedFlightIds = MutableStateFlow<Set<Long>>(emptySet())
     val selectedFlightIds = _selectedFlightIds.asStateFlow()
 
-    val gliders: kotlinx.coroutines.flow.StateFlow<List<Glider>> = glidersRepository.getAllGliders()
+    val gliders: StateFlow<List<Glider>> = glidersRepository.getAllGliders()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     // Kept for legacy delete/edit path

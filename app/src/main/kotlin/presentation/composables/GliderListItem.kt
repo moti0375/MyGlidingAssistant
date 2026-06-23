@@ -1,8 +1,5 @@
-package com.dunihuliapps.myglidingassistnat.presentation.composables
-
-import androidx.collection.LongList
+package presentation.composables
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding

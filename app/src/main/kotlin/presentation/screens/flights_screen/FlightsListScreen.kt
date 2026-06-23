@@ -1,5 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen
-
+package presentation.screens.flights_screen
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity

@@ -13,9 +13,6 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistnat.domain.map_helper.ImageMarker
-import com.dunihuliapps.myglidingassistnat.presentation.map.CustomInfoWindowAdapter
-import com.dunihuliapps.myglidingassistnat.presentation.map.InfoWindowClickListener
-import com.dunihuliapps.myglidingassistnat.presentation.map.MapReadyListener
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener

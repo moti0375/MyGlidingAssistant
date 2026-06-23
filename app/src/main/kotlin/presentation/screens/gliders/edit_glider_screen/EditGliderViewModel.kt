@@ -1,16 +1,9 @@
-package com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.edit_glider_screen
-
+package presentation.screens.gliders.edit_glider_screen
 import android.util.Log
-import androidx.activity.result.launch
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dunihuliapps.myglidingassistnat.data.model.Glider
 import com.dunihuliapps.myglidingassistnat.data.repositories.gliders.GlidersRepository
-import com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
