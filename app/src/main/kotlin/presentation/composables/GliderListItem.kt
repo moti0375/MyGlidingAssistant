@@ -20,7 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.dunihuliapps.myglidingassistant.R
-import com.dunihuliapps.myglidingassistnat.data.model.Glider // Ensure path is correct
+import com.dunihuliapps.myglidingassistnat.data.model.Glider
+import java.io.File
 
 @Composable
 fun GliderListItem(
@@ -42,7 +43,7 @@ fun GliderListItem(
             ) {
                 if (glider.gliderImage != null) {
                     AsyncImage(
-                        model = glider.gliderImage,
+                        model = File(glider.gliderImage),
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxSize()

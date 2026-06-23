@@ -6,6 +6,11 @@ import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.FileOutputStream
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -61,32 +66,56 @@ import java.io.File
 @Composable
 fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     val state by viewModel.state.collectAsState()
 
+    val gliderImagesDir = remember {
+        File(context.filesDir, "glider_images").apply { mkdirs() }
+    }
+
+    val tempCameraFile = remember {
+        File(gliderImagesDir, "glider_${System.currentTimeMillis()}.jpg")
+    }
+
     val tempUri = remember {
-        val directory = File(context.externalCacheDir, "camera_photos").apply { mkdirs() }
-        val file = File(directory, "temp_glider_${System.currentTimeMillis()}.jpg")
         FileProvider.getUriForFile(
             context,
             "${context.packageName}.provider",
-            file
+            tempCameraFile
         )
     }
 
     // Activity Result Launcher for CameraActivity
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri -> uri?.let {
-        viewModel.mapEventToState(EditGliderEvent.OnImageTaken(it))
-    } }
+    ) { uri ->
+        uri?.let {
+            scope.launch {
+                val destFile = File(gliderImagesDir, "glider_${System.currentTimeMillis()}.jpg")
+                val copied = withContext(Dispatchers.IO) {
+                    try {
+                        context.contentResolver.openInputStream(it)?.use { input ->
+                            FileOutputStream(destFile).use { output -> input.copyTo(output) }
+                        }
+                        true
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        false
+                    }
+                }
+                if (copied) {
+                    viewModel.mapEventToState(EditGliderEvent.OnImageTaken(destFile.absolutePath))
+                }
+            }
+        }
+    }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
-            // The image is now saved at tempUri
-            viewModel.mapEventToState(EditGliderEvent.OnImageTaken(tempUri))
+            viewModel.mapEventToState(EditGliderEvent.OnImageTaken(tempCameraFile.absolutePath))
         }
     }
 
@@ -144,9 +173,9 @@ fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit) {
                     tonalElevation = 2.dp
                 ) {
                     val imageUri = state.image
-                    imageUri?.let{
+                    imageUri?.let {
                         AsyncImage(
-                            model = imageUri,
+                            model = File(imageUri),
                             contentDescription = "Taken Glider Image",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop

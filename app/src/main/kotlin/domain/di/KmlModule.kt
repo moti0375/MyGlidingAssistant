@@ -1,4 +1,5 @@
-package com.dunihuliapps.myglidingassistnat.domain.di
+package domain.di
+
 import com.dunihuliapps.myglidingassistnat.domain.files.kml.KmlManager
 import com.dunihuliapps.myglidingassistnat.domain.files.kml.KmlManagerImpl
 import com.dunihuliapps.myglidingassistnat.domain.files.kml.KmlParser
