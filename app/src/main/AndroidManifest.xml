@@ -27,7 +27,7 @@
         android:icon="@mipmap/ic_launcher"
         android:theme="@style/Theme.App">
         <activity
-            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.splash_screen.SplashScreen"
+            android:name="presentation.screens.splash_screen.SplashScreenActivity"
             android:clearTaskOnLaunch="false"
             android:exported="true"
             android:screenOrientation="portrait">
