@@ -3,10 +3,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -28,6 +30,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -52,6 +55,8 @@ import presentation.composables.main_screen.MainMapContainer
 import presentation.composables.main_screen.MetricIndicator
 import presentation.map.CustomSupportMapFragment
 
+private enum class UnitDialogType { Speed, Distance, Altitude }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreenContent(
@@ -68,6 +73,10 @@ fun MainScreenContent(
     initialFlightSecondPilot: String,
     isLoading: Boolean,
     loadingMessage: String,
+    speedUnitValue: String,
+    distanceUnitValue: String,
+    altitudeUnitValue: String,
+    onUnitChanged: (key: String, value: String) -> Unit,
     onStartStopClick: () -> Unit,
     onTakeOffConfirmed: (glider: String?, firstPilot: String?, secondPilot: String?) -> Unit,
     onNewFlightDismiss: (glider: String?, firstPilot: String, secondPilot: String) -> Unit,
@@ -82,6 +91,64 @@ fun MainScreenContent(
     onSaveCancel: () -> Unit,
     onLoadingCancel: () -> Unit,
 ) {
+    var activeUnitDialog by remember { mutableStateOf<UnitDialogType?>(null) }
+
+    activeUnitDialog?.let { dialogType ->
+        val (title, entries, values, currentValue, key) = when (dialogType) {
+            UnitDialogType.Speed -> UnitDialogConfig(
+                title = "Speed Units",
+                entries = listOf("Metric (km/h)", "Knots"),
+                values = listOf("1", "2"),
+                currentValue = speedUnitValue,
+                key = "speed_units"
+            )
+            UnitDialogType.Distance -> UnitDialogConfig(
+                title = "Distance Units",
+                entries = listOf("Metric (km)", "Miles"),
+                values = listOf("1", "2"),
+                currentValue = distanceUnitValue,
+                key = "distance_units"
+            )
+            UnitDialogType.Altitude -> UnitDialogConfig(
+                title = "Altitude Units",
+                entries = listOf("Feet", "Metric (m)"),
+                values = listOf("1", "2"),
+                currentValue = altitudeUnitValue,
+                key = "altitudeUnits"
+            )
+        }
+        AlertDialog(
+            onDismissRequest = { activeUnitDialog = null },
+            title = { Text(title) },
+            text = {
+                Column {
+                    entries.forEachIndexed { index, entry ->
+                        val value = values[index]
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = currentValue == value,
+                                onClick = {
+                                    onUnitChanged(key, value)
+                                    activeUnitDialog = null
+                                }
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(entry)
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { activeUnitDialog = null }) { Text(stringResource(R.string.Cancel)) }
+            }
+        )
+    }
+
     if (showSaveDialog) {
         AlertDialog(
             onDismissRequest = onSaveCancel,
@@ -170,6 +237,8 @@ fun MainScreenContent(
                 speedText = speedText,
                 distanceText = distanceText,
                 isRecording = isRecording,
+                onSpeedClick = { activeUnitDialog = UnitDialogType.Speed },
+                onDistanceClick = { activeUnitDialog = UnitDialogType.Distance },
             )
 
             Column(
@@ -195,7 +264,8 @@ fun MainScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .onGloballyPositioned { onAltitudeHeightChanged(it.size.height) }
-                        .padding(horizontal = 4.dp, vertical = 4.dp)
+                        .padding(horizontal = 4.dp, vertical = 4.dp),
+                    onClick = { activeUnitDialog = UnitDialogType.Altitude }
                 )
             }
         }
@@ -311,3 +381,10 @@ private fun NewFlightDialog(
     )
 }
 
+private data class UnitDialogConfig(
+    val title: String,
+    val entries: List<String>,
+    val values: List<String>,
+    val currentValue: String,
+    val key: String,
+)

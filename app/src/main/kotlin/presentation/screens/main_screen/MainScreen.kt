@@ -40,14 +40,7 @@ import com.dunihuliapps.myglidingassistnat.domain.formatters.UnitsFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.map.MapReadyListener
 import com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen
 import com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.gliders_screen.GlidersActivity
-import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.FlightState
-import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreenViewModelEvent
-import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.SaveStatus
 import com.dunihuliapps.myglidingassistnat.data.model.Glider
-import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.FlightDraft
-import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.TripLoadFailures
-import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.TripManagerViewModel
-import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.TripUploadedResult
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.FeetFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.HmsFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.KmhFormatter
@@ -79,6 +72,9 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
     var loadingMessage by mutableStateOf("")
     var gliders by mutableStateOf<List<Glider>>(emptyList())
     var flightDraft by mutableStateOf(FlightDraft())
+    var speedUnitValue by mutableStateOf("1")
+    var distanceUnitValue by mutableStateOf("1")
+    var altitudeUnitValue by mutableStateOf("1")
 
     private var cameraZoom = 15f
     private var lineWidth = 5f
@@ -130,6 +126,13 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
                     initialFlightSecondPilot = flightDraft.secondPilot,
                     isLoading = isLoading,
                     loadingMessage = loadingMessage,
+                    speedUnitValue = speedUnitValue,
+                    distanceUnitValue = distanceUnitValue,
+                    altitudeUnitValue = altitudeUnitValue,
+                    onUnitChanged = { key, value ->
+                        settings.edit().putString(key, value).apply()
+                        updatePreferences()
+                    },
                     onStartStopClick = {
                         if (isRecording) {
                             tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.StartStopButtonClicked)
@@ -317,6 +320,10 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
         this.distanceUnits = if (distanceUnits == 2) DistanceUnits.Millage else DistanceUnits.Metric
         this.altUnits = if (altitudeUnits == 1) AltitudeUnits.Feet else AltitudeUnits.Metric
         this.speedUnits = if (speedUnits == 1) SpeedUnits.Metric else SpeedUnits.Knots
+
+        speedUnitValue = settings.getString(resources.getString(R.string.speed_units_key), "1") ?: "1"
+        distanceUnitValue = settings.getString(resources.getString(R.string.distance_units_key), "1") ?: "1"
+        altitudeUnitValue = settings.getString(resources.getString(R.string.altitude_units_key), "1") ?: "1"
 
         setFormatters()
 
