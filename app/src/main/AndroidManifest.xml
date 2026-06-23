@@ -102,10 +102,10 @@
             android:theme="@style/AppTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen" />
+                android:value="presentation.screens.flights_screen.FlightsListScreen" />
         </activity>
         <activity
-            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.flights_screen.FlightsListScreen"
+            android:name="presentation.screens.flights_screen.FlightsListScreen"
             android:exported="true"
             android:parentActivityName="presentation.screens.main_screen.MainScreen"
             android:screenOrientation="portrait">
@@ -136,7 +136,7 @@
         </activity>
 
         <activity
-            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.gliders_screen.GlidersActivity"
+            android:name="presentation.screens.gliders.gliders_screen.GlidersActivity"
             android:exported="true"
             android:screenOrientation="portrait">
 
@@ -147,13 +147,13 @@
         </activity>
 
         <activity
-            android:name="com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.edit_glider_screen.EditGliderActivity"
+            android:name="presentation.screens.gliders.edit_glider_screen.EditGliderActivity"
             android:exported="true"
             android:screenOrientation="portrait">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dunihuliapps.myglidingassistnat.presentation.screens.gliders.gliders_screen.GlidersActivity" />
+                android:value="presentation.screens.gliders.gliders_screen.GlidersActivity" />
 
         </activity>
 
