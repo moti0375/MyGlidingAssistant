@@ -48,7 +48,6 @@ import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.Flig
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.TripLoadFailures
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.TripManagerViewModel
 import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.TripUploadedResult
-import com.dunihuliapps.myglidingassistnat.presentation.screens.settings_screen.SettingsActivity
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.FeetFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.HmsFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.KmhFormatter
@@ -62,6 +61,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import presentation.map.CustomSupportMapFragment
 import presentation.screens.license_screen.GmsLicenseScreen
+import presentation.screens.settings_screen.SettingsActivity
 import services.GlidingAssistanceService
 
 @AndroidEntryPoint

@@ -21,11 +21,12 @@ import com.dunihuliapps.myglidingassistnat.domain.timer.TripTimer
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import data.model.Flight
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -42,8 +43,8 @@ class TripManagerViewModel @Inject constructor(
     private val kmlManager: KmlManager,
     private val sharedPreferences: SharedPreferences
 ) : ViewModel(), DefaultLifecycleObserver {
-    private val tripMutableStateFlow = MutableStateFlow<FlightState>(FlightState.Initiated)
-    val flightStateFlow: StateFlow<FlightState> = tripMutableStateFlow.asStateFlow()
+    private val tripMutableStateFlow = MutableSharedFlow<FlightState>(replay = 0, extraBufferCapacity = 64)
+    val flightStateFlow: SharedFlow<FlightState> = tripMutableStateFlow.asSharedFlow()
     val timerStateFlow = timer.timerStateFlow
 
     val gliders: StateFlow<List<Glider>> = glidersRepository.getAllGliders()
@@ -362,9 +363,7 @@ class TripManagerViewModel @Inject constructor(
     }
 
     private fun publishFlightState(state: FlightState) {
-        CoroutineScope(Dispatchers.Main).launch {
-            tripMutableStateFlow.value = state
-        }
+        tripMutableStateFlow.tryEmit(state)
     }
 
     companion object {
