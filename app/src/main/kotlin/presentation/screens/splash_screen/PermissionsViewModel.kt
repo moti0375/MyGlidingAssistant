@@ -2,14 +2,15 @@ package com.dunihuliapps.myglidingassistnat.presentation.screens.splash_screen
 
 import android.Manifest
 import android.os.Build
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class PermissionsViewModel @Inject constructor(): ViewModel() {
+class PermissionsViewModel @Inject constructor() : ViewModel() {
 
     data class PermissionStep(
         val permission: String,
@@ -18,11 +19,14 @@ class PermissionsViewModel @Inject constructor(): ViewModel() {
         val isMandatory: Boolean
     )
 
-    private val _currentStep = MutableLiveData<PermissionStep?>()
-    val currentStep: LiveData<PermissionStep?> = _currentStep
+    private val _currentStep = MutableStateFlow<PermissionStep?>(null)
+    val currentStep: StateFlow<PermissionStep?> = _currentStep.asStateFlow()
 
-    private val _navigateToMain = MutableLiveData<Boolean>()
-    val navigateToMain: LiveData<Boolean> = _navigateToMain
+    private val _navigateToMain = MutableStateFlow(false)
+    val navigateToMain: StateFlow<Boolean> = _navigateToMain.asStateFlow()
+
+    private val _shouldFinish = MutableStateFlow(false)
+    val shouldFinish: StateFlow<Boolean> = _shouldFinish.asStateFlow()
 
     private val steps = mutableListOf<PermissionStep>()
     private var stepIndex = 0
@@ -34,6 +38,7 @@ class PermissionsViewModel @Inject constructor(): ViewModel() {
         hasStorage: Boolean
     ) {
         steps.clear()
+        stepIndex = 0
 
         // 1. Location (Mandatory)
         if (!hasLocation) {
@@ -80,9 +85,8 @@ class PermissionsViewModel @Inject constructor(): ViewModel() {
     fun onStepResult(isGranted: Boolean) {
         val current = steps.getOrNull(stepIndex)
         if (!isGranted && current?.isMandatory == true) {
-            // Activity will observe that currentStep is null and handle termination if needed,
-            // or we could add an explicit 'exitApp' LiveData.
             _currentStep.value = null
+            _shouldFinish.value = true
         } else {
             stepIndex++
             processNext()

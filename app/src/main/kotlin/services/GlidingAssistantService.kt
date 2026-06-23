@@ -14,7 +14,7 @@ import androidx.preference.PreferenceManager
 import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistnat.data.enums.AltitudeUnits
 import com.dunihuliapps.myglidingassistnat.data.enums.DistanceUnits
-import com.dunihuliapps.myglidingassistnat.presentation.screens.main_screen.MainScreen
+import presentation.screens.main_screen.MainScreen
 import java.util.Locale
 
 /**

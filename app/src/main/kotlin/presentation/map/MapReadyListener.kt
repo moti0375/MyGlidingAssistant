@@ -1,5 +1,4 @@
-package com.dunihuliapps.myglidingassistnat.presentation.map
-
+package presentation.map
 interface MapReadyListener {
     fun onMapReady()
 }

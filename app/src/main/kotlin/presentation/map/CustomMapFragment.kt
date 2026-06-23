@@ -1,5 +1,7 @@
-package com.dunihuliapps.myglidingassistnat.presentation.map
+package presentation.map
+
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.location.Location
@@ -30,6 +32,7 @@ import com.google.android.gms.maps.model.PolylineOptions
 class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMarkerClickListener, OnInfoWindowClickListener {
 
     lateinit var map: GoogleMap
+    val isMapReady: Boolean get() = this::map.isInitialized
     var lineWidth = 5f
     var zoom = 5f
     var lineColor = Color.RED
@@ -150,7 +153,12 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
         val update = CameraUpdateFactory.zoomBy(this.zoom)
         this.map.apply {
             moveCamera(update)
-            setInfoWindowAdapter(CustomInfoWindowAdapter(LayoutInflater.from(context), markersIdsMap))
+            setInfoWindowAdapter(
+                CustomInfoWindowAdapter(
+                    LayoutInflater.from(context),
+                    markersIdsMap
+                )
+            )
         }
     }
 
@@ -251,10 +259,10 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
         val sizePx = (sizeDp * density).toInt()
 
         val vectorDrawable = ContextCompat.getDrawable(requireContext(), vectorResId) ?: return null
-        val bitmap = android.graphics.Bitmap.createBitmap(
+        val bitmap = Bitmap.createBitmap(
             sizePx,
             sizePx,
-            android.graphics.Bitmap.Config.ARGB_8888
+            Bitmap.Config.ARGB_8888
         )
 
         Log.i("CustomMapFragment", "bitmapDescriptorFromVector: width: ${bitmap.width}, height: ${bitmap.height} ")

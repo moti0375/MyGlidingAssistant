@@ -105,12 +105,11 @@
     <string name="Trip">Trip</string>    
     <string name="Trips">Trips</string>    
     <string name="NoTitleHint">No Title...</string>    
-    <string name="MergeTrips">Merge these trips?</string>    
-    <string name="MergeingTrips">Mergeing trips, please wait...</string>    
-    <string name="ContinuousMergerTrips">Merged trips must be continuous with no more than 300 meters</string>    
+    <string name="ContinuousMergerTrips">Merged trips must be continuous with no more than 300 meters</string>
     <string name="Completed">Done</string>    
     <string name="UploadTrip">Upload this trip?</string>    
-    
+    <string name="NoFlights">The Sky Is Waiting</string>
+
      <!-- License Activity -->
     <string name="GooglePlayServicesUnavailable">Google Play services is not installed on this device</string>
     <string name="MaxAltitudeHeader">Max Altitude</string>
