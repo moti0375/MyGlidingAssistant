@@ -42,8 +42,8 @@ class EditGliderViewModel @Inject constructor(
             is EditGliderEvent.OnCallsignChange -> _state.value = _state.value.copy(callsign = event.callsign)
             is EditGliderEvent.OnSeatsChange -> _state.value = _state.value.copy(seats = event.seats)
             is EditGliderEvent.OnRatioChange -> _state.value = _state.value.copy(ratio = event.ratio)
-            is EditGliderEvent.OnImageTaken ->  {
-                _state.value =  _state.value.copy(image = event.imageUri.toString())
+            is EditGliderEvent.OnImageTaken -> {
+                _state.value = _state.value.copy(image = event.imagePath)
             }
             is EditGliderEvent.Save -> save()
         }
