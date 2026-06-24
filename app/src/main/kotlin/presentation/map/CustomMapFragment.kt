@@ -219,7 +219,7 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
         }
     }
 
-    fun drawSafetyCircles(center: LatLng, circles: List<SafetyCircle>) {
+    fun drawSafetyCircles(center: LatLng, circles: List<SafetyCircle>, distanceLabel: (Double) -> String) {
         val safetyColor = Color.argb(220, 220, 0, 0)
         circles.forEach { safetyCircle ->
             val color = safetyColor
@@ -228,13 +228,14 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
                     .center(center)
                     .radius(safetyCircle.radiusMeters)
                     .strokeColor(color)
-                    .strokeWidth(3f)
+                    .strokeWidth(6f)
                     .fillColor(Color.TRANSPARENT)
             )
             safetyCircles.add(circle)
 
             val northLat = center.latitude + safetyCircle.radiusMeters / 111320.0
-            val labelBitmap = createAltitudeLabelBitmap("${safetyCircle.altitudeFt} ft", color)
+            val label = "${safetyCircle.altitudeFt}ft - ${distanceLabel(safetyCircle.radiusMeters)}"
+            val labelBitmap = createAltitudeLabelBitmap(label, color)
             map.addMarker(
                 MarkerOptions()
                     .position(LatLng(northLat, center.longitude))

@@ -265,7 +265,9 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
             is FlightState.StartLocation -> mapFrag?.goToLocation(state.location)
             is FlightState.SafetyCirclesReady -> {
                 safetyCirclesVisible = true
-                mapFrag?.drawSafetyCircles(state.takeoffLocation, state.circles)
+                mapFrag?.drawSafetyCircles(state.takeoffLocation, state.circles) { meters ->
+                    distanceFormatter.formatUnits(meters).toString()
+                }
             }
             is FlightState.StartRecording -> startRecording()
             is FlightState.StopAndSave -> saveTrip()
