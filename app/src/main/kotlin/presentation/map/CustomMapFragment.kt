@@ -220,6 +220,11 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
     }
 
     fun drawSafetyCircles(center: LatLng, circles: List<SafetyCircle>, distanceLabel: (Double) -> String) {
+        safetyCircles.forEach { it.remove() }
+        safetyCircles.clear()
+        safetyLabelMarkers.forEach { it.remove() }
+        safetyLabelMarkers.clear()
+
         val safetyColor = Color.argb(220, 220, 0, 0)
         circles.forEach { safetyCircle ->
             val color = safetyColor
