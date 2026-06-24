@@ -116,7 +116,9 @@ fun AppNavHost(
                             append("&callsign=${Uri.encode(glider.callsign)}")
                             append("&seats=${glider.seats}")
                             append("&ratio=${glider.ratio}")
-                            append("&image=${Uri.encode(glider.gliderImage ?: "")}")
+                            if (!glider.gliderImage.isNullOrEmpty()) {
+                                append("&image=${Uri.encode(glider.gliderImage)}")
+                            }
                         }
                         navController.navigate(route)
                     }

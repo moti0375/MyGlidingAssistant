@@ -293,10 +293,7 @@ fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit, onBack
             Spacer(modifier = Modifier.weight(1f))
 
             Button(
-                onClick = {
-                    viewModel.save()
-                    onSaved()
-                },
+                onClick = { viewModel.save(onSaved) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)

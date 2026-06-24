@@ -25,7 +25,7 @@ class EditGliderViewModel @Inject constructor(
         callsign = savedStateHandle.get<String>("callsign"),
         seats = savedStateHandle.get<Int>("seats") ?: DEFAULT_SEATS,
         ratio = savedStateHandle.get<Int>("ratio") ?: DEFAULT_RATIO,
-        image = savedStateHandle.get<String>("image")
+        image = savedStateHandle.get<String>("image")?.takeIf { it.isNotEmpty() }
     ))
     val state = _state.asStateFlow()
     val isEditMode: Boolean get() = (savedStateHandle.get<Long>("id") ?: 0L) > 0L
@@ -39,18 +39,20 @@ class EditGliderViewModel @Inject constructor(
             is EditGliderEvent.OnImageTaken -> {
                 _state.value = _state.value.copy(image = event.imagePath)
             }
-            is EditGliderEvent.Save -> save()
+            is EditGliderEvent.Save -> save {}
         }
     }
 
-    fun save() {
+    fun save(onComplete: () -> Unit = {}) {
         viewModelScope.launch {
             val gliderId = savedStateHandle.get<Long>("id") ?: 0L
+            val image = _state.value.image?.takeIf { it.isNotEmpty() }
             if (gliderId > 0L) {
-                repository.update(gliderId, type = _state.value.type ?: "", callsign = _state.value.callsign ?: "", seats = _state.value.seats, ratio = _state.value.ratio, gliderImage = _state.value.image)
+                repository.update(gliderId, type = _state.value.type ?: "", callsign = _state.value.callsign ?: "", seats = _state.value.seats, ratio = _state.value.ratio, gliderImage = image)
             } else {
-                repository.insertGlider(type = _state.value.type ?: "", callsign = _state.value.callsign ?: "", seats = _state.value.seats, ratio = _state.value.ratio, gliderImage = _state.value.image)
+                repository.insertGlider(type = _state.value.type ?: "", callsign = _state.value.callsign ?: "", seats = _state.value.seats, ratio = _state.value.ratio, gliderImage = image)
             }
+            onComplete()
         }
     }
 
