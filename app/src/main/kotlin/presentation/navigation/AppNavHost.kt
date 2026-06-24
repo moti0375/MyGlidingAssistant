@@ -9,6 +9,10 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,9 +42,22 @@ fun AppNavHost(
 ) {
     val context = LocalContext.current as ComponentActivity
 
-    NavHost(navController = navController, startDestination = "main") {
+    NavHost(
+        navController = navController,
+        startDestination = "main",
+        enterTransition = { slideInHorizontally(initialOffsetX = { it }) },
+        exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
+        popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+        popExitTransition = { slideOutHorizontally(targetOffsetX = { it }) }
+    ) {
 
-        composable("main") {
+        composable(
+            "main",
+            enterTransition = { EnterTransition.None },
+            exitTransition = { ExitTransition.None },
+            popEnterTransition = { EnterTransition.None },
+            popExitTransition = { ExitTransition.None }
+        ) {
             // Main screen is rendered outside the NavHost (in MainActivity's Box),
             // keeping it always in composition so the map fragment is never detached.
         }
@@ -122,7 +139,8 @@ fun AppNavHost(
             val viewModel: EditGliderViewModel = hiltViewModel()
             EditGliderScreen(
                 viewModel = viewModel,
-                onSaved = { navController.popBackStack() }
+                onSaved = { navController.popBackStack() },
+                onBack = { navController.popBackStack() }
             )
         }
 

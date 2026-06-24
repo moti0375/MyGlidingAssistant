@@ -28,6 +28,7 @@ class EditGliderViewModel @Inject constructor(
         image = savedStateHandle.get<String>("image")
     ))
     val state = _state.asStateFlow()
+    val isEditMode: Boolean get() = (savedStateHandle.get<Long>("id") ?: 0L) > 0L
 
     fun mapEventToState(event: EditGliderEvent){
         when (event){
