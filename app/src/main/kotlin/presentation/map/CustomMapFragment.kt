@@ -60,12 +60,14 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        gliderMarker = bitmapDescriptorFromVector(R.drawable.glider_marker, 100)
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     @SuppressLint("PotentialBehaviorOverride")
     override fun onMapReady(map: GoogleMap) {
+        // BitmapDescriptorFactory requires the Maps SDK to be initialized,
+        // which is only guaranteed once onMapReady fires.
+        gliderMarker = bitmapDescriptorFromVector(R.drawable.glider_marker, 100)
         setupMap(map)
         mapReadyListener?.onMapReady()
         map.setOnMarkerClickListener(this)
