@@ -41,7 +41,8 @@ class TripManagerViewModel @Inject constructor(
     private val glidersRepository: GlidersRepository,
     private val timer: TripTimer,
     private val kmlManager: KmlManager,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
+    private val flightComputer: FlightComputer,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val tripMutableStateFlow = MutableSharedFlow<FlightState>(replay = 0, extraBufferCapacity = 64)
     val flightStateFlow: SharedFlow<FlightState> = tripMutableStateFlow.asSharedFlow()
@@ -340,7 +341,7 @@ class TripManagerViewModel @Inject constructor(
         currentLocation = location
         publishFlightState(FlightState.StartLocation(location))
         val ratio = currentGlider?.ratio?.takeIf { it > 0 } ?: DEFAULT_GLIDE_RATIO
-        val circles = FlightComputer.calculateSafetyCircles(ratio)
+        val circles = flightComputer.calculateSafetyCircles(ratio)
         publishFlightState(FlightState.SafetyCirclesReady(LatLng(location.latitude, location.longitude), circles))
         if (recordingState == RecordingState.Recording) {
             if (recordingMode == RecordingMode.CONTINUE_TRIP) {
