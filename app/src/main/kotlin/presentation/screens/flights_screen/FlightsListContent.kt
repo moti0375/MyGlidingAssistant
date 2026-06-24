@@ -84,7 +84,7 @@ private const val TRIP_NAME_MAX_LENGTH = 25
 fun FlightsListContent(
     viewModel: FlightsListViewModel,
     onFlightClick: (Flight) -> Unit,
-    onUploadConfirmed: () -> Unit,
+    onUploadConfirmed: (Flight) -> Unit,
     onBack: () -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
@@ -141,8 +141,9 @@ fun FlightsListContent(
             text = { Text(stringResource(R.string.UploadTrip)) },
             confirmButton = {
                 TextButton(onClick = {
+                    val flightToUpload = flights.firstOrNull { it.id in selectedFlightIds }
                     showUploadDialog = false
-                    onUploadConfirmed()
+                    flightToUpload?.let { onUploadConfirmed(it) }
                 }) { Text(stringResource(R.string.YES)) }
             },
             dismissButton = {

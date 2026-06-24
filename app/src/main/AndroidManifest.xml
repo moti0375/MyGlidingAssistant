@@ -85,7 +85,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="presentation.screens.main_screen.MainScreen"
+            android:name="presentation.screens.MainActivity"
             android:alwaysRetainTaskState="true"
             android:exported="true"
             android:configChanges="orientation|screenSize"
@@ -94,67 +94,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
-        </activity>
-        <activity
-            android:name="presentation.screens.flight_details_screen.FlightDetailsActivity"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="presentation.screens.flights_screen.FlightsListScreen" />
-        </activity>
-        <activity
-            android:name="presentation.screens.flights_screen.FlightsListScreen"
-            android:exported="true"
-            android:parentActivityName="presentation.screens.main_screen.MainScreen"
-            android:screenOrientation="portrait">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="presentation.screens.main_screen.MainScreen" />
-        </activity>
-        <activity
-            android:name="presentation.screens.settings_screen.SettingsActivity"
-            android:icon="@drawable/ic_launcher"
-            android:label="@string/AppSettings"
-            android:exported="true"
-            android:parentActivityName="presentation.screens.main_screen.MainScreen">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="presentation.screens.main_screen.MainScreen" />
-        </activity>
-
-        <activity android:name="presentation.screens.license_screen.GmsLicenseScreen"
-            android:parentActivityName="presentation.screens.main_screen.MainScreen"
-            android:exported="true"
-            android:screenOrientation="portrait">
-
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="presentation.screens.main_screen.MainScreen" />
-
-        </activity>
-
-        <activity
-            android:name="presentation.screens.gliders.gliders_screen.GlidersActivity"
-            android:exported="true"
-            android:screenOrientation="portrait">
-
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="presentation.screens.main_screen.MainScreen" />
-
-        </activity>
-
-        <activity
-            android:name="presentation.screens.gliders.edit_glider_screen.EditGliderActivity"
-            android:exported="true"
-            android:screenOrientation="portrait">
-
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="presentation.screens.gliders.gliders_screen.GlidersActivity" />
-
         </activity>
 
         <service android:name="services.GlidingAssistanceService"

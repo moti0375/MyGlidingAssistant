@@ -44,10 +44,11 @@ class EditGliderViewModel @Inject constructor(
 
     fun save() {
         viewModelScope.launch {
-            savedStateHandle.get<Long>("id")?.let { gliderId ->
+            val gliderId = savedStateHandle.get<Long>("id") ?: 0L
+            if (gliderId > 0L) {
                 repository.update(gliderId, type = _state.value.type ?: "", callsign = _state.value.callsign ?: "", seats = _state.value.seats, ratio = _state.value.ratio, gliderImage = _state.value.image)
-            } ?: run {
-                repository.insertGlider( type =_state.value.type ?: "", callsign = _state.value.callsign ?: "", seats = _state.value.seats, ratio = _state.value.ratio, gliderImage = _state.value.image)
+            } else {
+                repository.insertGlider(type = _state.value.type ?: "", callsign = _state.value.callsign ?: "", seats = _state.value.seats, ratio = _state.value.ratio, gliderImage = _state.value.image)
             }
         }
     }

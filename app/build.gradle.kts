@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.oss.licenses)
     kotlin("kapt") // Keep kapt for Hilt for now
 }
 
@@ -73,6 +74,7 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.compose.material.icons.core)
 // In dependencies block
@@ -100,6 +102,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
+    implementation("com.google.android.gms:play-services-oss-licenses:17.0.1")
 
     implementation (files("libs/jdom-2.0.6.jar"))
     implementation (files("libs/jdom-2.0.6-javadoc.jar"))
