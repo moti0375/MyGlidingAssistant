@@ -276,6 +276,11 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
         return bitmap
     }
 
+    fun setSafetyCirclesVisible(visible: Boolean) {
+        safetyCircles.forEach { it.isVisible = visible }
+        safetyLabelMarkers.forEach { it.isVisible = visible }
+    }
+
     fun clearEverything() {
         if (this::map.isInitialized) {
             marker?.remove()

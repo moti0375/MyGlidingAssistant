@@ -77,6 +77,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
     var distanceText by mutableStateOf(AnnotatedString("0.0"))
     var altitudeText by mutableStateOf(AnnotatedString("0"))
     var isRecording by mutableStateOf(false)
+    var safetyCirclesVisible by mutableStateOf(true)
     var showSaveDialog by mutableStateOf(false)
     var showNewFlightDialog by mutableStateOf(false)
     var isLoading by mutableStateOf(false)
@@ -148,12 +149,17 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                             settings.edit().putString(key, value).apply()
                             updatePreferences()
                         },
+                        safetyCirclesVisible = safetyCirclesVisible,
                         onStartStopClick = {
                             if (isRecording) {
                                 tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.StartStopButtonClicked)
                             } else {
                                 showNewFlightDialog = true
                             }
+                        },
+                        onToggleSafetyCirclesClick = {
+                            safetyCirclesVisible = !safetyCirclesVisible
+                            mapFrag?.setSafetyCirclesVisible(safetyCirclesVisible)
                         },
                         onTakeOffConfirmed = { glider, firstPilot, secondPilot ->
                             showNewFlightDialog = false
@@ -257,7 +263,10 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
             is FlightState.Stopped -> mapFrag?.mapCameraLongShot()
             is FlightState.FlightSaved -> processTripSaved(state)
             is FlightState.StartLocation -> mapFrag?.goToLocation(state.location)
-            is FlightState.SafetyCirclesReady -> mapFrag?.drawSafetyCircles(state.takeoffLocation, state.circles)
+            is FlightState.SafetyCirclesReady -> {
+                safetyCirclesVisible = true
+                mapFrag?.drawSafetyCircles(state.takeoffLocation, state.circles)
+            }
             is FlightState.StartRecording -> startRecording()
             is FlightState.StopAndSave -> saveTrip()
             is FlightState.ShowSaveDialog -> showSaveDialog = true
