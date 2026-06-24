@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -33,7 +34,8 @@ import presentation.composables.GliderListItem
 @Composable
 fun GlidersScreen(
     viewModel: GlidersViewModel,
-    onAddClick: (glider: Glider?) -> Unit
+    onAddClick: (glider: Glider?) -> Unit,
+    onBack: () -> Unit,
 ) {
     val gliders by viewModel.gliders.collectAsState()
 
@@ -74,6 +76,13 @@ fun GlidersScreen(
         topBar = {
             TopAppBar(
                 title = { Text("My Gliders") },
+                navigationIcon = {
+                    if (selectedGliderForDelete == null) {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                },
                 actions = {
                     if (selectedGliderForDelete != null) {
                         // Delete Icon (Contextual Action)

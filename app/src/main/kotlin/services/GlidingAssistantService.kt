@@ -14,7 +14,7 @@ import androidx.preference.PreferenceManager
 import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistnat.data.enums.AltitudeUnits
 import com.dunihuliapps.myglidingassistnat.data.enums.DistanceUnits
-import presentation.screens.main_screen.MainScreen
+import presentation.screens.MainActivity
 import java.util.Locale
 
 /**
@@ -40,7 +40,7 @@ class GlidingAssistanceService : Service(), OnSharedPreferenceChangeListener {
         notificationManager = getSystemService(notificationService) as NotificationManager
         val notificationIntent = Intent(
             this,
-            MainScreen::class.java
+            MainActivity::class.java
         )
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
         val channelId = createNotificationChannel("GpsTripRecorderNotification")

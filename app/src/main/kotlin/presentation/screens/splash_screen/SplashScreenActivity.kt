@@ -15,7 +15,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import presentation.screens.main_screen.MainScreen
+import presentation.screens.MainActivity
 import java.io.BufferedInputStream
 import java.io.FileNotFoundException
 import java.io.FileOutputStream
@@ -46,14 +46,14 @@ class SplashScreenActivity : AppCompatActivity() {
 
     private suspend fun navigateToMain() {
         if (intent.scheme == null) {
-            startActivity(Intent(this, MainScreen::class.java))
+            startActivity(Intent(this, MainActivity::class.java))
             finish()
             return
         }
 
         if (intent.scheme == "file") {
             val path = intent.data?.path
-            startActivity(Intent(this, MainScreen::class.java).apply {
+            startActivity(Intent(this, MainActivity::class.java).apply {
                 path?.let { putExtra("kml_path", it) }
             })
             finish()
@@ -65,7 +65,7 @@ class SplashScreenActivity : AppCompatActivity() {
             try {
                 val inputStream = contentResolver.openInputStream(uri)
                 if (inputStream == null) {
-                    startActivity(Intent(this, MainScreen::class.java))
+                    startActivity(Intent(this, MainActivity::class.java))
                     finish()
                 } else {
                     inputStream.close()
@@ -89,7 +89,7 @@ class SplashScreenActivity : AppCompatActivity() {
                         }
                     }
                     if (success) {
-                        startActivity(Intent(this, MainScreen::class.java).apply {
+                        startActivity(Intent(this, MainActivity::class.java).apply {
                             putExtra("kml_path", destFile)
                         })
                         finish()
@@ -99,7 +99,7 @@ class SplashScreenActivity : AppCompatActivity() {
                 e.printStackTrace()
             } catch (e: SecurityException) {
                 Toast.makeText(this, getString(R.string.error_access_attachment), Toast.LENGTH_SHORT).show()
-                startActivity(Intent(this, MainScreen::class.java))
+                startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
         }

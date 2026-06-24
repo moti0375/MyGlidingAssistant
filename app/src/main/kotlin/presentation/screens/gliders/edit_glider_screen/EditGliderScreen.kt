@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,6 +24,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.CameraAlt
 import androidx.compose.material.icons.filled.PhotoLibrary
@@ -34,12 +33,15 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -60,7 +62,7 @@ import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit) {
+fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit, onBack: () -> Unit) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -147,7 +149,19 @@ fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit) {
         )
     }
 
-    Column(modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding()) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(if (viewModel.isEditMode) "Edit Glider" else "New Glider") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
+    Column(modifier = Modifier.fillMaxSize().padding(paddingValues).imePadding()) {
         // --- TOP AREA (1/3 Ratio) ---
         Box(
             modifier = Modifier
@@ -279,10 +293,7 @@ fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit) {
             Spacer(modifier = Modifier.weight(1f))
 
             Button(
-                onClick = {
-                    viewModel.save()
-                    onSaved()
-                },
+                onClick = { viewModel.save(onSaved) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp)
@@ -290,5 +301,6 @@ fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit) {
                 Text("Save Glider")
             }
         }
+    }
     }
 }

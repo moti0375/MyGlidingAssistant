@@ -1,4 +1,5 @@
-package presentation.screens.main_screen
+package presentation.screens
+
 import android.Manifest
 import android.content.ComponentName
 import android.content.Intent
@@ -21,16 +22,20 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color as ComposeColor
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.em
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.compose.rememberNavController
 import androidx.preference.PreferenceManager
 import com.dunihuliapps.myglidingassistant.R
 import com.dunihuliapps.myglidingassistnat.data.enums.AltitudeUnits
@@ -45,20 +50,26 @@ import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricA
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MetricFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.MillageFormatter
 import com.dunihuliapps.myglidingassistnat.presentation.units_formatters.presentation.units_formatters.KnotsFormatter
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import dagger.hilt.android.AndroidEntryPoint
 import data.model.Flight
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import presentation.map.CustomSupportMapFragment
 import presentation.map.MapReadyListener
-import presentation.screens.flights_screen.FlightsListScreen
-import presentation.screens.gliders.gliders_screen.GlidersActivity
-import presentation.screens.license_screen.GmsLicenseScreen
-import presentation.screens.settings_screen.SettingsActivity
+import presentation.navigation.AppNavHost
+import presentation.screens.main_screen.FlightDraft
+import presentation.screens.main_screen.FlightState
+import presentation.screens.main_screen.MainScreenContent
+import presentation.screens.main_screen.MainScreenViewModelEvent
+import presentation.screens.main_screen.SaveStatus
+import presentation.screens.main_screen.TripLoadFailures
+import presentation.screens.main_screen.TripManagerViewModel
+import presentation.screens.main_screen.TripUploadedResult
 import services.GlidingAssistanceService
 
 @AndroidEntryPoint
-class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
+class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
     // Compose UI state
     var timerText by mutableStateOf(AnnotatedString("00:00:00"))
@@ -79,7 +90,7 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
     private var cameraZoom = 15f
     private var lineWidth = 5f
 
-    private val tripManagerViewModel by viewModels<TripManagerViewModel>()
+    val tripManagerViewModel by viewModels<TripManagerViewModel>()
 
     private lateinit var speedFormatter: UnitsFormatter
     private lateinit var distanceFormatter: UnitsFormatter
@@ -112,77 +123,86 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
 
         setContent {
             MaterialTheme {
-                MainScreenContent(
-                    timerText = timerText,
-                    speedText = speedText,
-                    distanceText = distanceText,
-                    altitudeText = altitudeText,
-                    isRecording = isRecording,
-                    showSaveDialog = showSaveDialog,
-                    showNewFlightDialog = showNewFlightDialog,
-                    gliders = gliders,
-                    initialFlightGlider = flightDraft.glider,
-                    initialFlightFirstPilot = flightDraft.firstPilot,
-                    initialFlightSecondPilot = flightDraft.secondPilot,
-                    isLoading = isLoading,
-                    loadingMessage = loadingMessage,
-                    speedUnitValue = speedUnitValue,
-                    distanceUnitValue = distanceUnitValue,
-                    altitudeUnitValue = altitudeUnitValue,
-                    onUnitChanged = { key, value ->
-                        settings.edit().putString(key, value).apply()
-                        updatePreferences()
-                    },
-                    onStartStopClick = {
-                        if (isRecording) {
-                            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.StartStopButtonClicked)
-                        } else {
-                            showNewFlightDialog = true
+                val navController = rememberNavController()
+                Box(modifier = Modifier.fillMaxSize()) {
+                    // Main screen is always in composition so the map fragment is never
+                    // detached during navigation — preserving camera position and overlays.
+                    MainScreenContent(
+                        timerText = timerText,
+                        speedText = speedText,
+                        distanceText = distanceText,
+                        altitudeText = altitudeText,
+                        isRecording = isRecording,
+                        showSaveDialog = showSaveDialog,
+                        showNewFlightDialog = showNewFlightDialog,
+                        gliders = gliders,
+                        initialFlightGlider = flightDraft.glider,
+                        initialFlightFirstPilot = flightDraft.firstPilot,
+                        initialFlightSecondPilot = flightDraft.secondPilot,
+                        isLoading = isLoading,
+                        loadingMessage = loadingMessage,
+                        speedUnitValue = speedUnitValue,
+                        distanceUnitValue = distanceUnitValue,
+                        altitudeUnitValue = altitudeUnitValue,
+                        onUnitChanged = { key, value ->
+                            settings.edit().putString(key, value).apply()
+                            updatePreferences()
+                        },
+                        onStartStopClick = {
+                            if (isRecording) {
+                                tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.StartStopButtonClicked)
+                            } else {
+                                showNewFlightDialog = true
+                            }
+                        },
+                        onTakeOffConfirmed = { glider, firstPilot, secondPilot ->
+                            showNewFlightDialog = false
+                            tripManagerViewModel.addTripEvent(
+                                MainScreenViewModelEvent.StartFlight(glider, firstPilot, secondPilot)
+                            )
+                        },
+                        onNewFlightDismiss = { glider, firstPilot, secondPilot ->
+                            showNewFlightDialog = false
+                            tripManagerViewModel.updateFlightDraft(glider, firstPilot, secondPilot)
+                        },
+                        onFlightsClick = { navController.navigate("flights") },
+                        onSettingsClick = { navController.navigate("settings") },
+                        onGlidersClick = { navController.navigate("gliders") },
+                        onLicenseClick = { startActivity(Intent(this@MainActivity, OssLicensesMenuActivity::class.java)) },
+                        onMapReady = { fragment -> onFragmentReady(fragment) },
+                        onGaugesHeightChanged = { px ->
+                            gaugesHeightPx = px
+                            updateMapPadding()
+                        },
+                        onAltitudeHeightChanged = { px ->
+                            altitudeHeightPx = px
+                            updateMapPadding()
+                        },
+                        onSaveConfirm = {
+                            showSaveDialog = false
+                            saveTrip()
+                        },
+                        onSaveCancel = {
+                            showSaveDialog = false
+                            stopRecording()
+                        },
+                        onLoadingCancel = {
+                            isLoading = false
+                            Toast.makeText(this@MainActivity, getString(R.string.Canceled), Toast.LENGTH_SHORT).show()
+                            stopRecording()
                         }
-                    },
-                    onTakeOffConfirmed = { glider, firstPilot, secondPilot ->
-                        showNewFlightDialog = false
-                        tripManagerViewModel.addTripEvent(
-                            MainScreenViewModelEvent.StartFlight(glider, firstPilot, secondPilot)
-                        )
-                    },
-                    onNewFlightDismiss = { glider, firstPilot, secondPilot ->
-                        showNewFlightDialog = false
-                        tripManagerViewModel.updateFlightDraft(glider, firstPilot, secondPilot)
-                    },
-                    onFlightsClick = {
-                        @Suppress("DEPRECATION")
-                        startActivityForResult(
-                            Intent(this, FlightsListScreen::class.java),
-                            resources.getInteger(R.integer.GPS_TRIPS_LIST)
-                        )
-                    },
-                    onSettingsClick = { startActivity(Intent(this, SettingsActivity::class.java)) },
-                    onGlidersClick = { startActivity(Intent(this, GlidersActivity::class.java)) },
-                    onLicenseClick = { startActivity(Intent(this, GmsLicenseScreen::class.java)) },
-                    onMapReady = { fragment -> onFragmentReady(fragment) },
-                    onGaugesHeightChanged = { px ->
-                        gaugesHeightPx = px
-                        updateMapPadding()
-                    },
-                    onAltitudeHeightChanged = { px ->
-                        altitudeHeightPx = px
-                        updateMapPadding()
-                    },
-                    onSaveConfirm = {
-                        showSaveDialog = false
-                        saveTrip()
-                    },
-                    onSaveCancel = {
-                        showSaveDialog = false
-                        stopRecording()
-                    },
-                    onLoadingCancel = {
-                        isLoading = false
-                        Toast.makeText(this, getString(R.string.Canceled), Toast.LENGTH_SHORT).show()
-                        stopRecording()
-                    }
-                )
+                    )
+                    // Sub-screens (flights, settings, gliders, flight_details) overlay
+                    // on top as full-screen destinations, leaving the map untouched.
+                    AppNavHost(
+                        navController = navController,
+                        onUploadTrip = { flight ->
+                            isLoading = true
+                            loadingMessage = getString(R.string.displaying_trip)
+                            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.UploadTrip(flight))
+                        }
+                    )
+                }
             }
         }
 
@@ -375,7 +395,7 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
             startService()
             enableGPSLocationListener(trackLocationListener)
             tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.LocationFounded(location))
-            Toast.makeText(this@MainScreen, resources.getString(R.string.LocationFounded), Toast.LENGTH_LONG).show()
+            Toast.makeText(this@MainActivity, resources.getString(R.string.LocationFounded), Toast.LENGTH_LONG).show()
         }
     }
 
@@ -473,32 +493,11 @@ class MainScreen : AppCompatActivity(), OnSharedPreferenceChangeListener {
         updatePreferences()
     }
 
-    @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        val hasExtras = data?.hasExtra("UploadedTrip") == true
-        if (requestCode == TRIP_LIST_ACTIVITY && resultCode == RESULT_OK && hasExtras) {
-            val uploadedFlight = data.getSerializableExtra("UploadedTrip") as Flight
-            isLoading = true
-            loadingMessage = getString(R.string.displaying_trip)
-            tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.UploadTrip(uploadedFlight))
-        }
-    }
-
-    @Suppress("OVERRIDE_DEPRECATION")
-    override fun onBackPressed() {
-        finish()
-        super.onBackPressed()
-    }
-
     companion object {
-        private val TAG: String = MainScreen::class.java.simpleName
-        private const val TRIP_LIST_ACTIVITY = 100
+        private val TAG: String = MainActivity::class.java.simpleName
         private const val TIME_INTERVAL: Long = 2000
     }
 }
-
-const val MAIN_MAP_FRAGMENT_TAG = "main_map_fragment"
 
 private fun SpannableString.toAnnotatedString(): AnnotatedString = buildAnnotatedString {
     append(this@toAnnotatedString.toString())
