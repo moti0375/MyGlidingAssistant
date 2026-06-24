@@ -147,6 +147,7 @@ fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit) {
         )
     }
 
+    Surface(modifier = Modifier.fillMaxSize()) {
     Column(modifier = Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding()) {
         // --- TOP AREA (1/3 Ratio) ---
         Box(
@@ -290,5 +291,6 @@ fun EditGliderScreen(viewModel: EditGliderViewModel, onSaved: () -> Unit) {
                 Text("Save Glider")
             }
         }
+    }
     }
 }

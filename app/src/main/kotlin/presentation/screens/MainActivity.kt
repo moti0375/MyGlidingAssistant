@@ -493,12 +493,6 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         updatePreferences()
     }
 
-    @Suppress("OVERRIDE_DEPRECATION")
-    override fun onBackPressed() {
-        finish()
-        super.onBackPressed()
-    }
-
     companion object {
         private val TAG: String = MainActivity::class.java.simpleName
         private const val TIME_INTERVAL: Long = 2000
