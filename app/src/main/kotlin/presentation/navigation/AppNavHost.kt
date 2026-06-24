@@ -34,7 +34,6 @@ import presentation.screens.settings_screen.SettingsViewModel
 @Composable
 fun AppNavHost(
     navController: NavHostController,
-    mainScreenContent: @Composable () -> Unit,
     onUploadTrip: (Flight) -> Unit,
 ) {
     val context = LocalContext.current as ComponentActivity
@@ -42,7 +41,8 @@ fun AppNavHost(
     NavHost(navController = navController, startDestination = "main") {
 
         composable("main") {
-            mainScreenContent()
+            // Main screen is rendered outside the NavHost (in MainActivity's Box),
+            // keeping it always in composition so the map fragment is never detached.
         }
 
         composable("flights") {
