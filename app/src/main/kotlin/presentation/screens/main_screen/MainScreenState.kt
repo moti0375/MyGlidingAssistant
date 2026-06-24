@@ -2,6 +2,7 @@ package presentation.screens.main_screen
 import android.location.Location
 import com.dunihuliapps.myglidingassistnat.domain.map_helper.ImageMarker
 import com.google.android.gms.maps.model.LatLng
+import domain.flight_computer.SafetyCircle
 
 sealed class FlightState {
     data object Initiated : FlightState()
@@ -16,6 +17,7 @@ sealed class FlightState {
     data object StopAndSave : FlightState()
     data object ShowSaveDialog : FlightState()
     data object ShowRecordingInBackground : FlightState()
+    class SafetyCirclesReady(val takeoffLocation: LatLng, val circles: List<SafetyCircle>) : FlightState()
 }
 
 sealed class SaveStatus(){

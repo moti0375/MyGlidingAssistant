@@ -257,6 +257,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
             is FlightState.Stopped -> mapFrag?.mapCameraLongShot()
             is FlightState.FlightSaved -> processTripSaved(state)
             is FlightState.StartLocation -> mapFrag?.goToLocation(state.location)
+            is FlightState.SafetyCirclesReady -> mapFrag?.drawSafetyCircles(state.takeoffLocation, state.circles)
             is FlightState.StartRecording -> startRecording()
             is FlightState.StopAndSave -> saveTrip()
             is FlightState.ShowSaveDialog -> showSaveDialog = true

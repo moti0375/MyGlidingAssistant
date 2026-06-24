@@ -19,15 +19,21 @@ import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import android.graphics.Paint
+import android.graphics.RectF
+import android.graphics.Typeface
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.Circle
+import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polyline
 import com.google.android.gms.maps.model.PolylineOptions
+import domain.flight_computer.SafetyCircle
 
 class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMarkerClickListener, OnInfoWindowClickListener {
 
@@ -49,6 +55,8 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
     private var mapInfoWindowClickedListener : InfoWindowClickListener? = null
 
     private var gliderMarker : BitmapDescriptor? = null
+    private val safetyCircles = mutableListOf<Circle>()
+    private val safetyLabelMarkers = mutableListOf<Marker>()
 
     init {
         getMapAsync(this)
@@ -211,6 +219,63 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
         }
     }
 
+    fun drawSafetyCircles(center: LatLng, circles: List<SafetyCircle>) {
+        val safetyColor = Color.argb(220, 220, 0, 0)
+        circles.forEach { safetyCircle ->
+            val color = safetyColor
+            val circle = map.addCircle(
+                CircleOptions()
+                    .center(center)
+                    .radius(safetyCircle.radiusMeters)
+                    .strokeColor(color)
+                    .strokeWidth(3f)
+                    .fillColor(Color.TRANSPARENT)
+            )
+            safetyCircles.add(circle)
+
+            val northLat = center.latitude + safetyCircle.radiusMeters / 111320.0
+            val labelBitmap = createAltitudeLabelBitmap("${safetyCircle.altitudeFt} ft", color)
+            map.addMarker(
+                MarkerOptions()
+                    .position(LatLng(northLat, center.longitude))
+                    .icon(BitmapDescriptorFactory.fromBitmap(labelBitmap))
+                    .anchor(0.5f, 1.0f)
+                    .flat(false)
+            )?.let { safetyLabelMarkers.add(it) }
+        }
+    }
+
+    private fun createAltitudeLabelBitmap(text: String, borderColor: Int): Bitmap {
+        val textPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.WHITE
+            textSize = 32f
+            typeface = Typeface.DEFAULT_BOLD
+        }
+        val textWidth = textPaint.measureText(text)
+        val padding = 12f
+        val width = (textWidth + padding * 2).toInt()
+        val height = (textPaint.textSize + padding * 2).toInt()
+
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+
+        val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = Color.argb(200, 20, 20, 20)
+            style = Paint.Style.FILL
+        }
+        val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = borderColor
+            style = Paint.Style.STROKE
+            strokeWidth = 3f
+        }
+        val rect = RectF(0f, 0f, width.toFloat(), height.toFloat())
+        val cornerRadius = 8f
+        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, bgPaint)
+        canvas.drawRoundRect(rect, cornerRadius, cornerRadius, borderPaint)
+        canvas.drawText(text, padding, height - padding, textPaint)
+        return bitmap
+    }
+
     fun clearEverything() {
         if (this::map.isInitialized) {
             marker?.remove()
@@ -225,6 +290,9 @@ class CustomSupportMapFragment : SupportMapFragment(), OnMapReadyCallback, OnMar
 
             markersIdsMap.clear()
             this.map.clear()
+
+            safetyCircles.clear()
+            safetyLabelMarkers.clear()
         }
     }
 
