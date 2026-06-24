@@ -12,12 +12,19 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Stop
 import androidx.compose.material.icons.filled.Terrain
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
@@ -26,6 +33,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
@@ -77,7 +85,9 @@ fun MainScreenContent(
     distanceUnitValue: String,
     altitudeUnitValue: String,
     onUnitChanged: (key: String, value: String) -> Unit,
+    safetyCirclesVisible: Boolean,
     onStartStopClick: () -> Unit,
+    onToggleSafetyCirclesClick: () -> Unit,
     onTakeOffConfirmed: (glider: String?, firstPilot: String?, secondPilot: String?) -> Unit,
     onNewFlightDismiss: (glider: String?, firstPilot: String, secondPilot: String) -> Unit,
     onFlightsClick: () -> Unit,
@@ -247,6 +257,22 @@ fun MainScreenContent(
                     .align(Alignment.BottomCenter),
                 horizontalAlignment = Alignment.End,
             ) {
+                AnimatedVisibility(
+                    visible = isRecording,
+                    enter = scaleIn() + fadeIn(),
+                    exit = scaleOut() + fadeOut(),
+                ) {
+                    SmallFloatingActionButton(
+                        onClick = onToggleSafetyCirclesClick,
+                        modifier = Modifier.padding(end = 20.dp, bottom = 8.dp),
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    ) {
+                        Icon(
+                            imageVector = if (safetyCirclesVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                            contentDescription = if (safetyCirclesVisible) "Hide safety circles" else "Show safety circles"
+                        )
+                    }
+                }
                 FloatingActionButton(
                     onClick = onStartStopClick,
                     modifier = Modifier.padding(end = 16.dp, bottom = 8.dp),

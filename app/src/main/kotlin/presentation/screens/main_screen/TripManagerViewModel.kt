@@ -15,6 +15,7 @@ import com.dunihuliapps.myglidingassistnat.data.model.Glider
 import com.dunihuliapps.myglidingassistnat.data.repositories.flights.FlightsRepository
 import com.dunihuliapps.myglidingassistnat.data.repositories.gliders.GlidersRepository
 import com.dunihuliapps.myglidingassistnat.domain.files.kml.KmlManager
+import domain.flight_computer.FlightComputer
 import com.dunihuliapps.myglidingassistnat.domain.files.path_provider.PathProvider
 import com.dunihuliapps.myglidingassistnat.domain.timer.TripTimer
 import com.google.android.gms.maps.model.LatLng
@@ -40,7 +41,8 @@ class TripManagerViewModel @Inject constructor(
     private val glidersRepository: GlidersRepository,
     private val timer: TripTimer,
     private val kmlManager: KmlManager,
-    private val sharedPreferences: SharedPreferences
+    private val sharedPreferences: SharedPreferences,
+    private val flightComputer: FlightComputer,
 ) : ViewModel(), DefaultLifecycleObserver {
     private val tripMutableStateFlow = MutableSharedFlow<FlightState>(replay = 0, extraBufferCapacity = 64)
     val flightStateFlow: SharedFlow<FlightState> = tripMutableStateFlow.asSharedFlow()
@@ -57,6 +59,7 @@ class TripManagerViewModel @Inject constructor(
     private var takeOffTime: Long = 0
     private var landingTime: Long = 0
     private var currentFlightGlider: String? = null
+    private var currentGlider: com.dunihuliapps.myglidingassistnat.data.model.Glider? = null
     private var currentFlightFirstPilot: String? = null
     private var currentFlightSecondPilot: String? = null
     /**
@@ -136,6 +139,7 @@ class TripManagerViewModel @Inject constructor(
 
     private fun startFlight(glider: String?, firstPilot: String?, secondPilot: String?) {
         currentFlightGlider = glider
+        currentGlider = if (glider != null) gliders.value.find { it.callsign == glider } else null
         currentFlightFirstPilot = firstPilot
         currentFlightSecondPilot = secondPilot
         _flightDraft.value = FlightDraft(glider, firstPilot ?: "", secondPilot ?: "")
@@ -336,6 +340,9 @@ class TripManagerViewModel @Inject constructor(
     private fun setCurrentLocation(location: Location) {
         currentLocation = location
         publishFlightState(FlightState.StartLocation(location))
+        val ratio = currentGlider?.ratio?.takeIf { it > 0 } ?: DEFAULT_GLIDE_RATIO
+        val circles = flightComputer.calculateSafetyCircles(ratio)
+        publishFlightState(FlightState.SafetyCirclesReady(LatLng(location.latitude, location.longitude), circles))
         if (recordingState == RecordingState.Recording) {
             if (recordingMode == RecordingMode.CONTINUE_TRIP) {
                 timer.resumeTimer()
@@ -376,6 +383,7 @@ class TripManagerViewModel @Inject constructor(
         const val DEFAULT_ACCURACY = 25.0F
         const val SPEED_FILTER: Float = 0.832f // 0.833 < 3km/h
         private const val CONTINUE_TRIPS_GAP = 300
+        private const val DEFAULT_GLIDE_RATIO = 18
     }
 }
 
