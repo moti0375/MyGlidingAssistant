@@ -87,6 +87,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
     var speedUnitValue by mutableStateOf("1")
     var distanceUnitValue by mutableStateOf("1")
     var altitudeUnitValue by mutableStateOf("1")
+    var showLowGpsSignal by mutableStateOf(false)
 
     private var cameraZoom = 15f
     private var lineWidth = 5f
@@ -136,6 +137,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
                         isRecording = isRecording,
                         showSaveDialog = showSaveDialog,
                         showNewFlightDialog = showNewFlightDialog,
+                        showLowGpsSignal = showLowGpsSignal,
                         gliders = gliders,
                         initialFlightGlider = flightDraft.glider,
                         initialFlightFirstPilot = flightDraft.firstPilot,
@@ -275,6 +277,8 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
             is FlightState.ShowRecordingInBackground -> {
                 Toast.makeText(this, getString(R.string.StillRecording), Toast.LENGTH_SHORT).show()
             }
+            is FlightState.LowGpsQuality -> showLowGpsSignal = true
+            is FlightState.GpsQualityRestored -> showLowGpsSignal = false
         }
     }
 
@@ -391,6 +395,7 @@ class MainActivity : AppCompatActivity(), OnSharedPreferenceChangeListener {
         disableGpsLocationListener(trackLocationListener)
         tripManagerViewModel.addTripEvent(MainScreenViewModelEvent.FinishFlight)
         isRecording = false
+        showLowGpsSignal = false
         stopService()
     }
 

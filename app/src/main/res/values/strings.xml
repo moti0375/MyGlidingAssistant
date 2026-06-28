@@ -37,6 +37,7 @@
     <string name="NoGPSBody">GPS is disabled, would you like to activate it now?</string>
 
     <string name="WaitForGPS">Wait for GPS to acquire your location</string>
+    <string name="LowGpsSignal">Low GPS Signal</string>
     <string name="LocationFounded">Location has been found! You may start walking, running or driving! Have a safe trip!</string>
     <string name="Goodbye">Goodbye..</string>
 

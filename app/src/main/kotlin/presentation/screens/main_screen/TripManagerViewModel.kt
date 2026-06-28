@@ -67,6 +67,7 @@ class TripManagerViewModel @Inject constructor(
      */
     private var currentLocation: Location? = null
     private var accuracy = DEFAULT_ACCURACY
+    private var isLowGpsQuality = false
     private var overallDistance = 0.0f
     private var maxDistance = 0.0f
     private var heading = 0f
@@ -187,10 +188,30 @@ class TripManagerViewModel @Inject constructor(
                 publishFlightState(FlightState.FlightUpdated(newLocation, overallDistance))
             }
         } else { // all other locations
+            val distanceFromCurrent = FloatArray(1)
+            currentLocation?.let { current ->
+                Location.distanceBetween(
+                    current.latitude, current.longitude,
+                    newLocation.latitude, newLocation.longitude,
+                    distanceFromCurrent
+                )
+            }
+            if (currentLocation != null && distanceFromCurrent[0] > MAX_DISTANCE_FILTER_METERS) {
+                Log.w(TAG, "Location rejected: ${distanceFromCurrent[0] / 1000f} km from last known position")
+                if (!isLowGpsQuality) {
+                    isLowGpsQuality = true
+                    publishFlightState(FlightState.LowGpsQuality)
+                }
+                return
+            }
             // only locations that has speed, bearing, and bigger than the
             // speed_filter and accurate will be taken! all other will be
             // ignored!
             if ((newLocation.accuracy < accuracy)) {
+                if (isLowGpsQuality) {
+                    isLowGpsQuality = false
+                    publishFlightState(FlightState.GpsQualityRestored)
+                }
                 locations.add(markplace.toString())
                 latLngList.add(LatLng(newLocation.latitude, newLocation.longitude))
 
@@ -210,7 +231,6 @@ class TripManagerViewModel @Inject constructor(
                     )
                 }
 
-
                 this.overallDistance += portionLength[0]
                 if (maxDistance < portionLength[0]) {
                     maxDistance = portionLength[0]
@@ -225,6 +245,11 @@ class TripManagerViewModel @Inject constructor(
                     if (this.altitude > this.maxAltitude) {
                         this.maxAltitude = this.altitude
                     }
+                }
+            } else {
+                if (!isLowGpsQuality) {
+                    isLowGpsQuality = true
+                    publishFlightState(FlightState.LowGpsQuality)
                 }
             }
             updateRouteStatus(newLocation)
@@ -242,6 +267,7 @@ class TripManagerViewModel @Inject constructor(
         this.startLocation = null
         this.currentLocation = null
         this.maxAltitude = 0.0
+        this.isLowGpsQuality = false
 
         if (resetMap) {
             publishFlightState(FlightState.Initiated)
@@ -382,6 +408,7 @@ class TripManagerViewModel @Inject constructor(
         const val ACCURACY_TOLERANCE = 0.1F
         const val DEFAULT_ACCURACY = 25.0F
         const val SPEED_FILTER: Float = 0.832f // 0.833 < 3km/h
+        const val MAX_DISTANCE_FILTER_METERS = 50_000f // 50 km
         private const val CONTINUE_TRIPS_GAP = 300
         private const val DEFAULT_GLIDE_RATIO = 18
     }
