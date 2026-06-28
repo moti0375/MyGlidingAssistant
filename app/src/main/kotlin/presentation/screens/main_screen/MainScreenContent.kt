@@ -40,11 +40,16 @@ import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,6 +86,7 @@ fun MainScreenContent(
     initialFlightSecondPilot: String,
     isLoading: Boolean,
     loadingMessage: String,
+    showLowGpsSignal: Boolean,
     speedUnitValue: String,
     distanceUnitValue: String,
     altitudeUnitValue: String,
@@ -102,6 +108,18 @@ fun MainScreenContent(
     onLoadingCancel: () -> Unit,
 ) {
     var activeUnitDialog by remember { mutableStateOf<UnitDialogType?>(null) }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(showLowGpsSignal) {
+        if (showLowGpsSignal) {
+            snackbarHostState.showSnackbar(
+                message = "Low GPS Signal",
+                duration = SnackbarDuration.Indefinite
+            )
+        } else {
+            snackbarHostState.currentSnackbarData?.dismiss()
+        }
+    }
 
     activeUnitDialog?.let { dialogType ->
         val (title, entries, values, currentValue, key) = when (dialogType) {
@@ -204,6 +222,15 @@ fun MainScreenContent(
     }
 
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState) { data ->
+                Snackbar(
+                    snackbarData = data,
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
+        },
         topBar = {
             TopAppBar(
                 title = {},

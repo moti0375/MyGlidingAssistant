@@ -18,6 +18,8 @@ sealed class FlightState {
     data object ShowSaveDialog : FlightState()
     data object ShowRecordingInBackground : FlightState()
     class SafetyCirclesReady(val takeoffLocation: LatLng, val circles: List<SafetyCircle>) : FlightState()
+    data object LowGpsQuality : FlightState()
+    data object GpsQualityRestored : FlightState()
 }
 
 sealed class SaveStatus(){

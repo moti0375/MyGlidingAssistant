@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  GPS Glitch Simulation: Megido Airfield → Afula
+  ================================================
+  Structure:
+    • 8  points  — normal gliding route (Megido → mid-route)
+    • 20 points  — GPS glitch cluster in Tel Aviv (~70 km away)
+    • 9  points  — route resumes from mid-point → Afula
+  Total: 37 waypoints
+
+  Threshold: MAX_DISTANCE_FILTER_METERS = 50,000 m (50 km)
+    Tel Aviv is ~70 km from Megido — glitch WILL be caught and filtered.
+    Amman (~96 km) and Beersheba (~155 km) are also caught at this threshold.
+
+  Load in emulator: Extended Controls → Location → Import KML/GPX → play route
+-->
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Megido–Afula GPS Glitch Simulation</name>
+    <description>Gliding route Megido → Afula with a 20-point GPS glitch burst in Tel Aviv</description>
+
+    <!-- ═══════════════════════════════════════════════════
+         STYLES
+    ═══════════════════════════════════════════════════ -->
+    <Style id="normalStyle">
+      <IconStyle>
+        <color>ff00cc00</color>
+        <scale>0.8</scale>
+      </IconStyle>
+      <LineStyle><color>ff00cc00</color><width>3</width></LineStyle>
+    </Style>
+    <Style id="glitchStyle">
+      <IconStyle>
+        <color>ff0000ff</color>
+        <scale>0.8</scale>
+      </IconStyle>
+      <LineStyle><color>ff0000ff</color><width>2</width></LineStyle>
+    </Style>
+
+    <!-- ═══════════════════════════════════════════════════
+         PRE-GLITCH ROUTE  (8 waypoints — Megido → mid)
+         Altitude ~220 → 198 m MSL  (realistic Jezreel Valley)
+    ═══════════════════════════════════════════════════ -->
+    <Placemark>
+      <name>01 · Megido Airfield (Start)</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.22330,32.59720,220</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>02</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.22770,32.59790,215</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>03</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.23220,32.59860,212</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>04</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.23660,32.59930,208</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>05</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.24100,32.60000,205</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>06</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.24540,32.60070,202</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>07</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.24990,32.60140,200</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>08 · Mid-Route (last good fix)</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.25430,32.60210,198</coordinates></Point>
+    </Placemark>
+
+    <!-- ═══════════════════════════════════════════════════
+         GPS GLITCH  (20 waypoints — Tel Aviv / Ramat Gan)
+         ~70 km from last real fix  →  triggers filter if
+         MAX_DISTANCE_FILTER_METERS is lowered to 50,000 f
+    ═══════════════════════════════════════════════════ -->
+    <Placemark>
+      <name>GLITCH-01 · Tel Aviv (jump!)</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78000,32.09000,52</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-02</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78150,32.09100,54</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-03</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78300,32.09220,55</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-04</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78450,32.09350,53</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-05</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78600,32.09480,51</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-06</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78700,32.09580,54</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-07</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78800,32.09720,56</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-08</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78900,32.09830,50</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-09</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.79000,32.10000,48</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-10</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.79100,32.10100,50</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-11</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.79200,32.10050,52</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-12</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.79250,32.09900,54</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-13</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.79150,32.09750,55</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-14</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.79050,32.09650,53</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-15</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78950,32.09550,51</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-16</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78850,32.09450,50</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-17</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78750,32.09350,52</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-18</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78650,32.09250,54</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-19</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78550,32.09150,53</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>GLITCH-20 · last glitch fix</name>
+      <styleUrl>#glitchStyle</styleUrl>
+      <Point><coordinates>34.78450,32.09050,51</coordinates></Point>
+    </Placemark>
+
+    <!-- ═══════════════════════════════════════════════════
+         POST-GLITCH ROUTE  (9 waypoints — mid → Afula)
+         Resumes exactly where the route was interrupted.
+    ═══════════════════════════════════════════════════ -->
+    <Placemark>
+      <name>09 · Route Resumes</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.25430,32.60210,198</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>10</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.25870,32.60280,196</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>11</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.26320,32.60350,194</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>12</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.26760,32.60420,192</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>13</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.27200,32.60500,190</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>14</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.27650,32.60570,188</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>15</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.28090,32.60640,186</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>16</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.28530,32.60710,184</coordinates></Point>
+    </Placemark>
+
+    <Placemark>
+      <name>17 · Afula (End)</name>
+      <styleUrl>#normalStyle</styleUrl>
+      <Point><coordinates>35.28970,32.60780,182</coordinates></Point>
+    </Placemark>
+
+  </Document>
+</kml>
